@@ -135,10 +135,20 @@ const ProgramModal: React.FC<ProgramModalProps> = ({ program, onClose }) => {
               ))}
             </div>
           )}
-          <Accordion items={selectedItinerary.map(item => ({
-            title: `${uiText.modalDay} ${item.day}: ${item.title[lang] ?? item.title.en}`,
-            content: <ul className="list-disc list-inside space-y-2 text-gray-400 text-sm">{(item.activities[lang] ?? item.activities.en).map((act, i) => <li key={i}>{act}</li>)}</ul>,
-          }))} defaultOpenIndices={[0]}/>
+          <Accordion items={selectedItinerary.map(item => {
+            // Handle both array format and localized object format for activities
+            let activitiesList: string[] = [];
+            if (Array.isArray(item.activities)) {
+              activitiesList = item.activities;
+            } else if (item.activities && typeof item.activities === 'object') {
+              activitiesList = item.activities[lang] ?? item.activities.en ?? [];
+            }
+            
+            return {
+              title: `${uiText.modalDay} ${item.day}: ${item.title[lang] ?? item.title.en}`,
+              content: <ul className="list-disc list-inside space-y-2 text-gray-400 text-sm">{activitiesList.map((act, i) => <li key={i}>{act}</li>)}</ul>,
+            };
+          })} defaultOpenIndices={[0]}/>
         </div>
       ),
     },
