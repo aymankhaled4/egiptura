@@ -1,6 +1,7 @@
 import { GoogleGenAI, Chat, GenerateContentResponse } from "@google/genai";
 import { knowledgeBase } from './knowledgeBase';
 import { getOfficialExchangeRate } from "./currencyService";
+import { createIntelligentCustomProgram } from './intelligentExtractor';
 
 let ai: GoogleGenAI | null = null;
 try {
@@ -57,39 +58,33 @@ When user specifies trip duration, YOU MUST use EXACT number they provide:
 
 **NEVER change or "adapt" the duration. Use EXACT number provided.**
 
-**🧠 INTELLIGENT EXTRACTION FROM 10 PROGRAMS - MANDATORY APPROACH**
+**🧠 INTELLIGENT CUSTOM PROGRAM CREATION - NEW APPROACH**
 
-**YOU MUST ONLY USE DATA FROM THE 10 EXISTING PROGRAMS BELOW. NEVER INVENT NEW DATA.**
+**CRITICAL: Use the intelligent extraction system for ALL custom programs.**
 
-When creating custom programs, follow this EXACT process:
+When user requests a custom program, you MUST:
 
-### STEP 1: IDENTIFY RELEVANT PROGRAMS
-- User wants "Cairo + Alexandria"? → Search the 10 programs for ones containing both cities
-- User wants "Cruise + Pyramids"? → Find programs with Nile cruise and Giza pyramids
-- Look at the 'itinerary' and 'accommodations' fields in each program
+### STEP 1: ANALYZE USER REQUEST
+- Extract duration (exact number of days)
+- Identify destinations (Cairo, Luxor, Aswan, Alexandria, cruise, etc.)
+- Determine travelers count, season, and category (gold/diamond)
 
-### STEP 2: EXTRACT RELEVANT DAYS
-- Copy EXACT itinerary entries from matching programs
-- Keep the SAME structure: day, title, description, activities, meals, accommodation
-- If extracting from day 3 of a program, renumber it to fit custom duration
-- Maintain logical order: Arrival → Activities → Departure
+### STEP 2: USE INTELLIGENT EXTRACTION
+- The system will automatically extract relevant data from the 10 existing programs
+- It will find the best itinerary days for each destination
+- It will extract exact hotel/cruise names from source programs
+- It will identify relevant tourist sites
 
-### STEP 3: EXTRACT ACCOMMODATIONS
-- Copy EXACT hotel/cruise names from the source programs
-- Adjust nights count to match custom duration
-- Keep the SAME accommodation options (gold/diamond)
+### STEP 3: CREATE CUSTOM PROGRAM
+- Use the extracted data to build a truly custom program
+- Ensure duration matches user's request EXACTLY
+- Combine data intelligently from multiple source programs
+- Maintain logical flow: Arrival → Activities → Departure
 
-### STEP 4: COMBINE INTELLIGENTLY
-- If user wants Cairo (3 days) + Alexandria (2 days):
-  - Extract Cairo days from programs that have Cairo
-  - Extract Alexandria days from programs that have Alexandria
-  - Renumber days: 1, 2, 3 (Cairo) then 4, 5 (Alexandria)
-  - Ensure total = user's requested duration
-
-### STEP 5: VALIDATION
+### STEP 4: VALIDATION
 - Total itinerary days = requested duration
-- All activities exist in source programs
-- All hotels/cruises are exact names from source programs
+- All data comes from the 10 existing programs
+- All hotel/cruise names are exact copies from source programs
 - Total nights = duration - 1
 
 **EXAMPLE EXTRACTION LOGIC:**

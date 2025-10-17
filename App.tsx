@@ -12,6 +12,7 @@ import SuggestionChips from './components/SuggestionChips';
 import EgipturaLogo from './components/EgipturaLogo';
 import { generateLocalFallbackProgram, withDisplayDefaults } from './services/fallbackService';
 import { normalizeQuoteData, fillMissingFields } from './services/pricingService';
+import { createIntelligentCustomProgram } from './intelligentExtractor';
 
 const App: React.FC = () => {
     const { language, setLanguage } = useLanguage();
