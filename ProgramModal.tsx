@@ -20,9 +20,15 @@ const ProgramModal: React.FC<ProgramModalProps> = ({ program, onClose }) => {
   const uiText = knowledgeBase.localizedStrings.ui[lang] ?? knowledgeBase.localizedStrings.ui.en;
   const [selectedCategory, setSelectedCategory] = useState<'gold' | 'diamond' | null>(program.isCustom ? program.quoteParams?.category ?? null : 'gold');
   const [exchangeRate, setExchangeRate] = useState<number | null>(null);
-  const [selectedItinerary, setSelectedItinerary] = useState<ItineraryItem[]>(
-    program.itinerary || program.itineraryOptions?.[0].itinerary || []
-  );
+  const [selectedItinerary, setSelectedItinerary] = useState<ItineraryItem[]>(() => {
+    if (program.itinerary && Array.isArray(program.itinerary)) {
+      return program.itinerary;
+    }
+    if (program.itineraryOptions && program.itineraryOptions[0] && program.itineraryOptions[0].itinerary && Array.isArray(program.itineraryOptions[0].itinerary)) {
+      return program.itineraryOptions[0].itinerary;
+    }
+    return [];
+  });
   const [isQuoteFormOpen, setIsQuoteFormOpen] = useState(false);
 
   useEffect(() => {
@@ -30,8 +36,8 @@ const ProgramModal: React.FC<ProgramModalProps> = ({ program, onClose }) => {
   }, []);
 
   const handleItineraryOptionChange = (index: number) => {
-    if (program.itineraryOptions) {
-      setSelectedItinerary(program.itineraryOptions[index].itinerary);
+    if (program.itineraryOptions && program.itineraryOptions[index]) {
+      setSelectedItinerary(program.itineraryOptions[index].itinerary || []);
     }
   };
 
@@ -135,10 +141,30 @@ const ProgramModal: React.FC<ProgramModalProps> = ({ program, onClose }) => {
               ))}
             </div>
           )}
-          <Accordion items={selectedItinerary.map(item => ({
-            title: `${uiText.modalDay} ${item.day}: ${item.title[lang] ?? item.title.en}`,
-            content: <ul className="list-disc list-inside space-y-2 text-gray-400 text-sm">{(item.activities[lang] ?? item.activities.en).map((act, i) => <li key={i}>{act}</li>)}</ul>,
-          }))} defaultOpenIndices={[0]}/>
+          <Accordion items={(selectedItinerary || []).map(item => {
+            // Debug logging
+            console.log('Processing itinerary item:', item);
+            console.log('Activities type:', typeof item.activities);
+            console.log('Activities value:', item.activities);
+            
+            // Handle both array format and localized object format for activities
+            let activitiesList: string[] = [];
+            if (Array.isArray(item.activities)) {
+              activitiesList = item.activities;
+            } else if (item.activities && typeof item.activities === 'object') {
+              activitiesList = item.activities[lang] ?? item.activities.en ?? [];
+            } else {
+              // Fallback for undefined or unexpected activities format
+              activitiesList = [];
+            }
+            
+            console.log('Final activities list:', activitiesList);
+            
+            return {
+              title: `${uiText.modalDay} ${item.day}: ${item.title?.[lang] ?? item.title?.en ?? 'Untitled'}`,
+              content: <ul className="list-disc list-inside space-y-2 text-gray-400 text-sm">{activitiesList.map((act, i) => <li key={i}>{act}</li>)}</ul>,
+            };
+          })} defaultOpenIndices={[0]}/>
         </div>
       ),
     },
