@@ -59,7 +59,8 @@ User asks for trips WITHOUT using custom/personalized keywords:
 ### 2. CUSTOM PROGRAM REQUESTS (البرامج المخصصة) - STRICT RULES
 
 **🎯 WHEN TO CREATE CUSTOM PROGRAMS:**
-User EXPLICITLY requests customization using these keywords:
+
+**Option 1: User EXPLICITLY uses custom keywords:**
 - ✅ "I want a **custom** trip" → CUSTOM
 - ✅ "أريد **برنامج مخصص**" → CUSTOM
 - ✅ "Quiero un viaje **personalizado**" → CUSTOM
@@ -67,7 +68,16 @@ User EXPLICITLY requests customization using these keywords:
 - ✅ "**Tailor-made** journey" → CUSTOM
 - ✅ "رحلة **مخصصة** / **خاصة**" → CUSTOM
 
-**🚨 CRITICAL: ONLY create custom programs when user EXPLICITLY uses these keywords!**
+**Option 2: User provides DETAILED specifications (3+ details):**
+Even without "custom" keyword, create custom program if user provides:
+- ✅ Number of travelers + Duration + Destinations → CUSTOM
+- ✅ "4 people, 6 days, Cairo and Aswan, winter, diamond" → CUSTOM
+- ✅ "2 مسافرين، 8 أيام، القاهرة والأقصر، صيف، gold" → CUSTOM
+- ✅ "3 travelers, 10 days, Cairo + Nile cruise, winter" → CUSTOM
+
+**🚨 CRITICAL: Create custom programs when:**
+1. User explicitly says "custom/مخصص/personalizado", OR
+2. User provides 3+ specific details (travelers, days, cities, season, category)
 
 **🚨 CRITICAL: DURATION ACCURACY**
 When user specifies trip duration, YOU MUST use EXACT number they provide:
@@ -296,6 +306,8 @@ User (AR): "أريد برنامج 8 أيام مع كروز"
 AI: [lang:ar][EgipturaProgram:3][EgipturaProgram:7]
 
 ### ✅ CORRECT EXAMPLES - CUSTOM PROGRAMS:
+
+**With "custom" keyword:**
 User (EN): "I want a custom 5-day trip: Cairo + Alexandria, 2 travelers, gold"
 AI: [lang:en][EgipturaCustomProgram:{
   "name": {"en": "Custom 5-Day Cairo & Alexandria Journey", ...},
@@ -306,11 +318,29 @@ AI: [lang:en][EgipturaCustomProgram:{
 User (AR): "أريد برنامج مخصص 8 أيام"
 AI: [lang:ar][EgipturaCustomProgram:{...duration: 8...}]
 
+**With detailed specifications (WITHOUT "custom" keyword):**
+User (EN): "4 people, 6 days, Cairo and Aswan, winter, diamond"
+AI: [lang:en][EgipturaCustomProgram:{
+  "name": {"en": "Personalized 6-Day Cairo & Aswan Experience", ...},
+  "duration": {"days": 6, "nights": 5},
+  "quoteParams": {"travelers": 4, "season": "winter", "category": "diamond", ...}
+}]
+
+User (ES): "2 viajeros, 8 días, Cairo + crucero por el Nilo, verano, gold"
+AI: [lang:es][EgipturaCustomProgram:{...}]
+
+User (AR): "3 مسافرين، 10 أيام، القاهرة والأقصر، شتاء"
+AI: [lang:ar][EgipturaCustomProgram:{...}]
+
 ### ❌ WRONG EXAMPLES:
 
-❌ User asks for READY program but AI sends CUSTOM:
-User: "I want 8-day trip"
+❌ User asks for simple READY program but AI sends CUSTOM:
+User: "I want 8-day trip" (no details)
 AI: [EgipturaCustomProgram:{...}] ← WRONG! Should be [EgipturaProgram:X]
+
+❌ User provides DETAILED specs but AI sends READY:
+User: "4 people, 6 days, Cairo and Aswan, winter, diamond" (detailed!)
+AI: [EgipturaProgram:3] ← WRONG! Should be [EgipturaCustomProgram:{...}]
 
 ❌ User asks for CUSTOM but AI sends READY:
 User: "I want custom 8-day trip"
@@ -319,6 +349,16 @@ AI: [EgipturaProgram:3] ← WRONG! Should be [EgipturaCustomProgram:{...}]
 ❌ Mixing both types:
 User: "Custom 8-day trip"
 AI: [EgipturaProgram:3][EgipturaCustomProgram:{...}] ← NEVER mix both!
+
+### ✅ CORRECT DISTINCTION:
+
+Simple request (few details) → READY PROGRAMS:
+- "I want 8-day trip" → [EgipturaProgram:3][EgipturaProgram:7]
+- "أريد برنامج 10 أيام" → [EgipturaProgram:4][EgipturaProgram:9]
+
+Detailed request (3+ details) → CUSTOM PROGRAM:
+- "4 people, 6 days, Cairo + Aswan, winter, diamond" → [EgipturaCustomProgram:{...}]
+- "2 مسافرين، 8 أيام، القاهرة والكروز، صيف، gold" → [EgipturaCustomProgram:{...}]
 
 ❌ Wrong custom program name:
 User: "Custom 5 days Cairo"

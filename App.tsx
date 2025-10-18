@@ -1457,13 +1457,12 @@ const App: React.FC = () => {
             'برنامج مخصص', 'رحلة مخصصة', 'رحلة خاصة', 'برنامج خاص'
         ];
         
-        // ✅ كلمات تشير إلى طلب برامج جاهزة
+        // ✅ كلمات تشير إلى طلب برامج جاهزة بوضوح
         const readyProgramKeywords = [
-            'show me', 'i want', 'quiero', 'necesito', 'dame',
-            'أريد', 'أعطني', 'اعرض', 'عرض', 'أرني',
-            'programs', 'packages', 'trips', 'tours',
-            'programas', 'paquetes', 'viajes',
-            'برامج', 'رحلات', 'باقات'
+            'show me programs', 'show programs', 'list programs',
+            'available programs', 'your programs', 'what programs',
+            'اعرض البرامج', 'البرامج المتاحة', 'ما هي البرامج',
+            'muéstrame programas', 'programas disponibles'
         ];
         
         // ✅ فحص وجود كلمات مخصصة صريحة
@@ -1471,27 +1470,43 @@ const App: React.FC = () => {
             userInputLower.includes(keyword)
         );
         
-        // ✅ فحص وجود كلمات برامج جاهزة
+        // ✅ فحص وجود كلمات برامج جاهزة صريحة
         const hasReadyKeyword = readyProgramKeywords.some(keyword =>
             userInputLower.includes(keyword)
         );
-        
-        // ✅ القرار النهائي: مخصص فقط إذا كان هناك كلمة مخصصة صريحة
-        const isExplicitCustomRequest = hasCustomKeyword && !hasReadyKeyword;
-        
-        // ✅ طلب برامج جاهزة: إذا لم يكن مخصص أو كان فيه كلمات برامج جاهزة
-        const isReadyProgramRequest = !isExplicitCustomRequest && (hasReadyKeyword || !hasCustomKeyword);
-        
-        const isChipRequest = /i want an? \d+-day trip (with|without) cruise/i.test(userInputLower);
         
         // ✅ استخراج المدة
         const daysMatch = userInput.match(/(\d+)\s*(days?|d[ií]as|ايام|يوم)/i);
         const requestedDays = daysMatch ? parseInt(daysMatch[1], 10) : 0;
         
+        // ✅ استخراج التفاصيل الكاملة
+        const hasTravelers = /(\d+)\s*(people|person|travelers|traveller|viajeros|personas|اشخاص|أشخاص|افراد|مسافر)/i.test(userInput);
+        const hasCities = /(cairo|luxor|aswan|alexandria|hurghada|القاهرة|الأقصر|أسوان|الإسكندرية|الغردقة)/i.test(userInput);
+        const hasSeason = /(summer|winter|spring|fall|صيف|شتاء|verano|invierno)/i.test(userInput);
+        const hasCategory = /(gold|diamond|luxury|standard|ذهبي|الماسي|lujo)/i.test(userInput);
+        
+        // ✅ حساب عدد التفاصيل المقدمة
+        const detailsCount = [hasTravelers, requestedDays > 0, hasCities, hasSeason, hasCategory].filter(Boolean).length;
+        
+        // ✅ CRITICAL LOGIC: إذا أعطى 3 تفاصيل أو أكثر، فهو يريد برنامج مخصص حتى بدون كلمة "custom"
+        const hasDetailedRequest = detailsCount >= 3;
+        
+        // ✅ القرار النهائي للطلب المخصص:
+        // 1. إما أن يقول "custom" صراحة
+        // 2. أو يعطي تفاصيل كاملة (3+ تفاصيل) بدون طلب برامج جاهزة صراحة
+        const isExplicitCustomRequest = hasCustomKeyword || (hasDetailedRequest && !hasReadyKeyword);
+        
+        // ✅ طلب برامج جاهزة: فقط إذا طلب برامج صراحة أو طلب بسيط بدون تفاصيل
+        const isReadyProgramRequest = hasReadyKeyword || (!isExplicitCustomRequest && !hasDetailedRequest);
+        
+        const isChipRequest = /i want an? \d+-day trip (with|without) cruise/i.test(userInputLower);
+        
         console.log(`[debug] 🔍 Request analysis:
   - Input: "${userInput}"
   - Has custom keyword: ${hasCustomKeyword}
   - Has ready keyword: ${hasReadyKeyword}
+  - Details count: ${detailsCount}/5 (travelers:${hasTravelers}, days:${requestedDays > 0}, cities:${hasCities}, season:${hasSeason}, category:${hasCategory})
+  - Has detailed request: ${hasDetailedRequest}
   - Is explicit custom: ${isExplicitCustomRequest}
   - Is ready program: ${isReadyProgramRequest}
   - Days requested: ${requestedDays}`);
