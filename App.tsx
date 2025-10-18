@@ -1445,15 +1445,56 @@ const App: React.FC = () => {
     setIsLoading(true);
 
     try {
-        // ✅ الخطوة 1: تحليل الطلب والكشف عن النية
-        const isExplicitCustomRequest = /build|create|make|design|armar|crear|hacer|formar|custom|personalized|personalizado|مخصص|برنامج مخصص|رحلة مخصصة|tailor/i.test(userInput.toLowerCase());
-        const isChipRequest = /i want an? \d+-day trip (with|without) cruise/i.test(userInput.toLowerCase());
+        // ✅ الخطوة 1: تحليل الطلب والكشف عن النية بدقة عالية
+        const userInputLower = userInput.toLowerCase();
+        
+        // ✅ كلمات مفتاحية للطلبات المخصصة (يجب أن تكون موجودة بوضوح)
+        const customKeywords = [
+            'custom', 'personalized', 'personalizado', 'tailor', 'bespoke',
+            'build', 'create', 'make', 'design', 'craft',
+            'armar', 'crear', 'hacer', 'formar', 'diseñar',
+            'مخصص', 'خاص', 'خاصة', 'مصمم', 'مصممة',
+            'برنامج مخصص', 'رحلة مخصصة', 'رحلة خاصة', 'برنامج خاص'
+        ];
+        
+        // ✅ كلمات تشير إلى طلب برامج جاهزة
+        const readyProgramKeywords = [
+            'show me', 'i want', 'quiero', 'necesito', 'dame',
+            'أريد', 'أعطني', 'اعرض', 'عرض', 'أرني',
+            'programs', 'packages', 'trips', 'tours',
+            'programas', 'paquetes', 'viajes',
+            'برامج', 'رحلات', 'باقات'
+        ];
+        
+        // ✅ فحص وجود كلمات مخصصة صريحة
+        const hasCustomKeyword = customKeywords.some(keyword => 
+            userInputLower.includes(keyword)
+        );
+        
+        // ✅ فحص وجود كلمات برامج جاهزة
+        const hasReadyKeyword = readyProgramKeywords.some(keyword =>
+            userInputLower.includes(keyword)
+        );
+        
+        // ✅ القرار النهائي: مخصص فقط إذا كان هناك كلمة مخصصة صريحة
+        const isExplicitCustomRequest = hasCustomKeyword && !hasReadyKeyword;
+        
+        // ✅ طلب برامج جاهزة: إذا لم يكن مخصص أو كان فيه كلمات برامج جاهزة
+        const isReadyProgramRequest = !isExplicitCustomRequest && (hasReadyKeyword || !hasCustomKeyword);
+        
+        const isChipRequest = /i want an? \d+-day trip (with|without) cruise/i.test(userInputLower);
         
         // ✅ استخراج المدة
         const daysMatch = userInput.match(/(\d+)\s*(days?|d[ií]as|ايام|يوم)/i);
         const requestedDays = daysMatch ? parseInt(daysMatch[1], 10) : 0;
         
-        console.log(`[debug] Request analysis - Custom: ${isExplicitCustomRequest}, Days: ${requestedDays}`);
+        console.log(`[debug] 🔍 Request analysis:
+  - Input: "${userInput}"
+  - Has custom keyword: ${hasCustomKeyword}
+  - Has ready keyword: ${hasReadyKeyword}
+  - Is explicit custom: ${isExplicitCustomRequest}
+  - Is ready program: ${isReadyProgramRequest}
+  - Days requested: ${requestedDays}`);
 
         let response, responseText, currentLang = language;
         let finalCustomProgram: Program | undefined = undefined;
@@ -1698,12 +1739,26 @@ Una vez que tenga estos detalles, ¡crearé tu inolvidable aventura egipcia!`;
             matchingProgramIds = findMatchingPrograms(userInput, finalCustomProgram);
         }
 
-        // ✅ الخطوة 8: المنطق النهائي لعرض البرامج
-        if (matchingProgramIds.length > 0 && !isExplicitCustomRequest) {
-            console.log('[debug] Showing matching programs instead of custom');
+        // ✅ الخطوة 8: المنطق النهائي لعرض البرامج - CRITICAL LOGIC
+        console.log('[debug] 🎯 Final program display logic:');
+        console.log(`  - Matching programs found: ${matchingProgramIds.length}`);
+        console.log(`  - Predefined programs: ${programIds.length}`);
+        console.log(`  - Custom program created: ${!!finalCustomProgram}`);
+        console.log(`  - Is explicit custom: ${isExplicitCustomRequest}`);
+        console.log(`  - Is ready program: ${isReadyProgramRequest}`);
+        
+        // ✅ RULE 1: إذا طلب برنامج مخصص صراحة، نعرض فقط البرنامج المخصص
+        if (isExplicitCustomRequest && finalCustomProgram) {
+            console.log('[debug] ✅ Showing CUSTOM program (user explicitly requested custom)');
+            programIds.length = 0; // مسح أي برامج جاهزة
+            // لا نمسح finalCustomProgram
+            
+        // ✅ RULE 2: إذا طلب برامج جاهزة ووجدنا برامج مطابقة، نعرضها
+        } else if (isReadyProgramRequest && matchingProgramIds.length > 0) {
+            console.log('[debug] ✅ Showing READY programs (user requested ready programs)');
             programIds.length = 0;
             programIds.push(...matchingProgramIds);
-            finalCustomProgram = undefined;
+            finalCustomProgram = undefined; // مسح أي برنامج مخصص
             
             if (!responseText || responseText === uiText.customQuoteCreated) {
                 responseText = currentLang === 'es' ? 
@@ -1712,10 +1767,27 @@ Una vez que tenga estos detalles, ¡crearé tu inolvidable aventura egipcia!`;
                     "I found these programs that match what you're looking for:" :
                     "لقد وجدت هذه البرامج التي تطابق ما تبحث عنه:";
             }
-        } else if (isExplicitCustomRequest) {
-            console.log('[debug] Custom program request - clearing predefined programs');
+            
+        // ✅ RULE 3: إذا كان الـ AI أعطى برامج جاهزة ولم يطلب مخصص، نستخدمها
+        } else if (programIds.length > 0 && !isExplicitCustomRequest) {
+            console.log('[debug] ✅ Showing READY programs from AI');
+            finalCustomProgram = undefined;
+            
+        // ✅ RULE 4: إذا طلب مخصص لكن ما فيش برنامج، نسأله عن التفاصيل
+        } else if (isExplicitCustomRequest && !finalCustomProgram) {
+            console.log('[debug] ⚠️ Custom request but no program created - already asked for details');
             programIds.length = 0;
+            
+        // ✅ RULE 5: إذا ما فيش أي حاجة، نعرض برامج افتراضية
+        } else if (!isExplicitCustomRequest && programIds.length === 0 && !finalCustomProgram && matchingProgramIds.length === 0) {
+            console.log('[debug] ℹ️ No specific request - showing suggested programs');
+            const suggestedPrograms = knowledgeBase.packages.slice(0, 3).map(p => Number(p.id));
+            programIds.push(...suggestedPrograms);
         }
+        
+        console.log('[debug] 📊 Final decision:');
+        console.log(`  - Will show ${programIds.length} ready programs`);
+        console.log(`  - Will show custom program: ${!!finalCustomProgram}`);
 
         // ✅ الخطوة 9: إنشاء الرسالة النهائية
         if (responseText || programIds.length > 0 || finalCustomProgram) {

@@ -879,42 +879,54 @@ export function generateLocalFallbackProgram(userText: string, lang: Language): 
     if (bestMatch) {
         itineraryDays = adaptItineraryFromProgram(bestMatch, duration, intent);
         
+        // ✅ CRITICAL: أسماء البرامج المخصصة يجب أن تكون واضحة وفريدة
+        // لا تستخدم أبداً أسماء البرامج الجاهزة
+        const destinationsPart = cruiseNights > 0 ? 'Cairo & Nile Cruise' : 
+                                 destination.includes('alexandria') ? 'Cairo & Alexandria' :
+                                 destination.includes('luxor') ? 'Cairo & Luxor' : 
+                                 'Egypt';
+        
         programName = {
-            en: `Custom ${duration}-Day ${bestMatch.name.en}`,
-            es: `${bestMatch.name.es} Personalizado de ${duration} Días`,
-            ar: `${bestMatch.name.ar} مخصص لمدة ${duration} أيام`
+            en: `Custom ${duration}-Day ${destinationsPart} Journey`,
+            es: `Viaje Personalizado de ${duration} Días por ${destinationsPart === 'Egypt' ? 'Egipto' : destinationsPart}`,
+            ar: `رحلة مخصصة لمدة ${duration} أيام في ${destinationsPart === 'Egypt' ? 'مصر' : destinationsPart}`
         };
         
         briefDesc = {
-            en: `A tailored ${duration}-day version of ${bestMatch.name.en} - ${bestMatch.briefDescription.en}`,
-            es: `Una versión personalizada de ${duration} días de ${bestMatch.name.es} - ${bestMatch.briefDescription.es}`,
-            ar: `نسخة مخصصة لمدة ${duration} أيام من ${bestMatch.name.ar} - ${bestMatch.briefDescription.ar}`
+            en: `A personalized ${duration}-day adventure through ${destinationsPart}, designed exclusively for you`,
+            es: `Una aventura personalizada de ${duration} días por ${destinationsPart}, diseñada exclusivamente para ti`,
+            ar: `مغامرة مخصصة لمدة ${duration} يومًا عبر ${destinationsPart}، مصممة خصيصًا لك`
         };
         
         generalDesc = {
-            en: `This custom ${duration}-day itinerary is based on our popular ${bestMatch.name.en} program. ${bestMatch.generalDescription.en}`,
-            es: `Este itinerario personalizado de ${duration} días se basa en nuestro popular programa ${bestMatch.name.es}. ${bestMatch.generalDescription.es}`,
-            ar: `هذا المسار المخصص لمدة ${duration} أيام يستند إلى برنامجنا الشهير ${bestMatch.name.ar}. ${bestMatch.generalDescription.ar}`
+            en: `This custom-crafted ${duration}-day itinerary combines the best of Egypt's treasures. Experience ${destinationsPart} with accommodations and activities tailored to your preferences.`,
+            es: `Este itinerario personalizado de ${duration} días combina lo mejor de los tesoros de Egipto. Experimenta ${destinationsPart} con alojamiento y actividades adaptadas a tus preferencias.`,
+            ar: `يجمع هذا المسار المخصص لمدة ${duration} يومًا أفضل كنوز مصر. اختبر ${destinationsPart} مع الإقامة والأنشطة المصممة حسب تفضيلاتك.`
         };
     } else {
         itineraryDays = generateDefaultItinerary(intent);
         
+        // ✅ CRITICAL: أسماء واضحة للبرامج المخصصة - لا تستخدم أبداً أسماء البرامج الجاهزة
+        const destinations = cruiseNights > 0 ? 
+            'Cairo & Nile Cruise' : 
+            'Cairo & Beyond';
+        
         programName = {
-            es: uiText.customQuoteTitle.replace('{duration}', duration.toString()),
-            en: `Custom ${duration}-Day Egypt Journey`,
-            ar: `رحلة مخصصة لمدة ${duration} أيام في مصر`,
+            en: `Personalized ${duration}-Day ${destinations} Experience`,
+            es: `Experiencia Personalizada de ${duration} Días en ${destinations === 'Cairo & Beyond' ? 'El Cairo' : destinations}`,
+            ar: `تجربة مخصصة لمدة ${duration} أيام في ${destinations === 'Cairo & Beyond' ? 'القاهرة وما بعدها' : destinations}`
         };
         
         briefDesc = {
-            es: `Un viaje a medida de ${totalNights} noches, incluyendo ${cairoNights} noches en El Cairo ${cruiseNights > 0 ? `y ${cruiseNights} noches en un crucero por el Nilo` : ''}.`,
-            en: `A custom ${totalNights}-night journey, including ${cairoNights} nights in Cairo ${cruiseNights > 0 ? `and ${cruiseNights} nights on a Nile cruise` : ''}.`,
-            ar: `رحلة مخصصة لمدة ${totalNights} ليلة، تشمل ${cairoNights} ليالي في القاهرة ${cruiseNights > 0 ? `و ${cruiseNights} ليالي في رحلة نيلية` : ''}.`
+            en: `A bespoke ${totalNights}-night journey through Egypt, featuring ${cairoNights} nights in Cairo${cruiseNights > 0 ? ` and ${cruiseNights} nights on a luxury Nile cruise` : ''}.`,
+            es: `Un viaje a medida de ${totalNights} noches por Egipto, con ${cairoNights} noches en El Cairo${cruiseNights > 0 ? ` y ${cruiseNights} noches en un crucero de lujo por el Nilo` : ''}.`,
+            ar: `رحلة مصممة خصيصًا لمدة ${totalNights} ليلة في مصر، تتضمن ${cairoNights} ليالٍ في القاهرة${cruiseNights > 0 ? ` و ${cruiseNights} ليالٍ في رحلة نيلية فاخرة` : ''}.`
         };
         
         generalDesc = {
-            es: `Este es un itinerario diseñado especialmente para ti, basado en tu solicitud de ${duration} días. Explora las maravillas de Egipto, desde la majestuosidad de El Cairo ${cruiseNights > 0 ? 'hasta la serenidad de un crucero por el Nilo.' : '.'} Cada detalle ha sido considerado para crear una experiencia inolvidable.`,
-            en: `This is an itinerary specially designed for you, based on your request for ${duration} days. Explore the wonders of Egypt, from the majesty of Cairo ${cruiseNights > 0 ? 'to the serenity of a Nile cruise.' : '.'} Every detail has been considered to create an unforgettable experience.`,
-            ar: `هذا خط سير مصمم خصيصًا لك، بناءً على طلبك لمدة ${duration} يومًا. استكشف عجائب مصر، من عظمة القاهرة ${cruiseNights > 0 ? 'إلى هدوء رحلة نيلية.' : '.'} تم أخذ كل التفاصيل في الاعتبار لخلق تجربة لا تُنسى.`
+            en: `This tailor-made ${duration}-day itinerary has been crafted exclusively for you. Discover Egypt's timeless treasures, from Cairo's magnificent monuments${cruiseNights > 0 ? ' to a serene Nile cruise experience' : ''}. Every element is designed to create your perfect Egyptian adventure.`,
+            es: `Este itinerario hecho a medida de ${duration} días ha sido creado exclusivamente para ti. Descubre los tesoros atemporales de Egipto, desde los magníficos monumentos de El Cairo${cruiseNights > 0 ? ' hasta una serena experiencia en crucero por el Nilo' : ''}. Cada elemento está diseñado para crear tu aventura egipcia perfecta.`,
+            ar: `تم تصميم هذا المسار المخصص لمدة ${duration} يومًا خصيصًا لك. اكتشف كنوز مصر الأبدية، من معالم القاهرة الرائعة${cruiseNights > 0 ? ' إلى تجربة رحلة نيلية هادئة' : ''}. كل عنصر مصمم لإنشاء مغامرتك المصرية المثالية.`
         };
     }
 
