@@ -347,19 +347,7 @@ export class IntelligentDataExtractor {
 
     // 🏨 البحث عن فندق للمدينة
     private findHotelForCity(city: string, category: 'gold' | 'diamond', allHotels: any[]): any {
-        const availableHotels = allHotels.filter(h => 
-            h.city === city && h.category === category
-        );
-        
-        if (availableHotels.length > 0) {
-            // إرجاع فندق عشوائي من المتاح
-            return availableHotels[Math.floor(Math.random() * availableHotels.length)];
-        }
-        
-        return null;
-    }
-
-    // 🏨 فندق افتراضي للمدينة
+     // 🏨 فندق افتراضي للمدينة
     private getDefaultHotelForCity(city: string, category: 'gold' | 'diamond', language: Language): LocalizedString {
         const defaultHotels = {
             cairo: {
@@ -428,24 +416,51 @@ export class IntelligentDataExtractor {
         // البحث عن فنادق من البرامج الجاهزة لكل مدينة
         const allHotels = this.extractHotelsFromAllPrograms();
 
-        for (const [city, nights] of Object.entries(nightsDistribution)) {
-            if (typeof nights === 'number' && nights > 0 && city !== 'cruise') {
-                const cityName = this.getCityLocalizedName(city);
+        // ملء كل الفئات (Gold و Diamond) بدلاً من فئة واحدة فقط
+        const categories: ('gold' | 'diamond')[] = ['gold', 'diamond'];
+        
+        for (const cat of categories) {
+            for (const [city, nights] of Object.entries(nightsDistribution)) {
+                if (typeof nights === 'number' && nights > 0 && city !== 'cruise') {
+                    const cityName = this.getCityLocalizedName(city);
+                    
+                    // البحث عن فندق مناسب من البرامج الجاهزة
+                    const hotelForCity = this.findHotelForCity(city, cat, allHotels);
+                    
+                    if (hotelForCity) {
+                        accommodations[cat].push({
+                            city: cityName,
+                            hotel: hotelForCity.hotel
+                        });
+                    } else {
+                        // استخدام فندق افتراضي إذا لم يتم العثور على فندق
+                        accommodations[cat].push({
+                            city: cityName,
+                            hotel: this.getDefaultHotelForCity(city, cat, language)
+                        });
+                    }
+                }
+            }
+
+            // إضافة الإقامة في الكروز إذا كانت موجودة
+            if (nightsDistribution.cruise > 0) {
+                const cruiseName = cat === 'gold' 
+                    ? { es: 'Crucero Estándar por el Nilo', en: 'Standard Nile Cruise', ar: 'رحلة نيلية قياسية' }
+                    : { es: 'Crucero de Lujo por el Nilo', en: 'Luxury Nile Cruise', ar: 'رحلة نيلية فاخرة' };
                 
-                // البحث عن فندق مناسب من البرامج الجاهزة
-                const hotelForCity = this.findHotelForCity(city, category, allHotels);
+                const cruiseShipName = cat === 'gold'
+                    ? { es: 'Nave 5★', en: '5★ Cruise Ship', ar: 'سفينة نيلية 5 نجوم' }
+                    : { es: 'Nave 5★ Deluxe', en: '5★ Deluxe Cruise Ship', ar: 'سفينة نيلية 5 نجوم ديلوكس' };
                 
-                if (hotelForCity) {
-                    accommodations[category].push({
-                        city: cityName,
-                        hotel: hotelForCity.hotel
-                    });
-                } else {
-                    // استخدام فندق افتراضي إذا لم يتم العثور على فندق
-                    accommodations[category].push({
-                        city: cityName,
-                        hotel: this.getDefaultHotelForCity(city, category, language)
-                    });
+                accommodations[cat].push({
+                    city: cruiseName,
+                    hotel: cruiseShipName
+                });
+            }
+        }
+
+        return accommodations;
+    }          });
                 }
             }
         }
@@ -973,28 +988,7 @@ export class IntelligentDataExtractor {
             itinerary: customItinerary,
             itineraryOptions: [
                 {
-                    name: { es: "Itinerario Principal", en: "Main Itinerary", ar: "البرنامج الرئيسي" },
-                    itinerary: customItinerary
-                }
-            ],
-            accommodations: accommodations,
-            servicesIncluded: this.createServicesIncluded(nightsDistribution, category, language),
-            servicesExcluded: knowledgeBase.defaults.servicesExcluded,
-            importantNotes: knowledgeBase.defaults.importantNotes,
-            quoteParams: {
-                travelers,
-                duration,
-                season,
-                category,
-                itineraryPlan: {
-                    nights: this.convertNightsDistribution(nightsDistribution),
-                    sites: this.extractSitesFromItinerary(customItinerary, language),
-                    flightSectors: nightsDistribution.cruise > 0 ? 2 : 0,
-                }
-            }
-        };
-
-        return program;
+                    name: { es: "It        return program;
     }
 
     // 🗺️ استخراج المواقع من الـ itinerary
@@ -1055,27 +1049,27 @@ export class IntelligentDataExtractor {
 
     // 📝 إنشاء اسم البرنامج المخصص
     private createCustomProgramName(duration: number, destinations: string[], language: Language): LocalizedString {
-    const cityNames = destinations.map(city => this.getCityLocalizedName(city));
-    const cityList = cityNames.map(city => city[language]).join(' & ');
+        const cityNames = destinations.map(city => this.getCityLocalizedName(city));
+        const cityList = cityNames.map(city => city[language]).join(' & ');
 
-    const baseName = {
-        en: `Custom ${duration}-Day ${cityList} Journey`,
-        es: `Viaje Personalizado de ${duration} Días - ${cityList}`,
-        ar: `رحلة مخصصة لمدة ${duration} أيام - ${cityList}`
-    };
-
-    // التحقق من أن الاسم لا يتطابق مع برنامج جاهز
-    if (!this.validateCustomProgramName(baseName.en)) {
-        // استخدام اسم بديل آمن
-        return {
-            en: `Personalized ${duration}-Day Egypt Experience`,
-            es: `Experiencia Egipta Personalizada de ${duration} Días`,
-            ar: `تجربة مصرية مخصصة لمدة ${duration} أيام`
+        const baseName = {
+            en: `Custom ${duration}-Day ${cityList} Journey`,
+            es: `Viaje Personalizado de ${duration} Días - ${cityList}`,
+            ar: `رحلة مخصصة لمدة ${duration} أيام - ${cityList}`
         };
-    }
 
-    return baseName;
-}
+        // التحقق من أن الاسم لا يتطابق مع برنامج جاهز
+        if (!this.validateCustomProgramName(baseName.en)) {
+            // استخدام اسم بديل آمن
+            return {
+                en: `Personalized ${duration}-Day Egypt Experience`,
+                es: `Experiencia Egipta Personalizada de ${duration} Días`,
+                ar: `تجربة مصرية مخصصة لمدة ${duration} أيام`
+            };
+        }
+
+        return baseName;
+    }
 
     // 📝 إنشاء الوصف المختصر
     private createBriefDescription(duration: number, destinations: string[], language: Language): LocalizedString {
@@ -1107,27 +1101,31 @@ export class IntelligentDataExtractor {
         category: 'gold' | 'diamond',
         language: Language
     ): { es: string[]; en: string[]; ar: string[] } {
-        const baseServices = knowledgeBase.defaults.servicesIncluded[language] || [];
-        const services = [...baseServices];
+        const baseServicesEs = knowledgeBase.defaults.servicesIncluded?.es || [];
+        const baseServicesEn = knowledgeBase.defaults.servicesIncluded?.en || [];
+        const baseServicesAr = knowledgeBase.defaults.servicesIncluded?.ar || [];
+        
+        const servicesEs = [...baseServicesEs];
+        const servicesEn = [...baseServicesEn];
+        const servicesAr = [...baseServicesAr];
 
-        // إضافة خدمات الإقامة
+        // إضافة خدمات الإقامة لكل لغة
         for (const [city, nights] of Object.entries(nightsDistribution)) {
             if (typeof nights === 'number' && nights > 0) {
-                const cityName = this.getCityLocalizedName(city)[language];
-                if (language === 'es') {
-                    services.push(`${nights} noches en ${cityName}`);
-                } else if (language === 'en') {
-                    services.push(`${nights} nights in ${cityName}`);
-                } else {
-                    services.push(`${nights} ليالي في ${cityName}`);
-                }
+                const cityNameEs = this.getCityLocalizedName(city).es;
+                const cityNameEn = this.getCityLocalizedName(city).en;
+                const cityNameAr = this.getCityLocalizedName(city).ar;
+                
+                servicesEs.push(`${nights} noches en ${cityNameEs}`);
+                servicesEn.push(`${nights} nights in ${cityNameEn}`);
+                servicesAr.push(`${nights} ليالي في ${cityNameAr}`);
             }
         }
 
         return {
-            es: services,
-            en: services,
-            ar: services
+            es: servicesEs,
+            en: servicesEn,
+            ar: servicesAr
         };
     }
 

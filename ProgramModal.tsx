@@ -822,7 +822,7 @@ const ProgramModal: React.FC<ProgramModalProps> = ({ program, onClose }) => {
   const [selectedCategory, setSelectedCategory] = useState<'gold' | 'diamond' | null>(program.isCustom ? program.quoteParams?.category ?? null : 'gold');
   const [exchangeRate, setExchangeRate] = useState<number | null>(null);
   const [selectedItinerary, setSelectedItinerary] = useState<ItineraryItem[]>(
-    program.itinerary || program.itineraryOptions?.[0].itinerary || []
+    program.itinerary || program.itineraryOptions?.[0]?.itinerary || []
   );
   const [isQuoteFormOpen, setIsQuoteFormOpen] = useState(false);
 
@@ -831,8 +831,8 @@ const ProgramModal: React.FC<ProgramModalProps> = ({ program, onClose }) => {
   }, []);
 
   const handleItineraryOptionChange = (index: number) => {
-    if (program.itineraryOptions) {
-      setSelectedItinerary(program.itineraryOptions[index].itinerary);
+    if (program.itineraryOptions && program.itineraryOptions[index]) {
+      setSelectedItinerary(program.itineraryOptions[index]?.itinerary || []);
     }
   };
 
@@ -925,7 +925,7 @@ const ProgramModal: React.FC<ProgramModalProps> = ({ program, onClose }) => {
         <div className="space-y-4">
           {program.itineraryOptions && program.itineraryOptions.length > 1 && (
             <div className="flex space-x-2 p-1 bg-gray-800 rounded-lg">
-              {program.itineraryOptions.map((opt, index) => (
+              {(program.itineraryOptions || []).map((opt, index) => (
                 <button
                   key={index}
                   onClick={() => handleItineraryOptionChange(index)}
@@ -936,9 +936,9 @@ const ProgramModal: React.FC<ProgramModalProps> = ({ program, onClose }) => {
               ))}
             </div>
           )}
-          <Accordion items={selectedItinerary.map(item => ({
-            title: `${uiText.modalDay} ${item.day}: ${item.title[lang] ?? item.title.en}`,
-            content: <ul className="list-disc list-inside space-y-2 text-gray-400 text-sm">{(item.activities[lang] ?? item.activities.en).map((act, i) => <li key={i}>{act}</li>)}</ul>,
+          <Accordion items={(selectedItinerary || []).map(item => ({
+            title: `${uiText.modalDay} ${item.day}: ${item.title?.[lang] ?? item.title?.en ?? 'Untitled'}`,
+            content: <ul className="list-disc list-inside space-y-2 text-gray-400 text-sm">{(item.activities?.[lang] ?? item.activities?.en ?? []).map((act, i) => <li key={i}>{act}</li>)}</ul>,
           }))} defaultOpenIndices={[0]}/>
         </div>
       ),
@@ -952,12 +952,12 @@ const ProgramModal: React.FC<ProgramModalProps> = ({ program, onClose }) => {
                         <RaSunIcon className="w-5 h-5"/> {uiText.modalCategoryGold}
                     </h4>
                     <div className="space-y-3">
-                        {program.accommodations?.gold.map((acc, index) => (
+                        {(program.accommodations?.gold || []).map((acc, index) => (
                             <div key={`gold-${index}`} className="bg-gray-800/50 p-4 rounded-lg border border-gray-700 flex items-center gap-4">
                                 <MapPinIcon className="w-6 h-6 text-gray-400 flex-shrink-0" />
                                 <div>
-                                    <p className="font-semibold text-gray-200">{acc.city[lang] ?? acc.city.en}</p>
-                                    <p className="text-sm text-gray-400">{acc.hotel[lang] ?? acc.hotel.en}</p>
+                                    <p className="font-semibold text-gray-200">{acc.city?.[lang] ?? acc.city?.en ?? 'N/A'}</p>
+                                    <p className="text-sm text-gray-400">{acc.hotel?.[lang] ?? acc.hotel?.en ?? 'N/A'}</p>
                                 </div>
                             </div>
                         ))}
@@ -969,12 +969,12 @@ const ProgramModal: React.FC<ProgramModalProps> = ({ program, onClose }) => {
                         <DiamondIcon className="w-5 h-5"/> {uiText.modalCategoryDiamond}
                     </h4>
                     <div className="space-y-3">
-                        {program.accommodations?.diamond.map((acc, index) => (
+                        {(program.accommodations?.diamond || []).map((acc, index) => (
                              <div key={`diamond-${index}`} className="bg-gray-800/50 p-4 rounded-lg border border-gray-700 flex items-center gap-4">
                                 <MapPinIcon className="w-6 h-6 text-gray-400 flex-shrink-0" />
                                 <div>
-                                    <p className="font-semibold text-gray-200">{acc.city[lang] ?? acc.city.en}</p>
-                                    <p className="text-sm text-gray-400">{acc.hotel[lang] ?? acc.hotel.en}</p>
+                                    <p className="font-semibold text-gray-200">{acc.city?.[lang] ?? acc.city?.en ?? 'N/A'}</p>
+                                    <p className="text-sm text-gray-400">{acc.hotel?.[lang] ?? acc.hotel?.en ?? 'N/A'}</p>
                                 </div>
                             </div>
                         ))}
@@ -999,9 +999,9 @@ const ProgramModal: React.FC<ProgramModalProps> = ({ program, onClose }) => {
       label: uiText.modalIncluded,
       content: (
         <Accordion items={[
-            { title: uiText.modalIncluded, content: <ul className="list-disc list-inside space-y-1 text-sm text-gray-400">{(program.servicesIncluded?.[lang] ?? program.servicesIncluded?.en)?.map((item, i) => <li key={i}>{item}</li>)}</ul> },
-            { title: uiText.modalExcluded, content: <ul className="list-disc list-inside space-y-1 text-sm text-gray-400">{(program.servicesExcluded?.[lang] ?? program.servicesExcluded?.en)?.map((item, i) => <li key={i}>{item}</li>)}</ul> },
-            { title: uiText.modalImportantNotes, content: <ul className="list-disc list-inside space-y-1 text-sm text-gray-400">{(program.importantNotes?.[lang] ?? program.importantNotes?.en)?.map((item, i) => <li key={i}>{item}</li>)}</ul> },
+            { title: uiText.modalIncluded, content: <ul className="list-disc list-inside space-y-1 text-sm text-gray-400">{(program.servicesIncluded?.[lang] ?? program.servicesIncluded?.en ?? []).map((item, i) => <li key={i}>{item}</li>)}</ul> },
+            { title: uiText.modalExcluded, content: <ul className="list-disc list-inside space-y-1 text-sm text-gray-400">{(program.servicesExcluded?.[lang] ?? program.servicesExcluded?.en ?? []).map((item, i) => <li key={i}>{item}</li>)}</ul> },
+            { title: uiText.modalImportantNotes, content: <ul className="list-disc list-inside space-y-1 text-sm text-gray-400">{(program.importantNotes?.[lang] ?? program.importantNotes?.en ?? []).map((item, i) => <li key={i}>{item}</li>)}</ul> },
         ]} defaultOpenIndices={[0, 1, 2]} />
       )
     },
