@@ -1035,13 +1035,39 @@ export class IntelligentDataExtractor {
         if (activitiesText.includes('valley of the kings') || activitiesText.includes('valle de los reyes') || activitiesText.includes('وادي الملوك')) {
             sites.push('valleyOfTheKings');
         }
-        if (activitiesText.includes('hatshepsut') || activitiesText.includes('حتشبسوت')) {
-            sites.push('hatshepsutTemple');
+        if (activitiesText.includes('hatsh        if (activitiesText.includes('alexandria') || activitiesText.includes('alejandría') || activitiesText.includes('الإسكندرية')) {
+            sites.push('alexandriaNationalMuseum');
         }
-        if (activitiesText.includes('abu simbel') || activitiesText.includes('أبو سمبل')) {
-            sites.push('abuSimbelTemples');
+
+        return [...new Set(sites)];
+    }
+
+    // 📝 إنشاء اسم البرنامج المخصص
+    private createCustomProgramName(duration: number, destinations: string[], language: Language): LocalizedString {
+        const cityNames = destinations.map(city => this.getCityLocalizedName(city));
+        const cityList = cityNames.map(city => city[language]).join(' & ');
+
+        const baseName = {
+            en: `Custom ${duration}-Day ${cityList} Journey`,
+            es: `Viaje Personalizado de ${duration} Días - ${cityList}`,
+            ar: `رحلة مخصصة لمدة ${duration} أيام - ${cityList}`
+        };
+
+        // التحقق من أن الاسم لا يتطابق مع برنامج جاهز
+        if (!this.validateCustomProgramName(baseName.en)) {
+            // استخدام اسم بديل آمن
+            return {
+                en: `Personalized ${duration}-Day Egypt Experience`,
+                es: `Experiencia Egipta Personalizada de ${duration} Días`,
+                ar: `تجربة مصرية مخصصة لمدة ${duration} أيام`
+            };
         }
-        if (activitiesText.includes('philae') || activitiesText.includes('فيلة')) {
+
+        return baseName;
+    }
+
+    // 📝 إنشاء الوصف المختصر
+    private createBriefDescription(duration: number, destinations: string[], language: Language): LocalizedString {|| activitiesText.includes('فيلة')) {
             sites.push('philaeTemple');
         }
         if (activitiesText.includes('kom ombo') || activitiesText.includes('كوم أمبو')) {
@@ -1057,78 +1083,43 @@ export class IntelligentDataExtractor {
             sites.push('qaitbayCitadel');
         }
         if (activitiesText.includes('alexandria') || activitiesText.includes('alejandría') || activitiesText.includes('الإسكندرية')) {
-            sites.push('alexandriaNationalMuseum');
-        }
-
-        return [...new Set(sites)];
-    }
-
-    // 📝 إنشاء اسم البرنامج المخصص
-    private createCustomProgramName(duration: number, destinations: string[], language: Language): LocalizedString {
-    const cityNames = destinations.map(city => this.getCityLocalizedName(city));
-    const cityList = cityNames.map(city => city[language]).join(' & ');
-
-    const baseName = {
-        en: `Custom ${duration}-Day ${cityList} Journey`,
-        es: `Viaje Personalizado de ${duration} Días - ${cityList}`,
-        ar: `رحلة مخصصة لمدة ${duration} أيام - ${cityList}`
-    };
-
-    // التحقق من أن الاسم لا يتطابق مع برنامج جاهز
-    if (!this.validateCustomProgramName(baseName.en)) {
-        // استخدام اسم بديل آمن
-        return {
-            en: `Personalized ${duration}-Day Egypt Experience`,
-            es: `Experiencia Egipta Personalizada de ${duration} Días`,
-            ar: `تجربة مصرية مخصصة لمدة ${duration} أيام`
-        };
-    }
-
-    return baseName;
-}
-
-    // 📝 إنشاء الوصف المختصر
+            sites.pus    // 📝 إنشاء الوصف المختصر
     private createBriefDescription(duration: number, destinations: string[], language: Language): LocalizedString {
         const cityNames = destinations.map(city => this.getCityLocalizedName(city));
         const cityList = cityNames.map(city => city[language]).join(' & ');
 
         return {
             es: `Un viaje personalizado de ${duration} días explorando ${cityList}`,
-            en: `A custom ${duration}-day journey exploring ${c    // 🏨 إنشاء الخدمات المضمنة
+            en: `A custom ${duration}-day journey exploring ${cityList}`,
+            ar: `رحلة مخصصة لمدة ${duration} أيام لاستكشاف ${cityList}`
+        };
+    }
+
+    // 📝 إنشاء الوصف العام
+    private createGeneralDescription(duration: number, destinations: string[], language: Language): LocalizedString {
+        const cityNames = destinations.map(city => this.getCityLocalizedName(city));
+        const cityList = cityNames.map(city => city[language]).join(' & ');
+
+        return {
+            es: `Este itinerario personalizado de ${duration} días ha sido diseñado especialmente para ti, combinando lo mejor de ${cityList}. Cada detalle ha sido cuidadosamente seleccionado para crear una experiencia inolvidable.`,
+            en: `This custom ${duration}-day itinerary has been specially designed for you, combining the best of ${cityList}. Every detail has been carefully selected to create an unforgettable experience.`,
+            ar: `هذا المسار المخصص لمدة ${duration} أيام مصمم خصيصًا لك، يجمع بين أفضل ما في ${cityList}. تم اختيار كل تفصيل بعناية لخلق تجربة لا تُنسى.`
+        };
+    }
+
+    // 🏨 إنشاء الخدمات المضمنة
     private createServicesIncluded(
         nightsDistribution: any,
         category: 'gold' | 'diamond',
         language: Language
     ): { es: string[]; en: string[]; ar: string[] } {
-        const baseServicesEs = knowledgeBase.defaults.servicesIncluded?.es || [];
-        const baseServicesEn = knowledgeBase.defaults.servicesIncluded?.en || [];
-        const baseServicesAr = knowledgeBase.defaults.servicesIncluded?.ar || [];
-        
-        const servicesEs = [...baseServicesEs];
-        const servicesEn = [...baseServicesEn];
-        const servicesAr = [...baseServicesAr];
-
-        // إضافة خدمات الإقامة لكل لغة
-        for (const [city, nights] of Object.entries(nightsDistribution)) {
-            if (typeof nights === 'number' && nights > 0) {
-                const cityNameEs = this.getCityLocalizedName(city).es;
-                const cityNameEn = this.getCityLocalizedName(city).en;
-                const cityNameAr = this.getCityLocalizedName(city).ar;
-                
-                servicesEs.push(`${nights} noches en ${cityNameEs}`);
-                servicesEn.push(`${nights} nights in ${cityNameEn}`);
-                servicesAr.push(`${nights} ليالي في ${cityNameAr}`);
-            }
-        }
-
-        return {
-            es: servicesEs,
+        const baseServicesEs = knowledgeBase.defaul            es: servicesEs,
             en: servicesEn,
             ar: servicesAr
         };
-    }نشاء الخدمات المضمنة
-    private createServicesIncluded(
-        nightsDistribution: any,
+    }
+
+    // 🔄 تحويل توزيع الليالي: any,
         category: 'gold' | 'diamond',
         language: Language
     ): { es: string[]; en: string[]; ar: string[] } {
