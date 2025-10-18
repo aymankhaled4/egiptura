@@ -347,19 +347,7 @@ export class IntelligentDataExtractor {
 
     // 🏨 البحث عن فندق للمدينة
     private findHotelForCity(city: string, category: 'gold' | 'diamond', allHotels: any[]): any {
-        const availableHotels = allHotels.filter(h => 
-            h.city === city && h.category === category
-        );
-        
-        if (availableHotels.length > 0) {
-            // إرجاع فندق عشوائي من المتاح
-            return availableHotels[Math.floor(Math.random() * availableHotels.length)];
-        }
-        
-        return null;
-    }
-
-    // 🏨 فندق افتراضي للمدينة
+     // 🏨 فندق افتراضي للمدينة
     private getDefaultHotelForCity(city: string, category: 'gold' | 'diamond', language: Language): LocalizedString {
         const defaultHotels = {
             cairo: {
@@ -400,7 +388,24 @@ export class IntelligentDataExtractor {
             }
         };
 
-        const cityHotels = defaultHotels[city as key    // 🏨 إنشاء أماكن الإقامة المخصصة - إصلاح كامل
+        const cityHotels = defaultHotels[city as keyof typeof defaultHotels];
+        if (cityHotels) {
+            return {
+                es: cityHotels[category].es,
+                en: cityHotels[category].en,
+                ar: cityHotels[category].ar
+            };
+        }
+
+        // فندق افتراضي عام
+        return {
+            es: `Hotel en ${city}`,
+            en: `Hotel in ${city}`,
+            ar: `فندق في ${city}`
+        };
+    }
+
+    // 🏨 إنشاء أماكن الإقامة المخصصة - إصلاح كامل
     private createCustomAccommodations(
         nightsDistribution: any,
         category: 'gold' | 'diamond',
