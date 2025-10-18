@@ -1515,8 +1515,9 @@ const App: React.FC = () => {
         let finalCustomProgram: Program | undefined = undefined;
 
         // ✅ الخطوة 2: معالجة الطلبات المخصصة الناقصة
-        if (isExplicitCustomRequest && requestedDays === 0) {
-            console.log('🔄 Incomplete custom request - asking for details');
+        // CRITICAL: إذا طلب custom بدون تفاصيل كافية، نسأل ونوقف المعالجة
+        if (isExplicitCustomRequest && !hasDetailedRequest) {
+            console.log('🔄 Incomplete custom request - asking for details and STOPPING');
             
             let questionMessage = '';
             if (language === 'en') {
@@ -1559,7 +1560,8 @@ Una vez que tenga estos detalles, ¡crearé tu inolvidable aventura egipcia!`;
             
             setMessages(prev => [...prev, modelMessage]);
             setIsLoading(false);
-            return;
+            console.log('[debug] ✅ Questions sent - NOT proceeding to AI');
+            return; // ✅ CRITICAL: نوقف هنا ومش بنروح للـ AI
         }
 
         // ✅ الخطوة 3: إرسال الطلب للـ AI
