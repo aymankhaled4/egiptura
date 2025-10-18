@@ -43,14 +43,14 @@ export const knowledgeBase = {
     servicesIncluded: {
         es: ["Asistencia a la llegada al Aeropuerto Internacional de El Cairo.", "Alojamiento con desayuno.", "Traslados privados de lujo.", "Visitas según lo mencionado en el itinerario.", "Guía egiptólogo de habla hispana."],
         en: ["Arrival assistance at Cairo International Airport.", "Accommodation with breakfast.", "Private luxury transfers.", "Visits as mentioned in the itinerary.", "English-speaking Egyptologist guide."],
-        // FIX: Added optional 'ar' property to align with type definitions and prevent type errors.
-        ar: [],
+        ar: ["المساعدة عند الوصول إلى مطار القاهرة الدولي.", "الإقامة مع وجبة الإفطار.", "انتقالات خاصة فاخرة.", "الزيارات كما هو مذكور في البرنامج.", "مرشد متخصص في علم المصريات يتحدث العربية."]
+
     },
     servicesExcluded: {
         es: ["Vuelos internacionales.", "Visado de entrada a Egipto.", "Propinas.", "Bebidas y gastos personales.", "Excursiones opcionales."],
         en: ["International flights.", "Entry visa to Egypt.", "Tips.", "Drinks and personal expenses.", "Optional excursions."],
-        // FIX: Added optional 'ar' property to align with type definitions and prevent type errors.
-        ar: [],
+        ar: ["الرحلات الجوية الدولية.", "تأشيرة الدخول إلى مصر.", "الإكراميات.", "المشروبات والمصروفات الشخصية.", "الرحلات الاختيارية."]
+
     },
     importantNotes: {
         es: [
@@ -69,8 +69,14 @@ export const knowledgeBase = {
             "Triple rooms on cruises and in various hotels are double rooms with an extra bed.",
             "Cruise logistics: Departures from Luxor on Saturdays/Mondays; from Aswan on Wednesdays/Fridays."
         ],
-        // FIX: Added optional 'ar' property to align with type definitions and prevent type errors.
-        ar: [],
+         ar: [
+            "تأشيرة الدخول إلى مصر (25 دولار أمريكي) غير مشمولة ويجب دفعها عند الوصول.",
+            "قد يتم تعديل ترتيب الزيارات دون التأثير على محتوى الرحلة.",
+            "قد تتغير الأسعار النهائية بسبب التغييرات في الأسعار أو الضرائب أو رسوم الوقود.",
+            "قد يتم استبدال الفنادق والرحلات النيلية بأخرى من نفس الفئة بإشعار مسبق.",
+            "الغرف الثلاثية في الرحلات النيلية وفي العديد من الفنادق هي غرف مزدوجة مع سرير إضافي.",
+            "لوجستيات الرحلات النيلية: المغادرة من الأقصر أيام السبت/الاثنين؛ من أسوان أيام الأربعاء/الجمعة."
+        ]
     }
   },
 };
