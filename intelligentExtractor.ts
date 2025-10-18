@@ -1045,44 +1045,6 @@ export class IntelligentDataExtractor {
         }
 
         return [...new Set(sites)];
-    }s('museo') || activitiesText.includes('متحف')) {
-            sites.push('egyptianMuseum');
-        }
-        if (activitiesText.includes('karnak') || activitiesText.includes('الكرنك')) {
-            sites.push('karnakTemple');
-        }
-        if (activitiesText.includes('luxor temple') || activitiesText.includes('templo de luxor') || activitiesText.includes('معبد الأقصر')) {
-            sites.push('luxorTemple');
-        }
-        if (activitiesText.includes('valley of the kings') || activitiesText.includes('valle de los reyes') || activitiesText.includes('وادي الملوك')) {
-            sites.push('valleyOfTheKings');
-        }
-        if (activitiesText.includes('hatshepsut') || activitiesText.includes('حتشبسوت')) {
-            sites.push('hatshepsutTemple');
-        }
-        if (activitiesText.includes('abu simbel') || activitiesText.includes('أبو سمبل')) {
-            sites.push('abuSimbelTemples');
-        }
-        if (activitiesText.includes('philae') || activitiesText.includes('فيلة')) {
-            sites.push('philaeTemple');
-        }
-        if (activitiesText.includes('kom ombo') || activitiesText.includes('كوم أمبو')) {
-            sites.push('komOmboTemple');
-        }
-        if (activitiesText.includes('edfu') || activitiesText.includes('إدفو')) {
-            sites.push('edfuTemple');
-        }
-        if (activitiesText.includes('khan el khalili') || activitiesText.includes('خان الخليلي')) {
-            sites.push('khanElKhalili');
-        }
-        if (activitiesText.includes('citadel') || activitiesText.includes('ciudadela') || activitiesText.includes('قلعة')) {
-            sites.push('qaitbayCitadel');
-        }
-        if (activitiesText.includes('alexandria') || activitiesText.includes('alejandría') || activitiesText.includes('الإسكندرية')) {
-            sites.push('alexandriaNationalMuseum');
-        }
-
-        return [...new Set(sites)];
     }
 
     // 📝 إنشاء اسم البرنامج المخصص
