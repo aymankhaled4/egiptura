@@ -822,7 +822,7 @@ const ProgramModal: React.FC<ProgramModalProps> = ({ program, onClose }) => {
   const [selectedCategory, setSelectedCategory] = useState<'gold' | 'diamond' | null>(program.isCustom ? program.quoteParams?.category ?? null : 'gold');
   const [exchangeRate, setExchangeRate] = useState<number | null>(null);
   const [selectedItinerary, setSelectedItinerary] = useState<ItineraryItem[]>(
-    program.itinerary || program.itineraryOptions?.[0].itinerary || []
+    program.itinerary || program.itineraryOptions?.[0]?.itinerary || []
   );
   const [isQuoteFormOpen, setIsQuoteFormOpen] = useState(false);
 
@@ -831,8 +831,8 @@ const ProgramModal: React.FC<ProgramModalProps> = ({ program, onClose }) => {
   }, []);
 
   const handleItineraryOptionChange = (index: number) => {
-    if (program.itineraryOptions) {
-      setSelectedItinerary(program.itineraryOptions[index].itinerary);
+    if (program.itineraryOptions && program.itineraryOptions[index]) {
+      setSelectedItinerary(program.itineraryOptions[index]?.itinerary || []);
     }
   };
 
@@ -936,9 +936,9 @@ const ProgramModal: React.FC<ProgramModalProps> = ({ program, onClose }) => {
               ))}
             </div>
           )}
-          <Accordion items={selectedItinerary.map(item => ({
-            title: `${uiText.modalDay} ${item.day}: ${item.title[lang] ?? item.title.en}`,
-            content: <ul className="list-disc list-inside space-y-2 text-gray-400 text-sm">{(item.activities[lang] ?? item.activities.en ?? []).map((act, i) => <li key={i}>{act}</li>)}</ul>,
+          <Accordion items={(selectedItinerary || []).map(item => ({
+            title: `${uiText.modalDay} ${item.day}: ${item.title?.[lang] ?? item.title?.en ?? 'Untitled'}`,
+            content: <ul className="list-disc list-inside space-y-2 text-gray-400 text-sm">{(item.activities?.[lang] ?? item.activities?.en ?? []).map((act, i) => <li key={i}>{act}</li>)}</ul>,
           }))} defaultOpenIndices={[0]}/>
         </div>
       ),
