@@ -988,28 +988,7 @@ export class IntelligentDataExtractor {
             itinerary: customItinerary,
             itineraryOptions: [
                 {
-                    name: { es: "Itinerario Principal", en: "Main Itinerary", ar: "البرنامج الرئيسي" },
-                    itinerary: customItinerary
-                }
-            ],
-            accommodations: accommodations,
-            servicesIncluded: this.createServicesIncluded(nightsDistribution, category, language),
-            servicesExcluded: knowledgeBase.defaults.servicesExcluded,
-            importantNotes: knowledgeBase.defaults.importantNotes,
-            quoteParams: {
-                travelers,
-                duration,
-                season,
-                category,
-                itineraryPlan: {
-                    nights: this.convertNightsDistribution(nightsDistribution),
-                    sites: this.extractSitesFromItinerary(customItinerary, language),
-                    flightSectors: nightsDistribution.cruise > 0 ? 2 : 0,
-                }
-            }
-        };
-
-        return program;
+                    name: { es: "It        return program;
     }
 
     // 🗺️ استخراج المواقع من الـ itinerary
@@ -1040,7 +1019,66 @@ export class IntelligentDataExtractor {
         if (activitiesText.includes('valley of the kings') || activitiesText.includes('valle de los reyes') || activitiesText.includes('وادي الملوك')) {
             sites.push('valleyOfTheKings');
         }
-        if (activitiesText.includes('hatsh        if (activitiesText.includes('alexandria') || activitiesText.includes('alejandría') || activitiesText.includes('الإسكندرية')) {
+        if (activitiesText.includes('hatshepsut') || activitiesText.includes('حتشبسوت')) {
+            sites.push('hatshepsutTemple');
+        }
+        if (activitiesText.includes('abu simbel') || activitiesText.includes('أبو سمبل')) {
+            sites.push('abuSimbelTemples');
+        }
+        if (activitiesText.includes('philae') || activitiesText.includes('فيلة')) {
+            sites.push('philaeTemple');
+        }
+        if (activitiesText.includes('kom ombo') || activitiesText.includes('كوم أمبو')) {
+            sites.push('komOmboTemple');
+        }
+        if (activitiesText.includes('edfu') || activitiesText.includes('إدفو')) {
+            sites.push('edfuTemple');
+        }
+        if (activitiesText.includes('khan el khalili') || activitiesText.includes('خان الخليلي')) {
+            sites.push('khanElKhalili');
+        }
+        if (activitiesText.includes('citadel') || activitiesText.includes('ciudadela') || activitiesText.includes('قلعة')) {
+            sites.push('qaitbayCitadel');
+        }
+        if (activitiesText.includes('alexandria') || activitiesText.includes('alejandría') || activitiesText.includes('الإسكندرية')) {
+            sites.push('alexandriaNationalMuseum');
+        }
+
+        return [...new Set(sites)];
+    }s('museo') || activitiesText.includes('متحف')) {
+            sites.push('egyptianMuseum');
+        }
+        if (activitiesText.includes('karnak') || activitiesText.includes('الكرنك')) {
+            sites.push('karnakTemple');
+        }
+        if (activitiesText.includes('luxor temple') || activitiesText.includes('templo de luxor') || activitiesText.includes('معبد الأقصر')) {
+            sites.push('luxorTemple');
+        }
+        if (activitiesText.includes('valley of the kings') || activitiesText.includes('valle de los reyes') || activitiesText.includes('وادي الملوك')) {
+            sites.push('valleyOfTheKings');
+        }
+        if (activitiesText.includes('hatshepsut') || activitiesText.includes('حتشبسوت')) {
+            sites.push('hatshepsutTemple');
+        }
+        if (activitiesText.includes('abu simbel') || activitiesText.includes('أبو سمبل')) {
+            sites.push('abuSimbelTemples');
+        }
+        if (activitiesText.includes('philae') || activitiesText.includes('فيلة')) {
+            sites.push('philaeTemple');
+        }
+        if (activitiesText.includes('kom ombo') || activitiesText.includes('كوم أمبو')) {
+            sites.push('komOmboTemple');
+        }
+        if (activitiesText.includes('edfu') || activitiesText.includes('إدفو')) {
+            sites.push('edfuTemple');
+        }
+        if (activitiesText.includes('khan el khalili') || activitiesText.includes('خان الخليلي')) {
+            sites.push('khanElKhalili');
+        }
+        if (activitiesText.includes('citadel') || activitiesText.includes('ciudadela') || activitiesText.includes('قلعة')) {
+            sites.push('qaitbayCitadel');
+        }
+        if (activitiesText.includes('alexandria') || activitiesText.includes('alejandría') || activitiesText.includes('الإسكندرية')) {
             sites.push('alexandriaNationalMuseum');
         }
 
@@ -1072,23 +1110,6 @@ export class IntelligentDataExtractor {
     }
 
     // 📝 إنشاء الوصف المختصر
-    private createBriefDescription(duration: number, destinations: string[], language: Language): LocalizedString {|| activitiesText.includes('فيلة')) {
-            sites.push('philaeTemple');
-        }
-        if (activitiesText.includes('kom ombo') || activitiesText.includes('كوم أمبو')) {
-            sites.push('komOmboTemple');
-        }
-        if (activitiesText.includes('edfu') || activitiesText.includes('إدفو')) {
-            sites.push('edfuTemple');
-        }
-        if (activitiesText.includes('khan el khalili') || activitiesText.includes('خان الخليلي')) {
-            sites.push('khanElKhalili');
-        }
-        if (activitiesText.includes('citadel') || activitiesText.includes('ciudadela') || activitiesText.includes('قلعة')) {
-            sites.push('qaitbayCitadel');
-        }
-        if (activitiesText.includes('alexandria') || activitiesText.includes('alejandría') || activitiesText.includes('الإسكندرية')) {
-            sites.pus    // 📝 إنشاء الوصف المختصر
     private createBriefDescription(duration: number, destinations: string[], language: Language): LocalizedString {
         const cityNames = destinations.map(city => this.getCityLocalizedName(city));
         const cityList = cityNames.map(city => city[language]).join(' & ');
@@ -1118,37 +1139,31 @@ export class IntelligentDataExtractor {
         category: 'gold' | 'diamond',
         language: Language
     ): { es: string[]; en: string[]; ar: string[] } {
-        const baseServicesEs = knowledgeBase.defaul            es: servicesEs,
-            en: servicesEn,
-            ar: servicesAr
-        };
-    }
+        const baseServicesEs = knowledgeBase.defaults.servicesIncluded?.es || [];
+        const baseServicesEn = knowledgeBase.defaults.servicesIncluded?.en || [];
+        const baseServicesAr = knowledgeBase.defaults.servicesIncluded?.ar || [];
+        
+        const servicesEs = [...baseServicesEs];
+        const servicesEn = [...baseServicesEn];
+        const servicesAr = [...baseServicesAr];
 
-    // 🔄 تحويل توزيع الليالي: any,
-        category: 'gold' | 'diamond',
-        language: Language
-    ): { es: string[]; en: string[]; ar: string[] } {
-        const baseServices = knowledgeBase.defaults.servicesIncluded[language] || [];
-        const services = [...baseServices];
-
-        // إضافة خدمات الإقامة
+        // إضافة خدمات الإقامة لكل لغة
         for (const [city, nights] of Object.entries(nightsDistribution)) {
             if (typeof nights === 'number' && nights > 0) {
-                const cityName = this.getCityLocalizedName(city)[language];
-                if (language === 'es') {
-                    services.push(`${nights} noches en ${cityName}`);
-                } else if (language === 'en') {
-                    services.push(`${nights} nights in ${cityName}`);
-                } else {
-                    services.push(`${nights} ليالي في ${cityName}`);
-                }
+                const cityNameEs = this.getCityLocalizedName(city).es;
+                const cityNameEn = this.getCityLocalizedName(city).en;
+                const cityNameAr = this.getCityLocalizedName(city).ar;
+                
+                servicesEs.push(`${nights} noches en ${cityNameEs}`);
+                servicesEn.push(`${nights} nights in ${cityNameEn}`);
+                servicesAr.push(`${nights} ليالي في ${cityNameAr}`);
             }
         }
 
         return {
-            es: services,
-            en: services,
-            ar: services
+            es: servicesEs,
+            en: servicesEn,
+            ar: servicesAr
         };
     }
 
