@@ -157,7 +157,15 @@ export class IntelligentDataExtractor {
         const cityKeywords = this.getCityKeywords(city);
 
         for (const day of itinerary) {
-            const activities = day.activities[language] || day.activities.en || [];
+            // معالجة آمنة للأنشطة
+            let activities: string[] = [];
+            if (day.activities) {
+                if (Array.isArray(day.activities)) {
+                    activities = day.activities;
+                } else if (typeof day.activities === 'object') {
+                    activities = day.activities[language] || day.activities.en || [];
+                }
+            }
             
             for (const activity of activities) {
                 const activityLower = activity.toLowerCase();
@@ -189,7 +197,7 @@ export class IntelligentDataExtractor {
                 if (this.containsKeywords(activityLower, ['abu simbel', 'أبو سمبل'])) {
                     sites.push('abuSimbelTemples');
                 }
-                if (this.containsKeywords(activityLower, ['philae', 'fila', 'فيلة'])) {
+                if (this.containsKeywords(activityLower, ['philae', 'فيلة'])) {
                     sites.push('philaeTemple');
                 }
                 if (this.containsKeywords(activityLower, ['kom ombo', 'كوم أمبو'])) {
@@ -219,8 +227,18 @@ export class IntelligentDataExtractor {
         const filtered: ItineraryItem[] = [];
 
         for (const day of itinerary) {
-            const activities = day.activities[language] || day.activities.en || [];
-            const title = day.title[language] || day.title.en || '';
+            // معالجة آمنة للأنشطة
+            let activities: string[] = [];
+            if (day.activities) {
+                if (Array.isArray(day.activities)) {
+                    activities = day.activities;
+                } else if (typeof day.activities === 'object') {
+                    activities = day.activities[language] || day.activities.en || [];
+                }
+            }
+            
+            // معالجة آمنة للعنوان
+            const title = day.title?.[language] || day.title?.en || '';
             
             // التحقق من وجود المدينة في العنوان أو الأنشطة
             const hasCityReference = cityKeywords.some(keyword => 
@@ -285,7 +303,8 @@ export class IntelligentDataExtractor {
     private removeDuplicateItineraryItems(items: ItineraryItem[]): ItineraryItem[] {
         const seen = new Set<string>();
         return items.filter(item => {
-            const key = `${item.day}-${item.title.en}`;
+            const titleKey = item.title?.en ?? item.title?.es ?? item.title?.ar ?? 'untitled';
+            const key = `${item.day}-${titleKey}`;
             if (seen.has(key)) {
                 return false;
             }
@@ -695,7 +714,7 @@ export class IntelligentDataExtractor {
                     'زيارة قلعة قايتباي',
                     'استكشاف مكتبة الإسكندرية الجديدة',
                     'غداء مأكولات بحرية طازجة في الميناء',
-                    'زيارة катакомбы كوم الشقافة',
+                    'زيارة катакомبات كوم الشقافة',
                     'نزهة في قصر المنتزه وحدائقه',
                     'وقت حر في كورنيش الإسكندرية',
                     'العودة إلى القاهرة',
@@ -1000,9 +1019,14 @@ export class IntelligentDataExtractor {
     // 🗺️ استخراج المواقع من الـ itinerary
     private extractSitesFromItinerary(itinerary: ItineraryItem[], language: Language): SupportedSite[] {
         const sites: SupportedSite[] = [];
-        const allActivities = itinerary.flatMap(day => 
-            day.activities[language] || day.activities.en || []
-        );
+        const allActivities = itinerary.flatMap(day => {
+            if (!day.activities) return [];
+            if (Array.isArray(day.activities)) return day.activities;
+            if (typeof day.activities === 'object') {
+                return day.activities[language] || day.activities.en || [];
+            }
+            return [];
+        });
 
         const activitiesText = allActivities.join(' ').toLowerCase();
 
@@ -1055,32 +1079,32 @@ export class IntelligentDataExtractor {
 
     // 📝 إنشاء اسم البرنامج المخصص
     private createCustomProgramName(duration: number, destinations: string[], language: Language): LocalizedString {
-    const cityNames = destinations.map(city => this.getCityLocalizedName(city));
-    const cityList = cityNames.map(city => city[language]).join(' & ');
+        const cityNames = destinations.map(city => this.getCityLocalizedName(city));
+        const cityList = cityNames.map(city => city?.[language] || city?.en || city?.es || city?.ar || city).join(' & ');
 
-    const baseName = {
-        en: `Custom ${duration}-Day ${cityList} Journey`,
-        es: `Viaje Personalizado de ${duration} Días - ${cityList}`,
-        ar: `رحلة مخصصة لمدة ${duration} أيام - ${cityList}`
-    };
-
-    // التحقق من أن الاسم لا يتطابق مع برنامج جاهز
-    if (!this.validateCustomProgramName(baseName.en)) {
-        // استخدام اسم بديل آمن
-        return {
-            en: `Personalized ${duration}-Day Egypt Experience`,
-            es: `Experiencia Egipta Personalizada de ${duration} Días`,
-            ar: `تجربة مصرية مخصصة لمدة ${duration} أيام`
+        const baseName = {
+            en: `Custom ${duration}-Day ${cityList} Journey`,
+            es: `Viaje Personalizado de ${duration} Días - ${cityList}`,
+            ar: `رحلة مخصصة لمدة ${duration} أيام - ${cityList}`
         };
-    }
 
-    return baseName;
-}
+        // التحقق من أن الاسم لا يتطابق مع برنامج جاهز
+        if (!this.validateCustomProgramName(baseName.en)) {
+            // استخدام اسم بديل آمن
+            return {
+                en: `Personalized ${duration}-Day Egypt Experience`,
+                es: `Experiencia Egipta Personalizada de ${duration} Días`,
+                ar: `تجربة مصرية مخصصة لمدة ${duration} أيام`
+            };
+        }
+
+        return baseName;
+    }
 
     // 📝 إنشاء الوصف المختصر
     private createBriefDescription(duration: number, destinations: string[], language: Language): LocalizedString {
         const cityNames = destinations.map(city => this.getCityLocalizedName(city));
-        const cityList = cityNames.map(city => city[language]).join(' & ');
+        const cityList = cityNames.map(city => city?.[language] || city?.en || city?.es || city?.ar || city).join(' & ');
 
         return {
             es: `Un viaje personalizado de ${duration} días explorando ${cityList}`,
@@ -1092,7 +1116,7 @@ export class IntelligentDataExtractor {
     // 📝 إنشاء الوصف العام
     private createGeneralDescription(duration: number, destinations: string[], language: Language): LocalizedString {
         const cityNames = destinations.map(city => this.getCityLocalizedName(city));
-        const cityList = cityNames.map(city => city[language]).join(' & ');
+        const cityList = cityNames.map(city => city?.[language] || city?.en || city?.es || city?.ar || city).join(' & ');
 
         return {
             es: `Este itinerario personalizado de ${duration} días ha sido diseñado especialmente para ti, combinando lo mejor de ${cityList}. Cada detalle ha sido cuidadosamente seleccionado para crear una experiencia inolvidable.`,
@@ -1113,7 +1137,7 @@ export class IntelligentDataExtractor {
         // إضافة خدمات الإقامة
         for (const [city, nights] of Object.entries(nightsDistribution)) {
             if (typeof nights === 'number' && nights > 0) {
-                const cityName = this.getCityLocalizedName(city)[language];
+                const cityName = this.getCityLocalizedName(city)?.[language] || this.getCityLocalizedName(city)?.en || city;
                 if (language === 'es') {
                     services.push(`${nights} noches en ${cityName}`);
                 } else if (language === 'en') {
