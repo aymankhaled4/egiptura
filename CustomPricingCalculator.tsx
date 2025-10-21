@@ -106,9 +106,10 @@ import { RaSunIcon, CrescentMoonIcon, DiamondIcon } from './Icons';
 
 interface CustomPricingCalculatorProps {
   quoteParams: CustomQuoteParams;
+  detectedSeason?: 'summer' | 'winter' | null;
 }
 
-const CustomPricingCalculator: React.FC<CustomPricingCalculatorProps> = ({ quoteParams }) => {
+const CustomPricingCalculator: React.FC<CustomPricingCalculatorProps> = ({ quoteParams, detectedSeason }) => {
   const { language } = useLanguage();
   const uiText = knowledgeBase.localizedStrings.ui[language] ?? knowledgeBase.localizedStrings.ui.es;
   const [seasonalPrices, setSeasonalPrices] = useState<{ summer: SeasonalPricingDetail, winter: SeasonalPricingDetail } | null>(null);
@@ -180,14 +181,18 @@ const CustomPricingCalculator: React.FC<CustomPricingCalculatorProps> = ({ quote
                  <span className={`${selectedCategory === 'gold' ? 'text-[#C59D5F]' : 'text-sky-400'} ml-2`}>({selectedCategory === 'gold' ? uiText.modalCategoryGold : uiText.modalCategoryDiamond})</span>
             </h3>
             <div className="space-y-6">
-                <div>
-                    <h4 className="font-semibold text-gray-300 mb-3 flex items-center"><RaSunIcon className="w-5 h-5 mr-2 text-yellow-400" /> {uiText.modalSummerSeason}</h4>
-                    {renderPrice(seasonalPrices.summer)}
-                </div>
-                <div>
-                    <h4 className="font-semibold text-gray-300 mb-3 flex items-center"><CrescentMoonIcon className="w-5 h-5 mr-2 text-blue-300" /> {uiText.modalWinterSeason}</h4>
-                    {renderPrice(seasonalPrices.winter)}
-                </div>
+                {(!detectedSeason || detectedSeason === 'summer') && (
+                  <div>
+                      <h4 className="font-semibold text-gray-300 mb-3 flex items-center"><RaSunIcon className="w-5 h-5 mr-2 text-yellow-400" /> {uiText.modalSummerSeason}</h4>
+                      {renderPrice(seasonalPrices.summer)}
+                  </div>
+                )}
+                {(!detectedSeason || detectedSeason === 'winter') && (
+                  <div>
+                      <h4 className="font-semibold text-gray-300 mb-3 flex items-center"><CrescentMoonIcon className="w-5 h-5 mr-2 text-blue-300" /> {uiText.modalWinterSeason}</h4>
+                      {renderPrice(seasonalPrices.winter)}
+                  </div>
+                )}
             </div>
         </div>
       )}
