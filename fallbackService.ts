@@ -622,6 +622,9 @@
 import type { Program, ItineraryItem, CustomQuoteParams, SupportedSite, SupportedCity, LocalizedString } from '../types';
 import { knowledgeBase } from './knowledgeBase';
 import type { Language } from '../contexts/LanguageContext';
+import { detectSeasonFromText, getCurrentSeason } from '../SeasonDetector';
+import{IntelligentDataExtractor} from '../intelligentExtractor';
+
 
 // 🔍 دالة للعثور على أفضل برنامج مطابق من البرامج العشرة
 function findBestMatchingProgram(intent: { duration?: number; includeCruise?: boolean; destination?: string }): Program | null {
@@ -780,233 +783,318 @@ function generateDefaultItinerary(intent: any): ItineraryItem[] {
 }
 
 // 🎯 الدالة الرئيسية المحسنة - الحل النهائي
-export function generateLocalFallbackProgram(userText: string, lang: Language): Program {
-    const t = userText.toLowerCase();
-    const uiText = knowledgeBase.localizedStrings.ui[lang] ?? knowledgeBase.localizedStrings.ui.es;
+// export function generateLocalFallbackProgram(userText: string, lang: Language): Program {
+//     const t = userText.toLowerCase();
+//     const uiText = knowledgeBase.localizedStrings.ui[lang] ?? knowledgeBase.localizedStrings.ui.es;
     
-    // ✅ 1. استخراج المدة بشكل صحيح مع معالجة جميع الحالات
-    const daysMatch = t.match(/(\d+)\s*(days?|d[iíì]as|ايام|يوم)/i);
-    const nightsMatch = t.match(/(\d+)\s*(nights?|noches?|ليال(?:ي)?)/i);
+//     // ✅ 1. استخراج المدة بشكل صحيح مع معالجة جميع الحالات
+//     const daysMatch = t.match(/(\d+)\s*(days?|d[iíì]as|ايام|يوم)/i);
+//     const nightsMatch = t.match(/(\d+)\s*(nights?|noches?|ليال(?:ي)?)/i);
 
-    let duration: number;
-    let totalNights: number;
+//     let duration: number;
+//     let totalNights: number;
 
-    // ✅ الحل الصحيح: نعطي أولوية للـ nights ثم الـ days
-    if (nightsMatch) {
-        totalNights = parseInt(nightsMatch[1], 10);
-        duration = totalNights + 1;
-        console.log(`[fallback] Detected from nights: ${totalNights} nights = ${duration} days`);
+//     // ✅ الحل الصحيح: نعطي أولوية للـ nights ثم الـ days
+//     if (nightsMatch) {
+//         totalNights = parseInt(nightsMatch[1], 10);
+//         duration = totalNights + 1;
+//         console.log(`[fallback] Detected from nights: ${totalNights} nights = ${duration} days`);
+//     } else if (daysMatch) {
+//         duration = parseInt(daysMatch[1], 10);
+//         totalNights = duration - 1;
+//         console.log(`[fallback] Detected from days: ${duration} days = ${totalNights} nights`);
+//     } else {
+//         // فقط إذا لم يكن هناك أي رقم، نستخدم القيمة الافتراضية
+//         duration = 8;
+//         totalNights = 7;
+//         console.log(`[fallback] No duration found, using default: ${duration} days`);
+//     }
+
+//     // ✅ 2. التحقق من المدة المعقولة (بدون تغيير القيمة الأصلية إلا للضرورة)
+//     if (duration < 3) {
+//         console.warn(`[fallback] Duration ${duration} too short, adjusting to 4 days`);
+//         duration = 4;
+//         totalNights = 3;
+//     } else if (duration > 20) {
+//         console.warn(`[fallback] Duration ${duration} too long, adjusting to 15 days`);
+//         duration = 15;
+//         totalNights = 14;
+//     }
+
+//     console.log(`[fallback] FINAL DURATION: ${duration} days, ${totalNights} nights`);
+  
+//     const travelers = +(t.match(/(\d+)\s*(pax|personas|persons|اشخاص|أشخاص|افراد)/)?.[1] ?? 2);
+    
+//     // ✅ 3. حساب ليالي الكروز بشكل ذكي
+//     const includeCruise = /cruise|crucero|كروز|نيل|nile/i.test(t);
+    
+//     const calculateNightsDistribution = (dur: number, hasCruise: boolean) => {
+//         const nights = dur - 1;
+        
+//         if (hasCruise) {
+//             if (dur >= 8) {
+//                 return { cruiseNights: 4, cairoNights: nights - 4 };
+//             } else if (dur >= 5) {
+//                 return { cruiseNights: 3, cairoNights: nights - 3 };
+//             } else {
+//                 return { cruiseNights: Math.max(1, nights - 2), cairoNights: nights - Math.max(1, nights - 2) };
+//             }
+//         } else {
+//             return { cruiseNights: 0, cairoNights: nights };
+//         }
+//     };
+
+//     const { cruiseNights, cairoNights } = calculateNightsDistribution(duration, includeCruise);
+//     console.log(`[fallback] Distribution: ${cairoNights} Cairo nights, ${cruiseNights} cruise nights`);
+    
+//     // 4. تحديد الموسم والفئة
+//     const season = /oct|nov|dec|jan|feb|mar|apr|اكتوبر|أكتوبر|نوفمبر|ديسمبر|يناير|فبراير|مارس|أبريل/i.test(t) ? "winter" : "summer";
+//     const category = /diam/i.test(t) ? "diamond" : "gold";
+
+//     // 5. استخراج الوجهة
+//     let destination = '';
+//     if (t.includes('cairo') || t.includes('el cairo') || t.includes('القاهرة')) destination = 'cairo';
+//     if (t.includes('luxor') || t.includes('الأقصر')) destination = 'luxor';
+//     if (t.includes('aswan') || t.includes('أسوان')) destination = 'aswan';
+//     if (t.includes('alexandria') || t.includes('الإسكندرية')) destination = 'alexandria';
+//     if (t.includes('abu simbel') || t.includes('أبو سمبل')) destination = 'abu simbel';
+//     if (t.includes('red sea') || t.includes('hurghada') || t.includes('البحر الأحمر')) destination = 'red sea';
+
+//     // 6. كشف المواقع
+//     const siteKeywords: { [key: string]: SupportedSite } = {
+//         'pyramids': 'gizaPyramidsAndSphinx', 'pirámides': 'gizaPyramidsAndSphinx',
+//         'sphinx': 'gizaPyramidsAndSphinx', 'esfinge': 'gizaPyramidsAndSphinx',
+//         'museum': 'egyptianMuseum', 'museo': 'egyptianMuseum', 'khan el khalili': 'khanElKhalili',
+//         'karnak': 'karnakTemple', 'luxor temple': 'luxorTemple', 'valley of the kings': 'valleyOfTheKings',
+//         'hatshepsut': 'hatshepsutTemple', 'abu simbel': 'abuSimbelTemples',
+//     };
+//     const detectedSites = [...new Set(Object.keys(siteKeywords).filter(k => t.includes(k)).map(k => siteKeywords[k]))];
+
+//     // 7. البحث عن أفضل برنامج مطابق وإنشاء الـ Itinerary
+//     const intent = { duration, includeCruise, destination, lang };
+//     const bestMatch = findBestMatchingProgram(intent);
+    
+//     let itineraryDays: ItineraryItem[] = [];
+//     let programName = { en: '', es: '', ar: '' };
+//     let briefDesc = { en: '', es: '', ar: '' };
+//     let generalDesc = { en: '', es: '', ar: '' };
+
+//     if (bestMatch) {
+//         itineraryDays = adaptItineraryFromProgram(bestMatch, duration, intent);
+        
+//         programName = {
+//             en: `Custom ${duration}-Day ${bestMatch.name.en}`,
+//             es: `${bestMatch.name.es} Personalizado de ${duration} Días`,
+//             ar: `${bestMatch.name.ar} مخصص لمدة ${duration} أيام`
+//         };
+        
+//         briefDesc = {
+//             en: `A tailored ${duration}-day version of ${bestMatch.name.en} - ${bestMatch.briefDescription.en}`,
+//             es: `Una versión personalizada de ${duration} días de ${bestMatch.name.es} - ${bestMatch.briefDescription.es}`,
+//             ar: `نسخة مخصصة لمدة ${duration} أيام من ${bestMatch.name.ar} - ${bestMatch.briefDescription.ar}`
+//         };
+        
+//         generalDesc = {
+//             en: `This custom ${duration}-day itinerary is based on our popular ${bestMatch.name.en} program. ${bestMatch.generalDescription.en}`,
+//             es: `Este itinerario personalizado de ${duration} días se basa en nuestro popular programa ${bestMatch.name.es}. ${bestMatch.generalDescription.es}`,
+//             ar: `هذا المسار المخصص لمدة ${duration} أيام يستند إلى برنامجنا الشهير ${bestMatch.name.ar}. ${bestMatch.generalDescription.ar}`
+//         };
+//     } else {
+//         itineraryDays = generateDefaultItinerary(intent);
+        
+//         programName = {
+//             es: uiText.customQuoteTitle.replace('{duration}', duration.toString()),
+//             en: `Custom ${duration}-Day Egypt Journey`,
+//             ar: `رحلة مخصصة لمدة ${duration} أيام في مصر`,
+//         };
+        
+//         briefDesc = {
+//             es: `Un viaje a medida de ${totalNights} noches, incluyendo ${cairoNights} noches en El Cairo ${cruiseNights > 0 ? `y ${cruiseNights} noches en un crucero por el Nilo` : ''}.`,
+//             en: `A custom ${totalNights}-night journey, including ${cairoNights} nights in Cairo ${cruiseNights > 0 ? `and ${cruiseNights} nights on a Nile cruise` : ''}.`,
+//             ar: `رحلة مخصصة لمدة ${totalNights} ليلة، تشمل ${cairoNights} ليالي في القاهرة ${cruiseNights > 0 ? `و ${cruiseNights} ليالي في رحلة نيلية` : ''}.`
+//         };
+        
+//         generalDesc = {
+//             es: `Este es un itinerario diseñado especialmente para ti, basado en tu solicitud de ${duration} días. Explora las maravillas de Egipto, desde la majestuosidad de El Cairo ${cruiseNights > 0 ? 'hasta la serenidad de un crucero por el Nilo.' : '.'} Cada detalle ha sido considerado para crear una experiencia inolvidable.`,
+//             en: `This is an itinerary specially designed for you, based on your request for ${duration} days. Explore the wonders of Egypt, from the majesty of Cairo ${cruiseNights > 0 ? 'to the serenity of a Nile cruise.' : '.'} Every detail has been considered to create an unforgettable experience.`,
+//             ar: `هذا خط سير مصمم خصيصًا لك، بناءً على طلبك لمدة ${duration} يومًا. استكشف عجائب مصر، من عظمة القاهرة ${cruiseNights > 0 ? 'إلى هدوء رحلة نيلية.' : '.'} تم أخذ كل التفاصيل في الاعتبار لخلق تجربة لا تُنسى.`
+//         };
+//     }
+
+//     // 8. بناء Quote Params
+//     const nightsObject: Partial<Record<SupportedCity, number>> = {};
+//     if (cairoNights > 0) nightsObject.cairo = cairoNights;
+//     if (cruiseNights > 0) nightsObject.cruise = cruiseNights;
+  
+//     const quoteParams: CustomQuoteParams = {
+//         travelers, 
+//         duration, // ✅ استخدام المدة الصحيحة
+//         season, 
+//         category, 
+//         itineraryPlan: {
+//             nights: nightsObject,
+//             sites: detectedSites,
+//             flightSectors: cruiseNights > 0 ? 2 : 0,
+//         }
+//     };
+
+//     // 9. إنشاء الخدمات المضمنة
+//     const catKey = category === 'gold' ? 'Gold' : 'Diamond';
+//     const dynamicIncluded: Record<Language, string[]> = { es: [], en: [], ar: [] };
+    
+//     const langHotelDefs = knowledgeBase.definitions.accommodations[catKey];
+
+//     if (cairoNights > 0) {
+//         const hotel = langHotelDefs["El Cairo"];
+//         (Object.keys(dynamicIncluded) as Language[]).forEach(l => {
+//              dynamicIncluded[l].push(uiText.serviceStrings.accommodation[l]
+//                 .replace('{nights}', cairoNights.toString())
+//                 .replace('{city}', 'El Cairo')
+//                 .replace('{hotel}', hotel)
+//                 .replace('{board}', uiText.serviceStrings.breakfastBoard[l]));
+//         });
+//     }
+//     if (cruiseNights > 0) {
+//         const hotel = langHotelDefs["Crucero por el Nilo"];
+//          (Object.keys(dynamicIncluded) as Language[]).forEach(l => {
+//             dynamicIncluded[l].push(uiText.serviceStrings.accommodation[l]
+//                 .replace('{nights}', cruiseNights.toString())
+//                 .replace('{city}', 'Crucero por el Nilo')
+//                 .replace('{hotel}', hotel)
+//                 .replace('{board}', uiText.serviceStrings.fullBoard[l]));
+//             dynamicIncluded[l].push(uiText.serviceStrings.domesticFlights[l]);
+//         });
+//     }
+    
+//     // 10. بناء الكائن النهائي للبرنامج
+//     const program: Program = {
+//         id: `custom-${Date.now()}`,
+//         isCustom: true,
+//         quoteParams: quoteParams,
+//         name: programName,
+//         icon: bestMatch?.icon || "🗺️",
+//         duration: { days: duration, nights: totalNights }, // ✅ المدة الصحيحة
+//         priceFrom: bestMatch?.priceFrom || 0,
+//         categories: [category],
+//         startCity: { es: "El Cairo", en: "Cairo", ar: "القاهرة" },
+//         ...(cruiseNights > 0 && { cruiseNights }),
+//         briefDescription: briefDesc,
+//         generalDescription: generalDesc,
+//         itinerary: itineraryDays,
+//         accommodations: bestMatch?.accommodations || {
+//             gold: [{ 
+//                 city: {es:"El Cairo", en:"Cairo", ar: "القاهرة"}, 
+//                 hotel: {
+//                     es: knowledgeBase.definitions.accommodations.Gold["El Cairo"], 
+//                     en: knowledgeBase.definitions.accommodations.Gold["El Cairo"], 
+//                     ar: knowledgeBase.definitions.accommodations.Gold["El Cairo"]
+//                 } 
+//             }],
+//             diamond: [{ 
+//                 city: {es:"El Cairo", en:"Cairo", ar: "القاهرة"}, 
+//                 hotel: {
+//                     es: knowledgeBase.definitions.accommodations.Diamond["El Cairo"], 
+//                     en: knowledgeBase.definitions.accommodations.Diamond["El Cairo"], 
+//                     ar: knowledgeBase.definitions.accommodations.Diamond["El Cairo"]
+//                 } 
+//             }],
+//         },
+//         servicesIncluded: bestMatch?.servicesIncluded || {
+//             es: [...dynamicIncluded.es, ...knowledgeBase.defaults.servicesIncluded.es],
+//             en: [...dynamicIncluded.en, ...knowledgeBase.defaults.servicesIncluded.en],
+//             ar: [...(dynamicIncluded.ar ?? []), ...(knowledgeBase.defaults.servicesIncluded.ar ?? [])]
+//         },
+//         servicesExcluded: bestMatch?.servicesExcluded || knowledgeBase.defaults.servicesExcluded,
+//         importantNotes: bestMatch?.importantNotes || knowledgeBase.defaults.importantNotes,
+//     };
+
+//     console.log(`[fallback] Created program: ${program.name.en}, Duration: ${program.duration.days} days`);
+//     return program;
+// }
+
+
+export function generateLocalFallbackProgram(
+    userInput: string,
+    language: Language
+): Program {
+    console.log('[fallback] Generating local fallback program from:', userInput);
+    
+    // استخراج المدة
+    const daysMatch = userInput.match(/(\d+)\s*(days?|d[iíì]as|ايام|يوم)/i);
+    const nightsMatch = userInput.match(/(\d+)\s*(nights?|noches?|ليال(?:ي)?)/i);
+    const durationPattern = /duration:\s*(\d+)\s*days?/i;
+    const durationMatch = userInput.match(durationPattern);
+    
+    let duration = 7; // افتراضي
+    if (durationMatch) {
+        duration = parseInt(durationMatch[1], 10);
     } else if (daysMatch) {
         duration = parseInt(daysMatch[1], 10);
-        totalNights = duration - 1;
-        console.log(`[fallback] Detected from days: ${duration} days = ${totalNights} nights`);
+    } else if (nightsMatch) {
+        duration = parseInt(nightsMatch[1], 10) + 1;
+    }
+    
+    console.log('[fallback] Duration extracted:', duration);
+    
+    // 🆕 استخراج الموسم بذكاء (من الشهر أو الكلمة المباشرة)
+    const detectedSeason = detectSeasonFromText(userInput);
+    const season: 'summer' | 'winter' = detectedSeason || getCurrentSeason();
+    
+    console.log('[fallback] Season detected:', season);
+    if (detectedSeason) {
+        console.log('[fallback] ✅ Season explicitly mentioned or derived from month');
     } else {
-        // فقط إذا لم يكن هناك أي رقم، نستخدم القيمة الافتراضية
-        duration = 8;
-        totalNights = 7;
-        console.log(`[fallback] No duration found, using default: ${duration} days`);
-    }
-
-    // ✅ 2. التحقق من المدة المعقولة (بدون تغيير القيمة الأصلية إلا للضرورة)
-    if (duration < 3) {
-        console.warn(`[fallback] Duration ${duration} too short, adjusting to 4 days`);
-        duration = 4;
-        totalNights = 3;
-    } else if (duration > 20) {
-        console.warn(`[fallback] Duration ${duration} too long, adjusting to 15 days`);
-        duration = 15;
-        totalNights = 14;
-    }
-
-    console.log(`[fallback] FINAL DURATION: ${duration} days, ${totalNights} nights`);
-  
-    const travelers = +(t.match(/(\d+)\s*(pax|personas|persons|اشخاص|أشخاص|افراد)/)?.[1] ?? 2);
-    
-    // ✅ 3. حساب ليالي الكروز بشكل ذكي
-    const includeCruise = /cruise|crucero|كروز|نيل|nile/i.test(t);
-    
-    const calculateNightsDistribution = (dur: number, hasCruise: boolean) => {
-        const nights = dur - 1;
-        
-        if (hasCruise) {
-            if (dur >= 8) {
-                return { cruiseNights: 4, cairoNights: nights - 4 };
-            } else if (dur >= 5) {
-                return { cruiseNights: 3, cairoNights: nights - 3 };
-            } else {
-                return { cruiseNights: Math.max(1, nights - 2), cairoNights: nights - Math.max(1, nights - 2) };
-            }
-        } else {
-            return { cruiseNights: 0, cairoNights: nights };
-        }
-    };
-
-    const { cruiseNights, cairoNights } = calculateNightsDistribution(duration, includeCruise);
-    console.log(`[fallback] Distribution: ${cairoNights} Cairo nights, ${cruiseNights} cruise nights`);
-    
-    // 4. تحديد الموسم والفئة
-    const season = /oct|nov|dec|jan|feb|mar|apr|اكتوبر|أكتوبر|نوفمبر|ديسمبر|يناير|فبراير|مارس|أبريل/i.test(t) ? "winter" : "summer";
-    const category = /diam/i.test(t) ? "diamond" : "gold";
-
-    // 5. استخراج الوجهة
-    let destination = '';
-    if (t.includes('cairo') || t.includes('el cairo') || t.includes('القاهرة')) destination = 'cairo';
-    if (t.includes('luxor') || t.includes('الأقصر')) destination = 'luxor';
-    if (t.includes('aswan') || t.includes('أسوان')) destination = 'aswan';
-    if (t.includes('alexandria') || t.includes('الإسكندرية')) destination = 'alexandria';
-    if (t.includes('abu simbel') || t.includes('أبو سمبل')) destination = 'abu simbel';
-    if (t.includes('red sea') || t.includes('hurghada') || t.includes('البحر الأحمر')) destination = 'red sea';
-
-    // 6. كشف المواقع
-    const siteKeywords: { [key: string]: SupportedSite } = {
-        'pyramids': 'gizaPyramidsAndSphinx', 'pirámides': 'gizaPyramidsAndSphinx',
-        'sphinx': 'gizaPyramidsAndSphinx', 'esfinge': 'gizaPyramidsAndSphinx',
-        'museum': 'egyptianMuseum', 'museo': 'egyptianMuseum', 'khan el khalili': 'khanElKhalili',
-        'karnak': 'karnakTemple', 'luxor temple': 'luxorTemple', 'valley of the kings': 'valleyOfTheKings',
-        'hatshepsut': 'hatshepsutTemple', 'abu simbel': 'abuSimbelTemples',
-    };
-    const detectedSites = [...new Set(Object.keys(siteKeywords).filter(k => t.includes(k)).map(k => siteKeywords[k]))];
-
-    // 7. البحث عن أفضل برنامج مطابق وإنشاء الـ Itinerary
-    const intent = { duration, includeCruise, destination, lang };
-    const bestMatch = findBestMatchingProgram(intent);
-    
-    let itineraryDays: ItineraryItem[] = [];
-    let programName = { en: '', es: '', ar: '' };
-    let briefDesc = { en: '', es: '', ar: '' };
-    let generalDesc = { en: '', es: '', ar: '' };
-
-    if (bestMatch) {
-        itineraryDays = adaptItineraryFromProgram(bestMatch, duration, intent);
-        
-        programName = {
-            en: `Custom ${duration}-Day ${bestMatch.name.en}`,
-            es: `${bestMatch.name.es} Personalizado de ${duration} Días`,
-            ar: `${bestMatch.name.ar} مخصص لمدة ${duration} أيام`
-        };
-        
-        briefDesc = {
-            en: `A tailored ${duration}-day version of ${bestMatch.name.en} - ${bestMatch.briefDescription.en}`,
-            es: `Una versión personalizada de ${duration} días de ${bestMatch.name.es} - ${bestMatch.briefDescription.es}`,
-            ar: `نسخة مخصصة لمدة ${duration} أيام من ${bestMatch.name.ar} - ${bestMatch.briefDescription.ar}`
-        };
-        
-        generalDesc = {
-            en: `This custom ${duration}-day itinerary is based on our popular ${bestMatch.name.en} program. ${bestMatch.generalDescription.en}`,
-            es: `Este itinerario personalizado de ${duration} días se basa en nuestro popular programa ${bestMatch.name.es}. ${bestMatch.generalDescription.es}`,
-            ar: `هذا المسار المخصص لمدة ${duration} أيام يستند إلى برنامجنا الشهير ${bestMatch.name.ar}. ${bestMatch.generalDescription.ar}`
-        };
-    } else {
-        itineraryDays = generateDefaultItinerary(intent);
-        
-        programName = {
-            es: uiText.customQuoteTitle.replace('{duration}', duration.toString()),
-            en: `Custom ${duration}-Day Egypt Journey`,
-            ar: `رحلة مخصصة لمدة ${duration} أيام في مصر`,
-        };
-        
-        briefDesc = {
-            es: `Un viaje a medida de ${totalNights} noches, incluyendo ${cairoNights} noches en El Cairo ${cruiseNights > 0 ? `y ${cruiseNights} noches en un crucero por el Nilo` : ''}.`,
-            en: `A custom ${totalNights}-night journey, including ${cairoNights} nights in Cairo ${cruiseNights > 0 ? `and ${cruiseNights} nights on a Nile cruise` : ''}.`,
-            ar: `رحلة مخصصة لمدة ${totalNights} ليلة، تشمل ${cairoNights} ليالي في القاهرة ${cruiseNights > 0 ? `و ${cruiseNights} ليالي في رحلة نيلية` : ''}.`
-        };
-        
-        generalDesc = {
-            es: `Este es un itinerario diseñado especialmente para ti, basado en tu solicitud de ${duration} días. Explora las maravillas de Egipto, desde la majestuosidad de El Cairo ${cruiseNights > 0 ? 'hasta la serenidad de un crucero por el Nilo.' : '.'} Cada detalle ha sido considerado para crear una experiencia inolvidable.`,
-            en: `This is an itinerary specially designed for you, based on your request for ${duration} days. Explore the wonders of Egypt, from the majesty of Cairo ${cruiseNights > 0 ? 'to the serenity of a Nile cruise.' : '.'} Every detail has been considered to create an unforgettable experience.`,
-            ar: `هذا خط سير مصمم خصيصًا لك، بناءً على طلبك لمدة ${duration} يومًا. استكشف عجائب مصر، من عظمة القاهرة ${cruiseNights > 0 ? 'إلى هدوء رحلة نيلية.' : '.'} تم أخذ كل التفاصيل في الاعتبار لخلق تجربة لا تُنسى.`
-        };
-    }
-
-    // 8. بناء Quote Params
-    const nightsObject: Partial<Record<SupportedCity, number>> = {};
-    if (cairoNights > 0) nightsObject.cairo = cairoNights;
-    if (cruiseNights > 0) nightsObject.cruise = cruiseNights;
-  
-    const quoteParams: CustomQuoteParams = {
-        travelers, 
-        duration, // ✅ استخدام المدة الصحيحة
-        season, 
-        category, 
-        itineraryPlan: {
-            nights: nightsObject,
-            sites: detectedSites,
-            flightSectors: cruiseNights > 0 ? 2 : 0,
-        }
-    };
-
-    // 9. إنشاء الخدمات المضمنة
-    const catKey = category === 'gold' ? 'Gold' : 'Diamond';
-    const dynamicIncluded: Record<Language, string[]> = { es: [], en: [], ar: [] };
-    
-    const langHotelDefs = knowledgeBase.definitions.accommodations[catKey];
-
-    if (cairoNights > 0) {
-        const hotel = langHotelDefs["El Cairo"];
-        (Object.keys(dynamicIncluded) as Language[]).forEach(l => {
-             dynamicIncluded[l].push(uiText.serviceStrings.accommodation[l]
-                .replace('{nights}', cairoNights.toString())
-                .replace('{city}', 'El Cairo')
-                .replace('{hotel}', hotel)
-                .replace('{board}', uiText.serviceStrings.breakfastBoard[l]));
-        });
-    }
-    if (cruiseNights > 0) {
-        const hotel = langHotelDefs["Crucero por el Nilo"];
-         (Object.keys(dynamicIncluded) as Language[]).forEach(l => {
-            dynamicIncluded[l].push(uiText.serviceStrings.accommodation[l]
-                .replace('{nights}', cruiseNights.toString())
-                .replace('{city}', 'Crucero por el Nilo')
-                .replace('{hotel}', hotel)
-                .replace('{board}', uiText.serviceStrings.fullBoard[l]));
-            dynamicIncluded[l].push(uiText.serviceStrings.domesticFlights[l]);
-        });
+        console.log('[fallback] ℹ️ Using current season as default');
     }
     
-    // 10. بناء الكائن النهائي للبرنامج
-    const program: Program = {
-        id: `custom-${Date.now()}`,
-        isCustom: true,
-        quoteParams: quoteParams,
-        name: programName,
-        icon: bestMatch?.icon || "🗺️",
-        duration: { days: duration, nights: totalNights }, // ✅ المدة الصحيحة
-        priceFrom: bestMatch?.priceFrom || 0,
-        categories: [category],
-        startCity: { es: "El Cairo", en: "Cairo", ar: "القاهرة" },
-        ...(cruiseNights > 0 && { cruiseNights }),
-        briefDescription: briefDesc,
-        generalDescription: generalDesc,
-        itinerary: itineraryDays,
-        accommodations: bestMatch?.accommodations || {
-            gold: [{ 
-                city: {es:"El Cairo", en:"Cairo", ar: "القاهرة"}, 
-                hotel: {
-                    es: knowledgeBase.definitions.accommodations.Gold["El Cairo"], 
-                    en: knowledgeBase.definitions.accommodations.Gold["El Cairo"], 
-                    ar: knowledgeBase.definitions.accommodations.Gold["El Cairo"]
-                } 
-            }],
-            diamond: [{ 
-                city: {es:"El Cairo", en:"Cairo", ar: "القاهرة"}, 
-                hotel: {
-                    es: knowledgeBase.definitions.accommodations.Diamond["El Cairo"], 
-                    en: knowledgeBase.definitions.accommodations.Diamond["El Cairo"], 
-                    ar: knowledgeBase.definitions.accommodations.Diamond["El Cairo"]
-                } 
-            }],
-        },
-        servicesIncluded: bestMatch?.servicesIncluded || {
-            es: [...dynamicIncluded.es, ...knowledgeBase.defaults.servicesIncluded.es],
-            en: [...dynamicIncluded.en, ...knowledgeBase.defaults.servicesIncluded.en],
-            ar: [...(dynamicIncluded.ar ?? []), ...(knowledgeBase.defaults.servicesIncluded.ar ?? [])]
-        },
-        servicesExcluded: bestMatch?.servicesExcluded || knowledgeBase.defaults.servicesExcluded,
-        importantNotes: bestMatch?.importantNotes || knowledgeBase.defaults.importantNotes,
-    };
-
-    console.log(`[fallback] Created program: ${program.name.en}, Duration: ${program.duration.days} days`);
-    return program;
+    // استخراج عدد المسافرين
+    const travelersMatch = userInput.match(/(\d+)\s*(people|person|travelers|viajeros|personas|اشخاص|مسافر)/i);
+    const travelers = travelersMatch ? parseInt(travelersMatch[1], 10) : 2;
+    
+    console.log('[fallback] Travelers:', travelers);
+    
+    // استخراج الفئة
+    const categoryMatch = userInput.match(/(gold|diamond|ذهبي|الماسي|oro|diamante)/i);
+    let category: 'gold' | 'diamond' = 'gold';
+    if (categoryMatch) {
+        const catText = categoryMatch[1].toLowerCase();
+        category = (catText.includes('diamond') || catText.includes('الماسي') || catText.includes('diamante')) 
+            ? 'diamond' 
+            : 'gold';
+    }
+    
+    console.log('[fallback] Category:', category);
+    
+    // استخراج الوجهات
+    const destinations: string[] = ['cairo'];
+    if (/cruise|crucero|كروز|nile|نيل/i.test(userInput)) {
+        destinations.push('cruise');
+    }
+    if (/luxor|الأقصر|الاقصر/i.test(userInput)) {
+        destinations.push('luxor');
+    }
+    if (/aswan|أسوان|اسوان/i.test(userInput)) {
+        destinations.push('aswan');
+    }
+    if (/alexandria|alejandría|الإسكندرية|الاسكندرية/i.test(userInput)) {
+        destinations.push('alexandria');
+    }
+    
+    console.log('[fallback] Destinations:', destinations);
+    
+    // استخدام النظام الذكي لإنشاء البرنامج
+    const extractor = new IntelligentDataExtractor();
+    const customProgram = extractor.createCustomProgram({
+        duration,
+        travelers,
+        destinations,
+        season,  // ✅ الآن يدعم الكشف من الشهر
+        category,
+        language
+    });
+    
+    console.log('[fallback] ✅ Custom program created');
+    return customProgram;
 }
 
 export function withDisplayDefaults(program: Program): Program {

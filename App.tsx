@@ -12,6 +12,7 @@ import SuggestionChips from './components/SuggestionChips';
 import EgipturaLogo from './components/EgipturaLogo';
 import { generateLocalFallbackProgram, withDisplayDefaults } from './services/fallbackService';
 import { normalizeQuoteData, fillMissingFields } from './services/pricingService';
+import { extractSeasonInfo } from './SeasonDetector';
 
 const App: React.FC = () => {
     const { language, setLanguage } = useLanguage();
@@ -433,7 +434,383 @@ const App: React.FC = () => {
 
 
 
-    const handleSendMessage = useCallback(async (userInput: string) => {
+//     const handleSendMessage = useCallback(async (userInput: string) => {
+//     if (!userInput.trim()) return;
+
+//     const userMessage: Message = { id: Date.now().toString(), role: 'user', content: userInput };
+//     const currentMessages = [...messages, userMessage];
+//     setMessages(currentMessages);
+//     setIsLoading(true);
+
+//     // ✅ LOG 1: تسجيل بداية المعالجة
+//     console.group('🚀 Processing User Request');
+//     console.log('User Input:', userInput);
+//     console.log('Current Language:', language);
+
+//     try {
+//         // ✅ تحليل الطلب
+//         const isExplicitCustomRequest = /build|create|make|design|armar|crear|hacer|formar|custom|personalized|personalizado|مخصص|برنامج مخصص|رحلة مخصصة|tailor/i.test(userInput.toLowerCase());
+//         const isChipRequest = /i want an? \d+-day trip (with|without) cruise/i.test(userInput.toLowerCase());
+        
+//         // ✅ استخراج المدة بدقة عالية
+//         const daysMatch = userInput.match(/(\d+)\s*(days?|d[iíì]as|ايام|يوم)/i);
+//         const nightsMatch = userInput.match(/(\d+)\s*(nights?|noches?|ليال(?:ي)?)/i);
+//         const durationPattern = /duration:\s*(\d+)\s*days?/i;
+//         const durationMatch = userInput.match(durationPattern);
+        
+//         let requestedDays = 0;
+//         if (durationMatch) {
+//             requestedDays = parseInt(durationMatch[1], 10);
+//             console.log('📌 Duration extracted from "duration:" pattern:', requestedDays);
+//         } else if (daysMatch) {
+//             requestedDays = parseInt(daysMatch[1], 10);
+//             console.log('📌 Duration extracted from days pattern:', requestedDays);
+//         } else if (nightsMatch) {
+//             requestedDays = parseInt(nightsMatch[1], 10) + 1;
+//             console.log('📌 Duration calculated from nights:', requestedDays, '(nights + 1)');
+//         }
+        
+//         // ✅ LOG 2: تسجيل نوع الطلب
+//         console.log('📊 Request Analysis:', {
+//             isCustomRequest: isExplicitCustomRequest,
+//             isChipRequest: isChipRequest,
+//             requestedDays: requestedDays
+//         });
+
+//         let response, responseText, currentLang = language;
+//         let finalCustomProgram: Program | undefined = undefined;
+
+//         // ✅ معالجة Chip Requests
+//         if (isChipRequest) {
+//             console.log('⚡ Chip request detected - skipping AI');
+            
+//             const matchingProgramIds = findMatchingPrograms(userInput);
+//             console.log('✅ Found matching programs:', matchingProgramIds);
+            
+//             responseText = currentLang === 'es' ? 
+//                 "Encontré estos programas que coinciden con lo que buscas:" :
+//                 currentLang === 'en' ? 
+//                 "I found these programs that match what you're looking for:" :
+//                 "لقد وجدت هذه البرامج التي تطابق ما تبحث عنه:";
+            
+//             const modelMessage: Message = {
+//                 id: Date.now().toString() + Math.random(),
+//                 role: 'model',
+//                 content: responseText,
+//                 programIds: matchingProgramIds.length > 0 ? matchingProgramIds : undefined,
+//             };
+//             setMessages(prev => [...prev, modelMessage]);
+//             setIsLoading(false);
+//             console.groupEnd();
+//             return;
+//         }
+
+//         // ✅ معالجة الطلبات العادية عبر AI
+//         console.log('🤖 Sending to AI...');
+//         const fullPrompt = messages.length > 2 ? 
+//             `PREVIOUS_CONVERSATION_CONTEXT: ${messages.map(m => `${m.role}: ${m.content}`).join('\n')}\n\nCURRENT_USER_REQUEST: ${userInput}`
+//             : userInput;
+
+//         response = await sendMessageToAI(fullPrompt);
+//         console.log('✅ AI Response received, length:', response.length);
+        
+//         // Language detection
+//         response = response.trimStart();
+//         const langMatch = response.match(/^\[lang:(es|en|ar)\]/);
+
+//         if (langMatch) {
+//             const detectedLang = langMatch[1] as Language;
+//             console.log('🌐 Language detected:', detectedLang);
+//             if (language !== detectedLang) {
+//                 setLanguage(detectedLang);
+//                 currentLang = detectedLang;
+//             }
+//             response = response.replace(langMatch[0], '').trim();
+//         }
+
+//         responseText = response;
+
+//         // ✅ LOG 3: معالجة Custom Program من AI
+//         // في دالة handleSendMessage في App.tsx - استبدل هذا الجزء
+
+// // 📦 STEP 3: استخراج ومعالجة البرنامج المخصص من الـ AI
+// console.log('[App] 🔍 Looking for custom program in AI response...');
+
+// // دالة محسنة لاستخراج JSON
+// const extractCustomProgramJSON = (text: string): string | null => {
+//     const tokenStart = '[EgipturaCustomProgram:';
+//     const startIdx = text.indexOf(tokenStart);
+//     if (startIdx === -1) return null;
+
+//     const jsonStartIdx = text.indexOf('{', startIdx);
+//     if (jsonStartIdx === -1) return null;
+
+//     let openBraces = 0;
+//     let inString = false;
+//     let escapeNext = false;
+
+//     for (let i = jsonStartIdx; i < text.length; i++) {
+//         const char = text[i];
+//         if (escapeNext) { 
+//             escapeNext = false; 
+//             continue; 
+//         }
+//         if (char === '\\') { 
+//             escapeNext = true; 
+//             continue; 
+//         }
+//         if (char === '"' && !escapeNext) { 
+//             inString = !inString; 
+//             continue; 
+//         }
+//         if (!inString) {
+//             if (char === '{') openBraces++;
+//             else if (char === '}') {
+//                 openBraces--;
+//                 if (openBraces === 0) {
+//                     return text.substring(jsonStartIdx, i + 1);
+//                 }
+//             }
+//         }
+//     }
+//     return null;
+// };
+
+// const jsonString = extractCustomProgramJSON(responseText);
+
+// if (jsonString) {
+//     console.log('[App] ✅ Custom program JSON found, parsing...');
+//     console.log('📦 JSON length:', jsonString.length);
+    
+//     try {
+//         const programFromAI = JSON.parse(jsonString);
+//         console.log('✅ AI program parsed successfully');
+        
+//         // ✅ استخدام البرنامج مباشرة من الـ AI (تم معالجته في geminiService)
+//         if (programFromAI.id && programFromAI.isCustom) {
+//             console.log('✅ Using pre-processed custom program from AI');
+            
+//             // تطبيق التسعير إذا لزم الأمر
+//             if (programFromAI.quoteParams && validateQuoteParams(programFromAI.quoteParams)) {
+//                 const scenarios = calculatePriceScenarios(programFromAI.quoteParams);
+//                 finalCustomProgram = withDisplayDefaults({
+//                     ...programFromAI,
+//                     seasonalPricing: {
+//                         summer: { gold: scenarios.summer, diamond: scenarios.summer },
+//                         winter: { gold: scenarios.winter, diamond: scenarios.winter },
+//                     },
+//                 });
+//             } else {
+//                 finalCustomProgram = withDisplayDefaults(programFromAI);
+//             }
+            
+//             // ✅ إزالة الـ token من النص لعرض النص فقط
+//             responseText = responseText.replace(`[EgipturaCustomProgram:${jsonString}]`, '').trim();
+            
+//             if (!responseText) {
+//                 responseText = uiText.customQuoteCreated || "I've created your custom Egypt journey!";
+//             }
+//         }
+        
+//     } catch (error) {
+//         console.error('[App] ❌ Failed to parse custom program JSON:', error);
+//         // في حالة فشل التحليل، نستخدم fallback
+//         const fallbackProgram = generateLocalFallbackProgram(userInput, currentLang);
+//         if (fallbackProgram.quoteParams && validateQuoteParams(fallbackProgram.quoteParams)) {
+//             const scenarios = calculatePriceScenarios(fallbackProgram.quoteParams);
+//             finalCustomProgram = withDisplayDefaults({
+//                 ...fallbackProgram,
+//                 seasonalPricing: {
+//                     summer: { gold: scenarios.summer, diamond: scenarios.summer },
+//                     winter: { gold: scenarios.winter, diamond: scenarios.winter },
+//                 },
+//             });
+//             responseText = uiText.customQuoteCreated || "I've created your custom Egypt journey!";
+//         }
+//     }
+// }
+        
+//         // ✅ Fallback للطلبات المخصصة بدون رد AI
+//         const hasTravelDetails = /\d+\s*(days?|d[iíì]as|ايام)/i.test(userInput);
+//         if (isExplicitCustomRequest && hasTravelDetails && !finalCustomProgram) {
+//             console.warn('⚠️ Custom request without AI program - generating fallback');
+            
+//             const fallbackProgram = generateLocalFallbackProgram(userInput, currentLang);
+//             console.log('✅ Fallback program details:', {
+//                 duration: fallbackProgram.duration.days,
+//                 nights: fallbackProgram.duration.nights,
+//                 cairo: fallbackProgram.quoteParams?.itineraryPlan?.nights?.cairo,
+//                 cruise: fallbackProgram.quoteParams?.itineraryPlan?.nights?.cruise
+//             });
+            
+//             if (fallbackProgram.quoteParams && validateQuoteParams(fallbackProgram.quoteParams)) {
+//                 const scenarios = calculatePriceScenarios(fallbackProgram.quoteParams);
+//                 finalCustomProgram = withDisplayDefaults({
+//                     ...fallbackProgram,
+//                     seasonalPricing: {
+//                         summer: { gold: scenarios.summer, diamond: scenarios.summer },
+//                         winter: { gold: scenarios.winter, diamond: scenarios.winter },
+//                     },
+//                 });
+//                 console.log('💰 Pricing scenarios:', scenarios);
+//             }
+            
+//             responseText = uiText.customQuoteCreated;
+//         }
+
+//         // ✅ استخراج Pre-defined Program Tokens
+//         const programTokenRegex = /\[EgipturaProgram:(\d+)\]/g;
+//         const programIds: number[] = [];
+//         let match;
+//         while ((match = programTokenRegex.exec(responseText)) !== null) {
+//             programIds.push(parseInt(match[1], 10));
+//         }
+//         console.log('📋 Pre-defined program IDs found:', programIds);
+
+//         // ✅ البحث عن البرامج المطابقة
+//         let matchingProgramIds: number[] = [];
+//         if (!isExplicitCustomRequest) {
+//             matchingProgramIds = findMatchingPrograms(userInput, finalCustomProgram);
+//             console.log('🔍 Matching programs found:', matchingProgramIds);
+//         }
+
+//         // ✅ المنطق النهائي
+//         if (matchingProgramIds.length > 0 && !isExplicitCustomRequest) {
+//             console.log('✅ Showing matching programs');
+//             programIds.length = 0;
+//             programIds.push(...matchingProgramIds);
+//             finalCustomProgram = undefined;
+            
+//             if (!responseText || responseText === uiText.customQuoteCreated) {
+//                 responseText = currentLang === 'es' ? 
+//                     "Encontré estos programas que coinciden con lo que buscas:" :
+//                     currentLang === 'en' ? 
+//                     "I found these programs that match what you're looking for:" :
+//                     "لقد وجدت هذه البرامج التي تطابق ما تبحث عنه:";
+//             }
+//         } else if (isExplicitCustomRequest) {
+//             console.log('✅ Custom program request - clearing predefined programs');
+//             programIds.length = 0;
+            
+//             // ✅ التحقق النهائي من Duration
+//             if (finalCustomProgram && requestedDays > 0 && finalCustomProgram.duration.days !== requestedDays) {
+//                 console.error(`🚨 FINAL CHECK FAILED: ${finalCustomProgram.duration.days} days vs ${requestedDays} requested`);
+//                 console.log('🔄 Force regenerating program...');
+                
+//                 const forcedFallback = generateLocalFallbackProgram(userInput, currentLang);
+//                 if (forcedFallback.quoteParams && validateQuoteParams(forcedFallback.quoteParams)) {
+//                     const scenarios = calculatePriceScenarios(forcedFallback.quoteParams);
+//                     finalCustomProgram = withDisplayDefaults({
+//                         ...forcedFallback,
+//                         seasonalPricing: {
+//                             summer: { gold: scenarios.summer, diamond: scenarios.summer },
+//                             winter: { gold: scenarios.winter, diamond: scenarios.winter },
+//                         },
+//                     });
+//                     console.log('✅ Force regeneration successful:', finalCustomProgram.duration.days, 'days');
+//                 }
+//             }
+            
+//             // ✅ تصحيح الاسم
+//             if (finalCustomProgram) {
+//                 const predefinedProgramNames = knowledgeBase.packages.map(p => p.name.en);
+//                 const currentName = finalCustomProgram.name.en;
+                
+//                 const containsPredefined = predefinedProgramNames.some(name => 
+//                     currentName.toLowerCase().includes(name.toLowerCase())
+//                 );
+                
+//                 if (containsPredefined || !currentName.toLowerCase().includes('custom')) {
+//                     console.log('🔧 Fixing program name from:', currentName);
+//                     const dur = finalCustomProgram.duration.days;
+//                     finalCustomProgram.name = {
+//                         en: `Custom ${dur}-Day Egypt Journey`,
+//                         es: `Viaje Personalizado de ${dur} Días por Egipto`,
+//                         ar: `رحلة مخصصة لمدة ${dur} أيام في مصر`
+//                     };
+//                     console.log('✅ New program name:', finalCustomProgram.name.en);
+//                 }
+//             }
+//         }
+
+//         responseText = responseText.replace(programTokenRegex, '').trim();
+
+//         // ✅ LOG النهائي
+//         console.log('📤 Final Message:', {
+//             responseText: responseText.substring(0, 100) + '...',
+//             programIds: programIds,
+//             hasCustomProgram: !!finalCustomProgram,
+//             customProgramDuration: finalCustomProgram?.duration?.days
+//         });
+
+//         // إنشاء الرسالة النهائية
+//         if (responseText || programIds.length > 0 || finalCustomProgram) {
+//             const modelMessage: Message = {
+//                 id: Date.now().toString() + Math.random(),
+//                 role: 'model',
+//                 content: responseText,
+//                 programIds: programIds.length > 0 ? programIds : undefined,
+//                 customPrograms: finalCustomProgram ? [finalCustomProgram] : undefined,
+//             };
+//             setMessages(prev => [...prev, modelMessage]);
+//             console.log('✅ Message added to chat');
+//         }
+
+//         console.groupEnd();
+
+//     } catch (error) {
+//         console.error('❌ Error occurred:', error);
+//         console.groupEnd();
+        
+//         let errorMessage = uiText.genericError || 'An error occurred. Please try again.';
+
+//         // معالجة أخطاء السيرفر
+//         if (error instanceof Error && (error.message.includes('server') || error.message.includes('timeout') || error.message.includes('quota'))) {
+//             console.warn('⚠️ Server error - using fallback');
+            
+//             const isCustomRequest = /build|create|make|design|custom|personalized|tailor/i.test(userInput.toLowerCase());
+            
+//             if (isCustomRequest) {
+//                 const fallbackProgram = generateLocalFallbackProgram(userInput, language);
+//                 if (fallbackProgram.quoteParams && validateQuoteParams(fallbackProgram.quoteParams)) {
+//                     const scenarios = calculatePriceScenarios(fallbackProgram.quoteParams);
+//                     const finalProgram = withDisplayDefaults({
+//                         ...fallbackProgram,
+//                         seasonalPricing: {
+//                             summer: { gold: scenarios.summer, diamond: scenarios.summer },
+//                             winter: { gold: scenarios.winter, diamond: scenarios.winter },
+//                         },
+//                     });
+                    
+//                     const modelMessage: Message = {
+//                         id: Date.now().toString() + Math.random(),
+//                         role: 'model',
+//                         content: uiText.customQuoteCreated,
+//                         customPrograms: [finalProgram],
+//                     };
+//                     setMessages(prev => [...prev, modelMessage]);
+//                     setIsLoading(false);
+//                     return;
+//                 }
+//             }
+//         }
+
+//         if (error instanceof Error) {
+//             if (error.message.includes('quota') || error.message.includes('RESOURCE_EXHAUSTED')) {
+//                 errorMessage = uiText.quotaError || "Our AI assistant is currently experiencing high demand. Please try again in a little while.";
+//             } else if (error.message.includes('API key not valid')) {
+//                 errorMessage = uiText.apiKeyError || "There's an issue with the connection to our AI service. Our team has been notified.";
+//             }
+//         }
+        
+//         addMessage('model', errorMessage);
+//     } finally {
+//         setIsLoading(false);
+//     }
+// }, [addMessage, language, setLanguage, messages, findMatchingPrograms, uiText.customQuoteCreated, validateQuoteParams]);
+
+
+const handleSendMessage = useCallback(async (userInput: string) => {
     if (!userInput.trim()) return;
 
     const userMessage: Message = { id: Date.now().toString(), role: 'user', content: userInput };
@@ -469,11 +846,23 @@ const App: React.FC = () => {
             console.log('📌 Duration calculated from nights:', requestedDays, '(nights + 1)');
         }
         
+        // 🆕 استخراج معلومات الموسم (من الكلمة المباشرة أو الشهر)
+        const seasonInfo = extractSeasonInfo(userInput);
+        const hasSeason = seasonInfo.season !== null;
+        
+        console.log('🌡️ Season Analysis:', {
+            detected: seasonInfo.season,
+            mentionedMonth: seasonInfo.mentionedMonth,
+            isExplicitSeason: seasonInfo.isExplicitSeason,
+            source: seasonInfo.isExplicitSeason ? 'direct keyword' : seasonInfo.mentionedMonth ? 'from month' : 'not detected'
+        });
+        
         // ✅ LOG 2: تسجيل نوع الطلب
         console.log('📊 Request Analysis:', {
             isCustomRequest: isExplicitCustomRequest,
             isChipRequest: isChipRequest,
-            requestedDays: requestedDays
+            requestedDays: requestedDays,
+            hasSeason: hasSeason
         });
 
         let response, responseText, currentLang = language;
@@ -529,105 +918,102 @@ const App: React.FC = () => {
 
         responseText = response;
 
-        // ✅ LOG 3: معالجة Custom Program من AI
-        // في دالة handleSendMessage في App.tsx - استبدل هذا الجزء
+        // 📦 STEP 3: استخراج ومعالجة البرنامج المخصص من الـ AI
+        console.log('[App] 🔍 Looking for custom program in AI response...');
 
-// 📦 STEP 3: استخراج ومعالجة البرنامج المخصص من الـ AI
-console.log('[App] 🔍 Looking for custom program in AI response...');
+        // دالة محسنة لاستخراج JSON
+        const extractCustomProgramJSON = (text: string): string | null => {
+            const tokenStart = '[EgipturaCustomProgram:';
+            const startIdx = text.indexOf(tokenStart);
+            if (startIdx === -1) return null;
 
-// دالة محسنة لاستخراج JSON
-const extractCustomProgramJSON = (text: string): string | null => {
-    const tokenStart = '[EgipturaCustomProgram:';
-    const startIdx = text.indexOf(tokenStart);
-    if (startIdx === -1) return null;
+            const jsonStartIdx = text.indexOf('{', startIdx);
+            if (jsonStartIdx === -1) return null;
 
-    const jsonStartIdx = text.indexOf('{', startIdx);
-    if (jsonStartIdx === -1) return null;
+            let openBraces = 0;
+            let inString = false;
+            let escapeNext = false;
 
-    let openBraces = 0;
-    let inString = false;
-    let escapeNext = false;
+            for (let i = jsonStartIdx; i < text.length; i++) {
+                const char = text[i];
+                if (escapeNext) { 
+                    escapeNext = false; 
+                    continue; 
+                }
+                if (char === '\\') { 
+                    escapeNext = true; 
+                    continue; 
+                }
+                if (char === '"' && !escapeNext) { 
+                    inString = !inString; 
+                    continue; 
+                }
+                if (!inString) {
+                    if (char === '{') openBraces++;
+                    else if (char === '}') {
+                        openBraces--;
+                        if (openBraces === 0) {
+                            return text.substring(jsonStartIdx, i + 1);
+                        }
+                    }
+                }
+            }
+            return null;
+        };
 
-    for (let i = jsonStartIdx; i < text.length; i++) {
-        const char = text[i];
-        if (escapeNext) { 
-            escapeNext = false; 
-            continue; 
-        }
-        if (char === '\\') { 
-            escapeNext = true; 
-            continue; 
-        }
-        if (char === '"' && !escapeNext) { 
-            inString = !inString; 
-            continue; 
-        }
-        if (!inString) {
-            if (char === '{') openBraces++;
-            else if (char === '}') {
-                openBraces--;
-                if (openBraces === 0) {
-                    return text.substring(jsonStartIdx, i + 1);
+        const jsonString = extractCustomProgramJSON(responseText);
+
+        if (jsonString) {
+            console.log('[App] ✅ Custom program JSON found, parsing...');
+            console.log('📦 JSON length:', jsonString.length);
+            
+            try {
+                const programFromAI = JSON.parse(jsonString);
+                console.log('✅ AI program parsed successfully');
+                
+                // ✅ استخدام البرنامج مباشرة من الـ AI (تم معالجته في geminiService)
+                if (programFromAI.id && programFromAI.isCustom) {
+                    console.log('✅ Using pre-processed custom program from AI');
+                    
+                    // تطبيق التسعير إذا لزم الأمر
+                    if (programFromAI.quoteParams && validateQuoteParams(programFromAI.quoteParams)) {
+                        const scenarios = calculatePriceScenarios(programFromAI.quoteParams);
+                        finalCustomProgram = withDisplayDefaults({
+                            ...programFromAI,
+                            seasonalPricing: {
+                                summer: { gold: scenarios.summer, diamond: scenarios.summer },
+                                winter: { gold: scenarios.winter, diamond: scenarios.winter },
+                            },
+                        });
+                    } else {
+                        finalCustomProgram = withDisplayDefaults(programFromAI);
+                    }
+                    
+                    // ✅ إزالة الـ token من النص لعرض النص فقط
+                    responseText = responseText.replace(`[EgipturaCustomProgram:${jsonString}]`, '').trim();
+                    
+                    if (!responseText) {
+                        responseText = uiText.customQuoteCreated || "I've created your custom Egypt journey!";
+                    }
+                }
+                
+            } catch (error) {
+                console.error('[App] ❌ Failed to parse custom program JSON:', error);
+                // في حالة فشل التحليل، نستخدم fallback
+                const fallbackProgram = generateLocalFallbackProgram(userInput, currentLang);
+                if (fallbackProgram.quoteParams && validateQuoteParams(fallbackProgram.quoteParams)) {
+                    const scenarios = calculatePriceScenarios(fallbackProgram.quoteParams);
+                    finalCustomProgram = withDisplayDefaults({
+                        ...fallbackProgram,
+                        seasonalPricing: {
+                            summer: { gold: scenarios.summer, diamond: scenarios.summer },
+                            winter: { gold: scenarios.winter, diamond: scenarios.winter },
+                        },
+                    });
+                    responseText = uiText.customQuoteCreated || "I've created your custom Egypt journey!";
                 }
             }
         }
-    }
-    return null;
-};
-
-const jsonString = extractCustomProgramJSON(responseText);
-
-if (jsonString) {
-    console.log('[App] ✅ Custom program JSON found, parsing...');
-    console.log('📦 JSON length:', jsonString.length);
-    
-    try {
-        const programFromAI = JSON.parse(jsonString);
-        console.log('✅ AI program parsed successfully');
-        
-        // ✅ استخدام البرنامج مباشرة من الـ AI (تم معالجته في geminiService)
-        if (programFromAI.id && programFromAI.isCustom) {
-            console.log('✅ Using pre-processed custom program from AI');
-            
-            // تطبيق التسعير إذا لزم الأمر
-            if (programFromAI.quoteParams && validateQuoteParams(programFromAI.quoteParams)) {
-                const scenarios = calculatePriceScenarios(programFromAI.quoteParams);
-                finalCustomProgram = withDisplayDefaults({
-                    ...programFromAI,
-                    seasonalPricing: {
-                        summer: { gold: scenarios.summer, diamond: scenarios.summer },
-                        winter: { gold: scenarios.winter, diamond: scenarios.winter },
-                    },
-                });
-            } else {
-                finalCustomProgram = withDisplayDefaults(programFromAI);
-            }
-            
-            // ✅ إزالة الـ token من النص لعرض النص فقط
-            responseText = responseText.replace(`[EgipturaCustomProgram:${jsonString}]`, '').trim();
-            
-            if (!responseText) {
-                responseText = uiText.customQuoteCreated || "I've created your custom Egypt journey!";
-            }
-        }
-        
-    } catch (error) {
-        console.error('[App] ❌ Failed to parse custom program JSON:', error);
-        // في حالة فشل التحليل، نستخدم fallback
-        const fallbackProgram = generateLocalFallbackProgram(userInput, currentLang);
-        if (fallbackProgram.quoteParams && validateQuoteParams(fallbackProgram.quoteParams)) {
-            const scenarios = calculatePriceScenarios(fallbackProgram.quoteParams);
-            finalCustomProgram = withDisplayDefaults({
-                ...fallbackProgram,
-                seasonalPricing: {
-                    summer: { gold: scenarios.summer, diamond: scenarios.summer },
-                    winter: { gold: scenarios.winter, diamond: scenarios.winter },
-                },
-            });
-            responseText = uiText.customQuoteCreated || "I've created your custom Egypt journey!";
-        }
-    }
-}
         
         // ✅ Fallback للطلبات المخصصة بدون رد AI
         const hasTravelDetails = /\d+\s*(days?|d[iíì]as|ايام)/i.test(userInput);
@@ -639,7 +1025,8 @@ if (jsonString) {
                 duration: fallbackProgram.duration.days,
                 nights: fallbackProgram.duration.nights,
                 cairo: fallbackProgram.quoteParams?.itineraryPlan?.nights?.cairo,
-                cruise: fallbackProgram.quoteParams?.itineraryPlan?.nights?.cruise
+                cruise: fallbackProgram.quoteParams?.itineraryPlan?.nights?.cruise,
+                season: fallbackProgram.quoteParams?.season // 🆕 الموسم المكتشف
             });
             
             if (fallbackProgram.quoteParams && validateQuoteParams(fallbackProgram.quoteParams)) {
@@ -652,6 +1039,7 @@ if (jsonString) {
                     },
                 });
                 console.log('💰 Pricing scenarios:', scenarios);
+                console.log('🌡️ Season used:', fallbackProgram.quoteParams.season);
             }
             
             responseText = uiText.customQuoteCreated;
@@ -739,7 +1127,8 @@ if (jsonString) {
             responseText: responseText.substring(0, 100) + '...',
             programIds: programIds,
             hasCustomProgram: !!finalCustomProgram,
-            customProgramDuration: finalCustomProgram?.duration?.days
+            customProgramDuration: finalCustomProgram?.duration?.days,
+            detectedSeason: seasonInfo.season // 🆕
         });
 
         // إنشاء الرسالة النهائية
@@ -807,8 +1196,6 @@ if (jsonString) {
         setIsLoading(false);
     }
 }, [addMessage, language, setLanguage, messages, findMatchingPrograms, uiText.customQuoteCreated, validateQuoteParams]);
-
-
 
     const handleLoadSavedTrip = useCallback(() => {
         const savedProgramJson = localStorage.getItem('savedEgipturaProgram');
