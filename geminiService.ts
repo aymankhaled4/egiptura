@@ -89,17 +89,28 @@ User: "Custom 5 days Cairo" (missing travelers, season, category)
 → Ask questions ONLY, NO programs
 
 **🎯 CUSTOM PROGRAM FORMAT:**
-When user provides ALL 5 details, respond with:
+When user provides ALL 5 details, respond with. Include OPTIONAL fields when specified by the user:
 [lang:xx][EgipturaCustomProgram:{
   "travelers": 2,
   "duration": 5,
   "destinations": ["cairo", "alexandria"],
   "season": "winter",
   "category": "gold",
-  "language": "en"
+  "language": "en",
+  "daysAllocation": { "cairo": 2, "alexandria": 2, "cruise": 3 },
+  "sitesByCity": {
+    "cairo": ["gizaPyramidsAndSphinx", "khanElKhalili"],
+    "alexandria": ["alexandriaNationalMuseum", "qaitbayCitadel"]
+  }
 }]
 
 **CRITICAL:** Send ONLY the parameters above. The backend will extract real data from the 10 programs.
+
+**OPTIONAL FIELDS (include when explicitly specified by user):**
+- daysAllocation: { "cairo": number, "luxor": number, "aswan": number, "alexandria": number, "cruise": number }
+- sitesByCity: { [city]: string[] }
+  - Use canonical site keys when possible: e.g. "gizaPyramidsAndSphinx", "khanElKhalili", "citadelAndAlabasterMosque", "alexandriaNationalMuseum", "qaitbayCitadel", "karnakTemple", "philaeTemple".
+  - If unsure, you may use clear free-text names in the user's language (the backend will map best-effort).
 
 **❌ DO NOT include in response:**
 - itinerary (backend extracts it)
