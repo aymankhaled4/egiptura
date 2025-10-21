@@ -173,6 +173,7 @@ export const internalCosts: CostData = {
       kalabshaTemple: { adult: 4.4, student: 2.2 },
       elKab: { adult: 4.4, student: 2.2 },
       nubianMuseum: { adult: 8.9, student: 4.4 },
-      highDam: { adult: 0, student: null }, // Not listed in tickets, likely included in transport/tour cost
+      highDam: { adult: 4.9, student: 2.4 }
+
     },
 };
