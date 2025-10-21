@@ -12,9 +12,10 @@ import CustomPricingCalculator from './CustomPricingCalculator';
 interface ProgramModalProps {
   program: Program;
   onClose: () => void;
+  detectedSeason?: 'summer' | 'winter' | null;
 }
 
-const ProgramModal: React.FC<ProgramModalProps> = ({ program, onClose }) => {
+const ProgramModal: React.FC<ProgramModalProps> = ({ program, onClose, detectedSeason }) => {
   const { language } = useLanguage();
   const lang = language;
   const uiText = knowledgeBase.localizedStrings.ui[lang] ?? knowledgeBase.localizedStrings.ui.en;
@@ -253,11 +254,11 @@ const ProgramModal: React.FC<ProgramModalProps> = ({ program, onClose }) => {
     {
       label: uiText.modalPricing,
       content: program.isCustom && program.quoteParams ? (
-        <CustomPricingCalculator quoteParams={program.quoteParams} />
+        <CustomPricingCalculator quoteParams={program.quoteParams} detectedSeason={detectedSeason} />
       ) : (
         <div className="space-y-6">
-          {renderPriceTable('summer', uiText.modalSummerSeason)}
-          {renderPriceTable('winter', uiText.modalWinterSeason)}
+          {(!detectedSeason || detectedSeason === 'summer') && renderPriceTable('summer', uiText.modalSummerSeason)}
+          {(!detectedSeason || detectedSeason === 'winter') && renderPriceTable('winter', uiText.modalWinterSeason)}
           {exchangeRate && (
             <p className="text-xs text-gray-500 text-center pt-2">
               {uiText.modalExchangeRate} 1 USD ≈ {exchangeRate.toFixed(2)} EGP. {uiText.modalExchangeRateDisclaimer}

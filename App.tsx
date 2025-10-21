@@ -31,6 +31,7 @@ const App: React.FC = () => {
     const [isLoading, setIsLoading] = useState<boolean>(true);
     const [selectedProgram, setSelectedProgram] = useState<Program | null>(null);
     const [hasSavedTrip, setHasSavedTrip] = useState(false);
+    const [detectedSeason, setDetectedSeason] = useState<'summer' | 'winter' | null>(null);
 
     const uiText = useMemo(() => knowledgeBase.localizedStrings.ui[language] || knowledgeBase.localizedStrings.ui.es, [language]);
 
@@ -848,6 +849,7 @@ const handleSendMessage = useCallback(async (userInput: string) => {
         
         // 🆕 استخراج معلومات الموسم (من الكلمة المباشرة أو الشهر)
         const seasonInfo = extractSeasonInfo(userInput);
+        setDetectedSeason(seasonInfo.season);
         const hasSeason = seasonInfo.season !== null;
         
         console.log('🌡️ Season Analysis:', {
@@ -1259,6 +1261,7 @@ const handleSendMessage = useCallback(async (userInput: string) => {
                 <ProgramModal 
                     program={selectedProgram} 
                     onClose={() => setSelectedProgram(null)}
+                    detectedSeason={detectedSeason}
                 />
             )}
         </div>
