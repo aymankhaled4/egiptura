@@ -258,7 +258,9 @@ export const sendMessageToAI = async (message: string): Promise<string> => {
                     destinations: customParams.destinations,
                     season: customParams.season,
                     category: customParams.category,
-                    language: customParams.language || 'en'
+                    language: customParams.language || 'en',
+                    daysAllocation: customParams.daysAllocation,
+                    sitesByCity: customParams.sitesByCity
                 });
 
                 // ✅ التحقق من نجاح الإنشاء
