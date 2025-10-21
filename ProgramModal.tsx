@@ -76,24 +76,37 @@ const ProgramModal: React.FC<ProgramModalProps> = ({ program, onClose, detectedS
       const priceData = pricing[category];
       if (!priceData || typeof priceData === 'number') return null;
 
+      const details = priceData as SeasonalPricingDetail;
+      const showDouble = typeof details.double === 'number' && details.double > 0;
+      const showTriple = typeof details.triple === 'number' && details.triple > 0;
+      const showSingle = typeof details.single === 'number' && details.single > 0;
+      const anyVisible = showDouble || showTriple || showSingle;
+      if (!anyVisible) return null;
+
       return (
         <div key={category} className="bg-gray-800/50 p-4 rounded-lg border border-gray-700">
           <h4 className={`font-bold text-lg mb-3 flex items-center gap-2 ${category === 'gold' ? 'text-[#C59D5F]' : 'text-sky-400'}`}>
             {icon} {categoryLabel}
           </h4>
           <div className="grid grid-cols-1 sm:grid-cols-3 gap-2 text-center">
-            <div className="bg-gray-900/40 p-2 rounded">
-              <p className="text-xs text-gray-400">{uiText.modalPriceDouble}</p>
-              <p className="font-semibold text-white">{(priceData as SeasonalPricingDetail).double} USD</p>
-            </div>
-            <div className="bg-gray-900/40 p-2 rounded">
-              <p className="text-xs text-gray-400">{uiText.modalPriceTriple}</p>
-              <p className="font-semibold text-white">{(priceData as SeasonalPricingDetail).triple} USD</p>
-            </div>
-            <div className="bg-gray-900/40 p-2 rounded">
-              <p className="text-xs text-gray-400">{uiText.modalPriceSingle}</p>
-              <p className="font-semibold text-white">{(priceData as SeasonalPricingDetail).single} USD</p>
-            </div>
+            {showDouble && (
+              <div className="bg-gray-900/40 p-2 rounded">
+                <p className="text-xs text-gray-400">{uiText.modalPriceDouble}</p>
+                <p className="font-semibold text-white">{details.double} USD</p>
+              </div>
+            )}
+            {showTriple && (
+              <div className="bg-gray-900/40 p-2 rounded">
+                <p className="text-xs text-gray-400">{uiText.modalPriceTriple}</p>
+                <p className="font-semibold text-white">{details.triple} USD</p>
+              </div>
+            )}
+            {showSingle && (
+              <div className="bg-gray-900/40 p-2 rounded">
+                <p className="text-xs text-gray-400">{uiText.modalPriceSingle}</p>
+                <p className="font-semibold text-white">{details.single} USD</p>
+              </div>
+            )}
           </div>
         </div>
       );
