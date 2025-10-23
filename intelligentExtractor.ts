@@ -164,39 +164,58 @@ export class IntelligentDataExtractor {
         return program;
     }
 
-    // 📊 حساب توزيع الأيام بشكل ذكي
+    // 📊 حساب توزيع الأيام بشكل ذكي مع دعم ترتيب المدن
     private calculateDaysDistribution(duration: number, cities: string[]): { [city: string]: number } {
         const availableDays = duration - 2; // استبعاد يوم الوصول والمغادرة
         const distribution: { [city: string]: number } = {};
         
-        // القاهرة دائماً لها الأولوية
-        if (cities.includes('cairo')) {
-            distribution.cairo = Math.max(2, Math.ceil(availableDays * 0.4));
+        // تحديد نوع الكروز المطلوب
+        const hasLuxor = cities.includes('luxor');
+        const hasAswan = cities.includes('aswan');
+        const hasCruise = hasLuxor && hasAswan;
+        
+        // حساب أيام الكروز
+        let cruiseDays = 0;
+        if (hasCruise) {
+            // 4 ليالي من الأقصر (5 أيام)
+            cruiseDays = 5;
         }
         
-        // توزيع باقي الأيام
-        let remainingDays = availableDays - (distribution.cairo || 0);
+        // حساب الأيام المتاحة للمدن الأخرى
+        const remainingDays = availableDays - cruiseDays;
+        
+        // توزيع الأيام حسب ترتيب المدن في الطلب
+        let daysLeft = remainingDays;
         
         for (const city of cities) {
-            if (city === 'cairo') continue;
+            if (city === 'luxor' || city === 'aswan') continue; // سيتم التعامل معها في الكروز
             
-            if (remainingDays > 0) {
-                const cityDays = Math.max(1, Math.ceil(remainingDays * 0.3));
+            if (daysLeft > 0) {
+                // القاهرة تحصل على 3-4 أيام، باقي المدن على 2-3 أيام
+                const cityDays = city === 'cairo' 
+                    ? Math.min(4, Math.max(3, Math.ceil(daysLeft * 0.4)))
+                    : Math.min(3, Math.max(2, Math.ceil(daysLeft * 0.3)));
+                
                 distribution[city] = cityDays;
-                remainingDays -= cityDays;
+                daysLeft -= cityDays;
             }
         }
         
+        // إضافة أيام الكروز
+        if (hasCruise) {
+            distribution.cruise = cruiseDays;
+        }
+        
         // أي أيام متبقية تذهب للقاهرة
-        if (remainingDays > 0) {
-            distribution.cairo = (distribution.cairo || 0) + remainingDays;
+        if (daysLeft > 0) {
+            distribution.cairo = (distribution.cairo || 0) + daysLeft;
         }
         
         console.log('[Enhanced] Days distribution:', distribution);
         return distribution;
     }
 
-    // 🗺️ إنشاء برنامج يومي محسن
+    // 🗺️ إنشاء برنامج يومي محسن مع دعم ترتيب المدن والكروز
     private createEnhancedItinerary(
         daysDistribution: { [city: string]: number },
         specificSites: { [city: string]: SupportedSite[] },
@@ -210,12 +229,23 @@ export class IntelligentDataExtractor {
         itinerary.push(this.createArrivalDay(language));
         currentDay++;
         
-        // أيام المدن
-        for (const [city, days] of Object.entries(daysDistribution)) {
+        // ترتيب المدن حسب الطلب: القاهرة → الإسكندرية → الكروز
+        const orderedCities = this.getOrderedCities(daysDistribution);
+        
+        for (const city of orderedCities) {
+            const days = daysDistribution[city];
             if (days > 0) {
-                const cityDays = this.createCityDays(city, days, specificSites[city] || [], language, currentDay);
-                itinerary.push(...cityDays);
-                currentDay += days;
+                if (city === 'cruise') {
+                    // إنشاء أيام الكروز
+                    const cruiseDays = this.createCruiseDays(specificSites, language, currentDay);
+                    itinerary.push(...cruiseDays);
+                    currentDay += days;
+                } else {
+                    // إنشاء أيام المدن العادية
+                    const cityDays = this.createCityDays(city, days, specificSites[city] || [], language, currentDay);
+                    itinerary.push(...cityDays);
+                    currentDay += days;
+                }
             }
         }
         
@@ -223,6 +253,120 @@ export class IntelligentDataExtractor {
         itinerary.push(this.createDepartureDay(totalDuration, language));
         
         return itinerary;
+    }
+
+    // 🗺️ ترتيب المدن حسب الطلب المطلوب
+    private getOrderedCities(daysDistribution: { [city: string]: number }): string[] {
+        const cities = Object.keys(daysDistribution).filter(city => daysDistribution[city] > 0);
+        
+        // ترتيب مخصص: القاهرة → الإسكندرية → الكروز
+        const orderedCities: string[] = [];
+        
+        // إضافة القاهرة أولاً
+        if (cities.includes('cairo')) {
+            orderedCities.push('cairo');
+        }
+        
+        // إضافة الإسكندرية ثانياً
+        if (cities.includes('alexandria')) {
+            orderedCities.push('alexandria');
+        }
+        
+        // إضافة الكروز أخيراً
+        if (cities.includes('cruise')) {
+            orderedCities.push('cruise');
+        }
+        
+        // إضافة أي مدن أخرى
+        for (const city of cities) {
+            if (!orderedCities.includes(city)) {
+                orderedCities.push(city);
+            }
+        }
+        
+        return orderedCities;
+    }
+
+    // ⛵ إنشاء أيام الكروز مع المسار الصحيح
+    private createCruiseDays(
+        specificSites: { [city: string]: SupportedSite[] },
+        language: Language,
+        startDay: number
+    ): ItineraryItem[] {
+        const cruiseDays: ItineraryItem[] = [];
+        
+        // اليوم 1: الأقصر (معبد الأقصر + الكرنك + وادي الملوك + حتشبسوت + ممنون)
+        cruiseDays.push({
+            day: startDay,
+            title: this.getCruiseDayTitle('luxor', 1, language),
+            activities: this.getCruiseDayActivities('luxor', specificSites.luxor || [], language)
+        });
+        
+        // اليوم 2: إدفو
+        cruiseDays.push({
+            day: startDay + 1,
+            title: this.getCruiseDayTitle('edfu', 2, language),
+            activities: this.getCruiseDayActivities('edfu', [], language)
+        });
+        
+        // اليوم 3: كوم أمبو
+        cruiseDays.push({
+            day: startDay + 2,
+            title: this.getCruiseDayTitle('komOmbo', 3, language),
+            activities: this.getCruiseDayActivities('komOmbo', [], language)
+        });
+        
+        // اليوم 4: أسوان (معبد فيلة)
+        cruiseDays.push({
+            day: startDay + 3,
+            title: this.getCruiseDayTitle('aswan', 4, language),
+            activities: this.getCruiseDayActivities('aswan', specificSites.aswan || [], language)
+        });
+        
+        return cruiseDays;
+    }
+
+    // ⛵ عنوان يوم الكروز
+    private getCruiseDayTitle(city: string, dayNumber: number, language: Language): LocalizedString {
+        const cityNames = {
+            luxor: { es: "Luxor", en: "Luxor", ar: "الأقصر" },
+            edfu: { es: "Edfu", en: "Edfu", ar: "إدفو" },
+            komOmbo: { es: "Kom Ombo", en: "Kom Ombo", ar: "كوم أمبو" },
+            aswan: { es: "Asuán", en: "Aswan", ar: "أسوان" }
+        };
+        
+        const cityName = cityNames[city as keyof typeof cityNames] || { es: city, en: city, ar: city };
+        
+        return {
+            es: `Crucero por el Nilo - ${cityName.es}`,
+            en: `Nile Cruise - ${cityName.en}`,
+            ar: `رحلة نيلية - ${cityName.ar}`
+        };
+    }
+
+    // ⛵ أنشطة يوم الكروز
+    private getCruiseDayActivities(city: string, sites: SupportedSite[], language: Language): { es: string[]; en: string[]; ar: string[] } {
+        const activities: { es: string[]; en: string[]; ar: string[] } = { es: [], en: [], ar: [] };
+        
+        if (city === 'luxor') {
+            activities[language].push(
+                this.getSiteActivity('luxorTemple', language) || 'زيارة معبد الأقصر',
+                this.getSiteActivity('karnakTemple', language) || 'زيارة معبد الكرنك',
+                this.getSiteActivity('valleyOfTheKings', language) || 'زيارة وادي الملوك',
+                this.getSiteActivity('hatshepsutTemple', language) || 'زيارة معبد حتشبسوت',
+                this.getSiteActivity('colossiOfMemnon', language) || 'زيارة تمثالي ممنون'
+            );
+        } else if (city === 'edfu') {
+            activities[language].push('زيارة معبد إدفو المخصص للإله حورس');
+        } else if (city === 'komOmbo') {
+            activities[language].push('زيارة معبد كوم أمبو المخصص للإله سوبك وحورس');
+        } else if (city === 'aswan') {
+            activities[language].push(
+                this.getSiteActivity('philaeTemple', language) || 'زيارة معبد فيلة المخصص للإلهة إيزيس'
+            );
+        }
+        
+        return activities;
     }
 
     // 🏙️ إنشاء أيام مدينة محددة
@@ -323,18 +467,58 @@ export class IntelligentDataExtractor {
         const accommodations = { gold: [] as any[], diamond: [] as any[] };
         
         for (const [city, days] of Object.entries(daysDistribution)) {
-            if (days > 0 && city !== 'cruise') {
-                const cityName = this.getCityLocalizedName(city);
-                const hotel = this.getBestHotelForCity(city, category, language);
-                
-                accommodations[category].push({
-                    city: cityName,
-                    hotel: hotel
-                });
+            if (days > 0) {
+                if (city === 'cruise') {
+                    // إضافة الكروز
+                    const cruiseInfo = this.getCruiseInfo(category, language);
+                    accommodations[category].push(cruiseInfo);
+                } else {
+                    // إضافة الفنادق العادية
+                    const cityName = this.getCityLocalizedName(city);
+                    const hotel = this.getBestHotelForCity(city, category, language);
+                    
+                    accommodations[category].push({
+                        city: cityName,
+                        hotel: hotel,
+                        nights: days - 1
+                    });
+                }
             }
         }
         
         return accommodations;
+    }
+
+    // ⛵ معلومات الكروز
+    private getCruiseInfo(category: 'gold' | 'diamond', language: Language): any {
+        const cruiseNames = {
+            gold: {
+                es: "Crucero Dorado del Nilo",
+                en: "Golden Nile Cruise",
+                ar: "كروز نيل ذهبي"
+            },
+            diamond: {
+                es: "Crucero Diamante del Nilo",
+                en: "Diamond Nile Cruise", 
+                ar: "كروز نيل ماسي"
+            }
+        };
+        
+        return {
+            type: 'cruise',
+            name: cruiseNames[category],
+            nights: 4,
+            route: {
+                es: "Luxor a Asuán",
+                en: "Luxor to Aswan",
+                ar: "من الأقصر إلى أسوان"
+            },
+            departureDays: {
+                es: "Sábado y Lunes",
+                en: "Saturday and Monday",
+                ar: "السبت والاثنين"
+            }
+        };
     }
 
     // 🏨 الحصول على أفضل فندق للمدينة
