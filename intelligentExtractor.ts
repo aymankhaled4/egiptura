@@ -1,4 +1,5 @@
 import type { Program, ItineraryItem, CustomQuoteParams, SupportedSite, SupportedCity, LocalizedString } from './types';
+import { normalizeSiteKey } from './siteAliases';
 import { knowledgeBase } from './services/knowledgeBase';
 import type { Language } from './contexts/LanguageContext';
 
@@ -723,6 +724,186 @@ export class IntelligentDataExtractor {
         }];
     }
 
+    // 🏖️ أيام الغردقة
+    private getHurghadaDays(language: Language): ItineraryItem[] {
+        return [{
+            day: 1,
+            title: { es: 'Hurghada – Mar Rojo y Relax', en: 'Hurghada – Red Sea & Relaxation', ar: 'الغردقة – البحر الأحمر والاسترخاء' },
+            activities: {
+                es: [
+                    'Desayuno en el hotel',
+                    'Día libre en la playa del Mar Rojo',
+                    'Opcional: Excursión de snorkel en barco',
+                    'Opcional: Safari en el desierto al atardecer',
+                    'Cena y alojamiento'
+                ],
+                en: [
+                    'Breakfast at the hotel',
+                    'Leisure day on the Red Sea beach',
+                    'Optional: Boat snorkeling excursion',
+                    'Optional: Sunset desert safari',
+                    'Dinner and accommodation'
+                ],
+                ar: [
+                    'الإفطار في الفندق',
+                    'يوم حر على شاطئ البحر الأحمر',
+                    'اختياري: رحلة سنوركل بالقارب',
+                    'اختياري: سفاري صحراء وقت الغروب',
+                    'العشاء والإقامة'
+                ]
+            }
+        }];
+    }
+
+    // 🌊 أيام شرم الشيخ
+    private getSharmElSheikhDays(language: Language): ItineraryItem[] {
+        return [{
+            day: 1,
+            title: { es: 'Sharm el-Sheij – Mar Rojo y Ocio', en: 'Sharm El-Sheikh – Red Sea & Leisure', ar: 'شرم الشيخ – البحر الأحمر والترفيه' },
+            activities: {
+                es: [
+                    'Desayuno en el hotel',
+                    'Día libre para disfrutar de la playa y la piscina',
+                    'Opcional: Parque Nacional Ras Mohammed (snorkel)',
+                    'Opcional: Cena beduina bajo las estrellas',
+                    'Alojamiento'
+                ],
+                en: [
+                    'Breakfast at the hotel',
+                    'Free day to enjoy beach and pool',
+                    'Optional: Ras Mohammed National Park (snorkeling)',
+                    'Optional: Bedouin dinner under the stars',
+                    'Accommodation'
+                ],
+                ar: [
+                    'الإفطار في الفندق',
+                    'يوم حر للاستمتاع بالشاطئ والمسبح',
+                    'اختياري: محمية رأس محمد (سنوركل)',
+                    'اختياري: عشاء بدوي تحت النجوم',
+                    'الإقامة'
+                ]
+            }
+        }];
+    }
+
+    // ⛰️ أيام سانت كاترين
+    private getSaintCatherineDays(language: Language): ItineraryItem[] {
+        return [{
+            day: 1,
+            title: { es: 'Santa Catalina – Sinaí y Monasterio', en: 'Saint Catherine – Sinai & Monastery', ar: 'سانت كاترين – جبل سيناء والدير' },
+            activities: {
+                es: [
+                    'Salida de madrugada para ascenso opcional al Monte Sinaí',
+                    'Amanecer sobre el desierto',
+                    'Visita al Monasterio de Santa Catalina',
+                    'Regreso y tiempo libre',
+                    'Alojamiento'
+                ],
+                en: [
+                    'Early departure for optional Mount Sinai ascent',
+                    'Sunrise over the desert',
+                    'Visit to Saint Catherine Monastery',
+                    'Return and free time',
+                    'Accommodation'
+                ],
+                ar: [
+                    'مغادرة مبكرة لصعود اختياري إلى جبل سيناء',
+                    'مشاهدة شروق الشمس فوق الصحراء',
+                    'زيارة دير سانت كاترين',
+                    'العودة ووقت حر',
+                    'الإقامة'
+                ]
+            }
+        }];
+    }
+
+    // 🏜️ أيام سيوة
+    private getSiwaDays(language: Language): ItineraryItem[] {
+        return [{
+            day: 1,
+            title: { es: 'Siwa – Oasis y Cultura Local', en: 'Siwa – Oasis & Local Culture', ar: 'سيوة – الواحة والثقافة المحلية' },
+            activities: {
+                es: [
+                    'Desayuno',
+                    'Paseo por la fortaleza de Shali (exterior)',
+                    'Tiempo en la fuente de Cleopatra',
+                    'Atardecer en el Gran Mar de Arena',
+                    'Cena y alojamiento'
+                ],
+                en: [
+                    'Breakfast',
+                    'Walk around Shali Fortress (exterior)',
+                    'Time at Cleopatra Spring',
+                    'Sunset in the Great Sand Sea',
+                    'Dinner and accommodation'
+                ],
+                ar: [
+                    'الإفطار',
+                    'نزهة حول قلعة شالي (من الخارج)',
+                    'الاستمتاع بعين كليوباترا',
+                    'غروب الشمس في بحر الرمال العظيم',
+                    'العشاء والإقامة'
+                ]
+            }
+        }];
+    }
+
+    // 🏖️ أيام مرسى مطروح
+    private getMatrouhDays(language: Language): ItineraryItem[] {
+        return [{
+            day: 1,
+            title: { es: 'Mersa Matruh – Playas del Mediterráneo', en: 'Marsa Matrouh – Mediterranean Beaches', ar: 'مرسى مطروح – شواطئ البحر المتوسط' },
+            activities: {
+                es: [
+                    'Desayuno en el hotel',
+                    'Día libre en playas de aguas turquesa',
+                    'Opcional: Calas y bahías cercanas',
+                    'Cena y alojamiento'
+                ],
+                en: [
+                    'Breakfast at the hotel',
+                    'Free day on turquoise-water beaches',
+                    'Optional: Nearby coves and bays',
+                    'Dinner and accommodation'
+                ],
+                ar: [
+                    'الإفطار في الفندق',
+                    'يوم حر على الشواطئ ذات المياه الفيروزية',
+                    'اختياري: الخلجان والخلجان القريبة',
+                    'العشاء والإقامة'
+                ]
+            }
+        }];
+    }
+
+    // 🏛️ أيام أبو سمبل
+    private getAbuSimbelDays(language: Language): ItineraryItem[] {
+        return [{
+            day: 1,
+            title: { es: 'Abu Simbel – Templos de Ramsés II', en: 'Abu Simbel – Temples of Ramses II', ar: 'أبو سمبل – معابد رمسيس الثاني' },
+            activities: {
+                es: [
+                    'Salida de madrugada hacia Abu Simbel',
+                    'Visita a los templos de Ramsés II y Nefertari',
+                    'Tiempo para fotos y contemplación',
+                    'Regreso y tarde libre'
+                ],
+                en: [
+                    'Early departure to Abu Simbel',
+                    'Visit the Temples of Ramses II and Nefertari',
+                    'Time for photos and contemplation',
+                    'Return and free afternoon'
+                ],
+                ar: [
+                    'مغادرة مبكرة إلى أبو سمبل',
+                    'زيارة معابد رمسيس الثاني ونفرتاري',
+                    'وقت لالتقاط الصور والتأمل',
+                    'العودة وبعد الظهر حر'
+                ]
+            }
+        }];
+    }
+
     // 🚢 أيام الكروز المفصلة
    // 🚢 أيام الكروز المفصلة
     private getCruiseDays(totalDuration: number, language: Language): ItineraryItem[] {
@@ -918,9 +1099,113 @@ export class IntelligentDataExtractor {
             case 'cruise':
                 days.push(...this.getCruiseDays(totalDuration, language));
                 break;
+            case 'hurghada':
+                days.push(...this.getHurghadaDays(language));
+                break;
+            case 'sharmelsheikh':
+            case 'sharm el sheikh':
+                days.push(...this.getSharmElSheikhDays(language));
+                break;
+            case 'saintcatherine':
+            case 'saint catherine':
+                days.push(...this.getSaintCatherineDays(language));
+                break;
+            case 'siwa':
+                days.push(...this.getSiwaDays(language));
+                break;
+            case 'matrouh':
+            case 'marsa matrouh':
+                days.push(...this.getMatrouhDays(language));
+                break;
+            case 'abusimbel':
+            case 'abu simbel':
+                days.push(...this.getAbuSimbelDays(language));
+                break;
         }
         
         return days;
+    }
+
+    // 🧱 إنشاء سرد يومي لكل مدينة اعتمادًا على باقاتنا (Dynamic narrative from packages)
+    private buildCityItineraryFromPackages(city: string, count: number, language: Language): ItineraryItem[] {
+        if (count <= 0) return [];
+
+        const cityData = this.extractCityData(city, language);
+
+        const arrivalKeywords = ['arrival', 'llegada', 'الوصول'];
+        const departureKeywords = ['departure', 'salida', 'المغادرة'];
+        const freeDayKeywords = ['free', 'libre', 'حر'];
+
+        const isNonTouringDay = (title: string, activities: string[]): boolean => {
+            const t = (title || '').toLowerCase();
+            const a = (activities || []).join(' ').toLowerCase();
+            const has = (kw: string[]) => kw.some(k => t.includes(k) || a.includes(k));
+            return has(arrivalKeywords) || has(departureKeywords) || has(freeDayKeywords);
+        };
+
+        const normalized: ItineraryItem[] = [];
+        for (const item of cityData.itinerary) {
+            const localTitle = item.title?.[language] || item.title?.en || '';
+            let acts: string[] = [];
+            if (Array.isArray((item as any).activities)) {
+                acts = (item as any).activities as string[];
+            } else if (typeof (item as any).activities === 'object' && (item as any).activities) {
+                acts = (item as any).activities[language] || (item as any).activities.en || [];
+            }
+
+            if (isNonTouringDay(localTitle, acts)) continue;
+
+            const activitiesObj = Array.isArray((item as any).activities)
+                ? { es: acts, en: acts, ar: acts }
+                : (item as any).activities;
+
+            normalized.push({
+                day: (item as any).day ?? 0, // سيتم ضبطه عند الإدراج النهائي
+                title: item.title,
+                activities: activitiesObj,
+            } as ItineraryItem);
+        }
+
+        return normalized.slice(0, Math.max(0, count));
+    }
+
+    // 🧩 بناء أيام مخصصة تحتوي فقط على المواقع التي اختارها العميل (Site-only days)
+    private buildSiteOnlyDays(
+        city: string,
+        daysToAdd: number,
+        sitesRaw: string[] | undefined,
+        language: Language
+    ): ItineraryItem[] {
+        if (!sitesRaw || sitesRaw.length === 0 || daysToAdd <= 0) return [];
+
+        const cityName = this.getCityLocalizedName(city);
+        const localizedCity = cityName?.[language] || cityName?.en || city;
+
+        // قسم المواقع على عدد الأيام المطلوب بالتساوي
+        const chunkSize = Math.max(1, Math.ceil(sitesRaw.length / daysToAdd));
+        const chunks: string[][] = [];
+        for (let i = 0; i < sitesRaw.length; i += chunkSize) {
+            chunks.push(sitesRaw.slice(i, i + chunkSize));
+        }
+        while (chunks.length < daysToAdd) chunks.push([]);
+
+        const mkTitle = (dayIndex: number): LocalizedString => ({
+            es: `${localizedCity} – Visitas Personalizadas (${dayIndex})`,
+            en: `${localizedCity} – Personalized Visits (${dayIndex})`,
+            ar: `${localizedCity} – زيارات مخصصة (${dayIndex})`,
+        });
+
+        const mkActivities = (sites: string[]): { es: string[]; en: string[]; ar?: string[] } => ({
+            es: sites.map(s => `Visita: ${s}`),
+            en: sites.map(s => `Visit: ${s}`),
+            ar: sites.map(s => `زيارة: ${s}`),
+        });
+
+        return chunks.slice(0, daysToAdd).map((sites, idx) => ({
+            day: 0, // سيتم ضبطه لاحقاً
+            title: mkTitle(idx + 1),
+            activities: mkActivities(sites)
+        }));
     }
 
     // 📝 إنشاء الـ itinerary المخصص بالتفاصيل الكاملة
@@ -1027,7 +1312,11 @@ export class IntelligentDataExtractor {
     duration: number,
     destinations: string[],
     nightsDistribution: any,
-    language: Language
+    language: Language,
+    clientPlan?: {
+        perCityDays?: Record<string, number>;
+        perCitySitesRaw?: Record<string, string[]>;
+    }
 ): ItineraryItem[] {
     const customItinerary: ItineraryItem[] = [];
     
@@ -1072,75 +1361,67 @@ export class IntelligentDataExtractor {
     console.log('[itinerary] Starting itinerary creation');
     console.log('[itinerary] Duration:', duration, 'Current day:', currentDay);
     console.log('[itinerary] Nights distribution:', nightsDistribution);
-    
-    // إضافة أيام القاهرة أولاً
-    if (nightsDistribution.cairo > 0) {
-        const cairoDays = this.getCairoDays(duration, language);
-        const daysToAdd = Math.min(nightsDistribution.cairo, cairoDays.length, duration - currentDay - 1);
-        
-        console.log(`[itinerary] Adding ${daysToAdd} Cairo days`);
-        for (let i = 0; i < daysToAdd; i++) {
+
+    // ابنِ الأيام حسب ترتيب اختيارات العميل، بسرد من الباقات إن وُجد
+    const normalizeCity = (d: string): string => {
+        const s = d.toLowerCase();
+        if (s.includes('cruise') || s.includes('nile')) return 'cruise';
+        if (s.includes('cairo') || s.includes('القاهرة') || s.includes('القاهره')) return 'cairo';
+        if (s.includes('luxor') || s.includes('الأقصر') || s.includes('الاقصر')) return 'luxor';
+        if (s.includes('aswan') || s.includes('أسوان') || s.includes('اسوان')) return 'aswan';
+        if (s.includes('alexandria') || s.includes('الإسكندرية') || s.includes('الاسكندرية')) return 'alexandria';
+        if (s.includes('hurghada') || s.includes('الغردقة')) return 'hurghada';
+        if (s.includes('sharm') || s.includes('شرم')) return 'sharm el sheikh';
+        if (s.includes('catherine') || s.includes('كاترين')) return 'saint catherine';
+        if (s.includes('siwa') || s.includes('سيوة')) return 'siwa';
+        if (s.includes('matrouh') || s.includes('مطروح') || s.includes('مرسى')) return 'matrouh';
+        if (s.includes('abu simbel') || s.includes('ابو سمبل') || s.includes('أبو سمبل')) return 'abu simbel';
+        return s;
+    };
+
+    // دمج توزيع الأيام الذكي مع التوزيع الذي حدده العميل (إن وجد)
+    const effectiveDays: Record<string, number> = { ...nightsDistribution, ...(clientPlan?.perCityDays || {}) };
+
+    for (const rawDestination of destinations) {
+        const city = normalizeCity(rawDestination);
+        const availableDaysForCity = Math.max(0, (effectiveDays[city] ?? 0));
+        if (availableDaysForCity <= 0) continue;
+
+        const remainingSlots = Math.max(0, (duration - currentDay - 1)); // اترك يوم المغادرة
+        if (remainingSlots <= 0) break;
+
+        const daysToAdd = Math.min(availableDaysForCity, remainingSlots);
+
+        let cityDays: ItineraryItem[] = [];
+
+        // إذا حدّد العميل مواقع بعينها لهذه المدينة، أنشئ أياماً تحتوي فقط على هذه المواقع
+        const clientSitesRaw = clientPlan?.perCitySitesRaw?.[city];
+        if (clientSitesRaw && clientSitesRaw.length > 0) {
+            cityDays = this.buildSiteOnlyDays(city, daysToAdd, clientSitesRaw, language);
+        } else {
+            // جرّب السرد من الباقات أولاً
+            cityDays = this.buildCityItineraryFromPackages(city, daysToAdd, language);
+
+            // إن لم تكفِ العناصر، كمل بقوالب fallback
+            if (cityDays.length < daysToAdd) {
+                const fallbackDays = this.getDaysForDestination(city, duration, language);
+                const needed = daysToAdd - cityDays.length;
+                cityDays = [
+                    ...cityDays,
+                    ...fallbackDays.slice(0, needed)
+                ];
+            }
+        }
+
+        for (const d of cityDays) {
             customItinerary.push({
-                ...cairoDays[i],
+                ...d,
                 day: currentDay++
             });
+            if (currentDay >= duration) break; // لا تتجاوز اليوم الأخير
         }
-    }
-    
-    // إضافة أيام الكروز
-    if (nightsDistribution.cruise > 0) {
-        const cruiseDays = this.getCruiseDays(duration, language);
-        const daysToAdd = Math.min(nightsDistribution.cruise, cruiseDays.length, duration - currentDay - 1);
-        
-        console.log(`[itinerary] Adding ${daysToAdd} Cruise days from ${cruiseDays.length} available`);
-        for (let i = 0; i < daysToAdd; i++) {
-            customItinerary.push({
-                ...cruiseDays[i],
-                day: currentDay++
-            });
-        }
-    }
-    
-    // إضافة أيام الأقصر
-    if (nightsDistribution.luxor > 0) {
-        const luxorDays = this.getLuxorDays(language);
-        const daysToAdd = Math.min(nightsDistribution.luxor, luxorDays.length, duration - currentDay - 1);
-        
-        console.log(`[itinerary] Adding ${daysToAdd} Luxor days`);
-        for (let i = 0; i < daysToAdd; i++) {
-            customItinerary.push({
-                ...luxorDays[i],
-                day: currentDay++
-            });
-        }
-    }
-    
-    // إضافة أيام أسوان
-    if (nightsDistribution.aswan > 0) {
-        const aswanDays = this.getAswanDays(language);
-        const daysToAdd = Math.min(nightsDistribution.aswan, aswanDays.length, duration - currentDay - 1);
-        
-        console.log(`[itinerary] Adding ${daysToAdd} Aswan days`);
-        for (let i = 0; i < daysToAdd; i++) {
-            customItinerary.push({
-                ...aswanDays[i],
-                day: currentDay++
-            });
-        }
-    }
-    
-    // إضافة أيام الإسكندرية
-    if (nightsDistribution.alexandria > 0) {
-        const alexandriaDays = this.getAlexandriaDays(language);
-        const daysToAdd = Math.min(nightsDistribution.alexandria, alexandriaDays.length, duration - currentDay - 1);
-        
-        console.log(`[itinerary] Adding ${daysToAdd} Alexandria days`);
-        for (let i = 0; i < daysToAdd; i++) {
-            customItinerary.push({
-                ...alexandriaDays[i],
-                day: currentDay++
-            });
-        }
+
+        if (currentDay >= duration) break;
     }
     
     // ملء الأيام الفارغة بأيام حرة
@@ -1318,8 +1599,12 @@ private calculateNightsDistribution(duration: number, destinations: string[]): {
         season: 'summer' | 'winter';
         category: 'gold' | 'diamond';
         language: Language;
+        clientPlan?: {
+            perCityDays?: Record<string, number>;
+            perCitySitesRaw?: Record<string, string[]>;
+        }
     }): Program {
-        const { duration, travelers, destinations, season, category, language } = request;
+        const { duration, travelers, destinations, season, category, language, clientPlan } = request;
         const totalNights = duration - 1;
 
         // حساب توزيع الليالي
@@ -1330,7 +1615,8 @@ private calculateNightsDistribution(duration: number, destinations: string[]): {
             duration, 
             destinations, 
             nightsDistribution,
-            language
+            language,
+            clientPlan
         );
 
         // إنشاء أماكن الإقامة المفصلة
