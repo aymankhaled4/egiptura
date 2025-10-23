@@ -724,6 +724,186 @@ export class IntelligentDataExtractor {
         }];
     }
 
+    // 🏖️ أيام الغردقة
+    private getHurghadaDays(language: Language): ItineraryItem[] {
+        return [{
+            day: 1,
+            title: { es: 'Hurghada – Mar Rojo y Relax', en: 'Hurghada – Red Sea & Relaxation', ar: 'الغردقة – البحر الأحمر والاسترخاء' },
+            activities: {
+                es: [
+                    'Desayuno en el hotel',
+                    'Día libre en la playa del Mar Rojo',
+                    'Opcional: Excursión de snorkel en barco',
+                    'Opcional: Safari en el desierto al atardecer',
+                    'Cena y alojamiento'
+                ],
+                en: [
+                    'Breakfast at the hotel',
+                    'Leisure day on the Red Sea beach',
+                    'Optional: Boat snorkeling excursion',
+                    'Optional: Sunset desert safari',
+                    'Dinner and accommodation'
+                ],
+                ar: [
+                    'الإفطار في الفندق',
+                    'يوم حر على شاطئ البحر الأحمر',
+                    'اختياري: رحلة سنوركل بالقارب',
+                    'اختياري: سفاري صحراء وقت الغروب',
+                    'العشاء والإقامة'
+                ]
+            }
+        }];
+    }
+
+    // 🌊 أيام شرم الشيخ
+    private getSharmElSheikhDays(language: Language): ItineraryItem[] {
+        return [{
+            day: 1,
+            title: { es: 'Sharm el-Sheij – Mar Rojo y Ocio', en: 'Sharm El-Sheikh – Red Sea & Leisure', ar: 'شرم الشيخ – البحر الأحمر والترفيه' },
+            activities: {
+                es: [
+                    'Desayuno en el hotel',
+                    'Día libre para disfrutar de la playa y la piscina',
+                    'Opcional: Parque Nacional Ras Mohammed (snorkel)',
+                    'Opcional: Cena beduina bajo las estrellas',
+                    'Alojamiento'
+                ],
+                en: [
+                    'Breakfast at the hotel',
+                    'Free day to enjoy beach and pool',
+                    'Optional: Ras Mohammed National Park (snorkeling)',
+                    'Optional: Bedouin dinner under the stars',
+                    'Accommodation'
+                ],
+                ar: [
+                    'الإفطار في الفندق',
+                    'يوم حر للاستمتاع بالشاطئ والمسبح',
+                    'اختياري: محمية رأس محمد (سنوركل)',
+                    'اختياري: عشاء بدوي تحت النجوم',
+                    'الإقامة'
+                ]
+            }
+        }];
+    }
+
+    // ⛰️ أيام سانت كاترين
+    private getSaintCatherineDays(language: Language): ItineraryItem[] {
+        return [{
+            day: 1,
+            title: { es: 'Santa Catalina – Sinaí y Monasterio', en: 'Saint Catherine – Sinai & Monastery', ar: 'سانت كاترين – جبل سيناء والدير' },
+            activities: {
+                es: [
+                    'Salida de madrugada para ascenso opcional al Monte Sinaí',
+                    'Amanecer sobre el desierto',
+                    'Visita al Monasterio de Santa Catalina',
+                    'Regreso y tiempo libre',
+                    'Alojamiento'
+                ],
+                en: [
+                    'Early departure for optional Mount Sinai ascent',
+                    'Sunrise over the desert',
+                    'Visit to Saint Catherine Monastery',
+                    'Return and free time',
+                    'Accommodation'
+                ],
+                ar: [
+                    'مغادرة مبكرة لصعود اختياري إلى جبل سيناء',
+                    'مشاهدة شروق الشمس فوق الصحراء',
+                    'زيارة دير سانت كاترين',
+                    'العودة ووقت حر',
+                    'الإقامة'
+                ]
+            }
+        }];
+    }
+
+    // 🏜️ أيام سيوة
+    private getSiwaDays(language: Language): ItineraryItem[] {
+        return [{
+            day: 1,
+            title: { es: 'Siwa – Oasis y Cultura Local', en: 'Siwa – Oasis & Local Culture', ar: 'سيوة – الواحة والثقافة المحلية' },
+            activities: {
+                es: [
+                    'Desayuno',
+                    'Paseo por la fortaleza de Shali (exterior)',
+                    'Tiempo en la fuente de Cleopatra',
+                    'Atardecer en el Gran Mar de Arena',
+                    'Cena y alojamiento'
+                ],
+                en: [
+                    'Breakfast',
+                    'Walk around Shali Fortress (exterior)',
+                    'Time at Cleopatra Spring',
+                    'Sunset in the Great Sand Sea',
+                    'Dinner and accommodation'
+                ],
+                ar: [
+                    'الإفطار',
+                    'نزهة حول قلعة شالي (من الخارج)',
+                    'الاستمتاع بعين كليوباترا',
+                    'غروب الشمس في بحر الرمال العظيم',
+                    'العشاء والإقامة'
+                ]
+            }
+        }];
+    }
+
+    // 🏖️ أيام مرسى مطروح
+    private getMatrouhDays(language: Language): ItineraryItem[] {
+        return [{
+            day: 1,
+            title: { es: 'Mersa Matruh – Playas del Mediterráneo', en: 'Marsa Matrouh – Mediterranean Beaches', ar: 'مرسى مطروح – شواطئ البحر المتوسط' },
+            activities: {
+                es: [
+                    'Desayuno en el hotel',
+                    'Día libre en playas de aguas turquesa',
+                    'Opcional: Calas y bahías cercanas',
+                    'Cena y alojamiento'
+                ],
+                en: [
+                    'Breakfast at the hotel',
+                    'Free day on turquoise-water beaches',
+                    'Optional: Nearby coves and bays',
+                    'Dinner and accommodation'
+                ],
+                ar: [
+                    'الإفطار في الفندق',
+                    'يوم حر على الشواطئ ذات المياه الفيروزية',
+                    'اختياري: الخلجان والخلجان القريبة',
+                    'العشاء والإقامة'
+                ]
+            }
+        }];
+    }
+
+    // 🏛️ أيام أبو سمبل
+    private getAbuSimbelDays(language: Language): ItineraryItem[] {
+        return [{
+            day: 1,
+            title: { es: 'Abu Simbel – Templos de Ramsés II', en: 'Abu Simbel – Temples of Ramses II', ar: 'أبو سمبل – معابد رمسيس الثاني' },
+            activities: {
+                es: [
+                    'Salida de madrugada hacia Abu Simbel',
+                    'Visita a los templos de Ramsés II y Nefertari',
+                    'Tiempo para fotos y contemplación',
+                    'Regreso y tarde libre'
+                ],
+                en: [
+                    'Early departure to Abu Simbel',
+                    'Visit the Temples of Ramses II and Nefertari',
+                    'Time for photos and contemplation',
+                    'Return and free afternoon'
+                ],
+                ar: [
+                    'مغادرة مبكرة إلى أبو سمبل',
+                    'زيارة معابد رمسيس الثاني ونفرتاري',
+                    'وقت لالتقاط الصور والتأمل',
+                    'العودة وبعد الظهر حر'
+                ]
+            }
+        }];
+    }
+
     // 🚢 أيام الكروز المفصلة
    // 🚢 أيام الكروز المفصلة
     private getCruiseDays(totalDuration: number, language: Language): ItineraryItem[] {
@@ -918,6 +1098,28 @@ export class IntelligentDataExtractor {
                 break;
             case 'cruise':
                 days.push(...this.getCruiseDays(totalDuration, language));
+                break;
+            case 'hurghada':
+                days.push(...this.getHurghadaDays(language));
+                break;
+            case 'sharmelsheikh':
+            case 'sharm el sheikh':
+                days.push(...this.getSharmElSheikhDays(language));
+                break;
+            case 'saintcatherine':
+            case 'saint catherine':
+                days.push(...this.getSaintCatherineDays(language));
+                break;
+            case 'siwa':
+                days.push(...this.getSiwaDays(language));
+                break;
+            case 'matrouh':
+            case 'marsa matrouh':
+                days.push(...this.getMatrouhDays(language));
+                break;
+            case 'abusimbel':
+            case 'abu simbel':
+                days.push(...this.getAbuSimbelDays(language));
                 break;
         }
         
@@ -1168,6 +1370,12 @@ export class IntelligentDataExtractor {
         if (s.includes('luxor') || s.includes('الأقصر') || s.includes('الاقصر')) return 'luxor';
         if (s.includes('aswan') || s.includes('أسوان') || s.includes('اسوان')) return 'aswan';
         if (s.includes('alexandria') || s.includes('الإسكندرية') || s.includes('الاسكندرية')) return 'alexandria';
+        if (s.includes('hurghada') || s.includes('الغردقة')) return 'hurghada';
+        if (s.includes('sharm') || s.includes('شرم')) return 'sharm el sheikh';
+        if (s.includes('catherine') || s.includes('كاترين')) return 'saint catherine';
+        if (s.includes('siwa') || s.includes('سيوة')) return 'siwa';
+        if (s.includes('matrouh') || s.includes('مطروح') || s.includes('مرسى')) return 'matrouh';
+        if (s.includes('abu simbel') || s.includes('ابو سمبل') || s.includes('أبو سمبل')) return 'abu simbel';
         return s;
     };
 
