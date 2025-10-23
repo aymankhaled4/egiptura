@@ -696,6 +696,16 @@ export class IntelligentDataExtractor {
                 es: "Visitar el Templo de Philae",
                 en: "Visit Philae Temple",
                 ar: "زيارة معبد فيلة"
+            },
+            edfuTemple: {
+                es: "Visitar el Templo de Edfu",
+                en: "Visit Edfu Temple",
+                ar: "زيارة معبد إدفو"
+            },
+            komOmboTemple: {
+                es: "Visitar el Templo de Kom Ombo",
+                en: "Visit Kom Ombo Temple",
+                ar: "زيارة معبد كوم أمبو"
             }
         };
         
