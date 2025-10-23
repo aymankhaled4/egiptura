@@ -2,7 +2,63 @@ import type { Program, ItineraryItem, CustomQuoteParams, SupportedSite, Supporte
 import { knowledgeBase } from './services/knowledgeBase';
 import type { Language } from './contexts/LanguageContext';
 
-// 🧠 نظام ذكي لاستخراج البيانات من البرامج الـ10 الموجودة
+// 🔥 النظام المرن الجديد - واجهات البيانات
+
+interface DayPlan {
+    days: string; // "1-2" or "3"
+    city?: string;
+    sites?: string[]; // أماكن محددة
+    type?: 'cruise' | 'city';
+    nights?: number; // للكروز
+    startCity?: 'luxor' | 'aswan';
+    direction?: 'luxor-to-aswan' | 'aswan-to-luxor';
+    departureDay?: 'saturday' | 'monday' | 'wednesday' | 'friday';
+}
+
+interface FlexibleCustomRequest {
+    travelers: number;
+    duration: number;
+    dayByDay: DayPlan[];
+    season: 'summer' | 'winter';
+    category: 'gold' | 'diamond';
+    language: Language;
+}
+
+// 🗺️ خريطة المواقع المتاحة
+const AVAILABLE_SITES = {
+    cairo: [
+        'gizaPyramidsAndSphinx', 'egyptianMuseum', 'khanElKhalili', 
+        'citadelOfSaladin', 'saqqara', 'copticMuseum'
+    ],
+    luxor: [
+        'karnakTemple', 'luxorTemple', 'valleyOfTheKings', 
+        'hatshepsutTemple', 'ramesseumTemple'
+    ],
+    aswan: [
+        'philaeTemple', 'highDam', 'abuSimbelTemples', 'unfinishedObelisk'
+    ],
+    alexandria: [
+        'qaitbayCitadel', 'alexandriaNationalMuseum', 'komElShoqafaCatacombs', 'pompeysPillar'
+    ],
+    edfu: ['edfuTemple'],
+    komOmbo: ['komOmboTemple']
+};
+
+// 🚢 قواعد الكروز
+const CRUISE_RULES = {
+    3: {
+        startCity: 'aswan',
+        departureDays: ['wednesday', 'friday'],
+        direction: 'aswan-to-luxor'
+    },
+    4: {
+        startCity: 'luxor',
+        departureDays: ['saturday', 'monday'],
+        direction: 'luxor-to-aswan'
+    }
+};
+
+// 🧠 نظام ذكي لاستخراج البيانات من البرامج الـ10 الموجودةجودة
 export class IntelligentDataExtractor {
     private programs: Program[];
 
@@ -1272,15 +1328,126 @@ private calculateNightsDistribution(duration: number, destinations: string[]): {
         } else {
             // برنامج قصير جداً
             distribution.cairo = Math.max(1, availableDays - 1);
-            distribution.cruise = 1;
-        }
-    } else {
-        // بدون كروز - توزيع على المدن
-        let remainingDays = availableDays;
+            distribution.cruis    // 🎯 إنشاء برنامج مخصص مرن بناءً على اختيارات العميل
+    createFlexibleCustomProgram(request: FlexibleCustomRequest): Program {
+        const { travelers, duration, dayByDay, season, category, language } = request;
         
-        // القاهرة دائماً لها الأولوية
-        distribution.cairo = Math.max(2, Math.ceil(remainingDays * 0.4));
-        remainingDays -= distribution.cairo;
+        // تحليل الطلب المرن
+        const analyzedRequest = this.analyzeFlexibleRequest(dayByDay, duration);
+        
+        // إنشاء البرنامج اليومي المرن
+        const flexibleItinerary = this.createFlexibleItinerary(analyzedRequest, language);
+        
+        // حساب توزيع الليالي
+        const nightsDistribution = this.calculateFlexibleNightsDistribution(analyzedRequest);
+        
+        // إنشاء أماكن الإقامة
+        const accommodations = this.createCustomAccommodations(
+            nightsDistribution, 
+            category,
+            language
+        );
+
+        // إنشاء البرنامج النهائي
+        const program: Program = {
+            id: `flexible-custom-${Date.now()}`,
+            isCustom: true,
+            name: this.createFlexibleProgramName(analyzedRequest, language),
+            icon: "🗺️",
+            duration: { days: duration, nights: duration - 1 },
+            priceFrom: 0,
+            categories: [category],
+            startCity: { es: "El Cairo", en: "Cairo", ar: "القاهرة" },
+            ...(analyzedRequest.hasCruise && { cruiseNights: analyzedRequest.cruiseNights }),
+            briefDescription: this.createFlexibleBriefDescription(analyzedRequest, language),
+            generalDescription: this.createFlexibleGeneralDescription(analyzedRequest, language),
+            itinerary: flexibleItinerary,
+            itineraryOptions: [
+                {
+                    name: { es: "Itinerario Personalizado", en: "Custom Itinerary", ar: "البرنامج المخصص" },
+                    itinerary: flexibleItinerary
+                }
+            ],
+            accommodations: accommodations,
+            servicesIncluded: this.createServicesIncluded(nightsDistribution, category, language),
+            servicesExcluded: knowledgeBase.defaults.servicesExcluded,
+            importantNotes: knowledgeBase.defaults.importantNotes,
+            quoteParams: {
+                travelers,
+                duration,
+                season,
+                category,
+                itineraryPlan: {
+                    nights: this.convertNightsDistribution(nightsDistribution),
+                    sites: this.extractSitesFromFlexibleItinerary(flexibleItinerary, language),
+                    flightSectors: analyzedRequest.hasCruise ? 2 : 0,
+                }
+            }
+        };
+
+        return program;
+    }
+
+    // 🧠 تحليل الطلب المرن
+    private analyzeFlexibleRequest(dayByDay: DayPlan[], duration: number): {
+        cities: string[];
+        sites: { [city: string]: string[] };
+        hasCruise: boolean;
+        cruiseNights: number;
+        cruiseDirection: string;
+        cruiseStartCity: string;
+        cruiseDepartureDay: string;
+    } {
+        const cities: string[] = [];
+        const sites: { [city: string]: string[] } = {};
+        let hasCruise = false;
+        let cruiseNights = 0;
+        let cruiseDirection = '';
+        let cruiseStartCity = '';
+        let cruiseDepartureDay = '';
+
+        for (const dayPlan of dayByDay) {
+            if (dayPlan.type === 'cruise') {
+                hasCruise = true;
+                cruiseNights = dayPlan.nights || 3;
+                cruiseDirection = dayPlan.direction || 'luxor-to-aswan';
+                cruiseStartCity = dayPlan.startCity || 'luxor';
+                cruiseDepartureDay = dayPlan.departureDay || 'saturday';
+            } else if (dayPlan.city) {
+                const city = dayPlan.city.toLowerCase();
+                if (!cities.includes(city)) {
+                    cities.push(city);
+                }
+                
+                if (dayPlan.sites && dayPlan.sites.length > 0) {
+                    sites[city] = dayPlan.sites;
+                } else {
+                    // إذا لم يحدد العميل مواقع محددة، نستخدم المواقع الافتراضية للمدينة
+                    sites[city] = AVAILABLE_SITES[city as keyof typeof AVAILABLE_SITES] || [];
+                }
+            }
+        }
+
+        return {
+            cities,
+            sites,
+            hasCruise,
+            cruiseNights,
+            cruiseDirection,
+            cruiseStartCity,
+            cruiseDepartureDay
+        };
+    }
+
+    // 🎯 إنشاء برنامج مخصص ذكي (الطريقة القديمة - للتوافق مع الكود الموجود)
+    createCustomProgram(request: {
+        duration: number;
+        travelers: number;
+        destinations: string[];
+        season: 'summer' | 'winter';
+        category: 'gold' | 'diamond';
+        language: Language;
+    }): Program {ibution.cairo;
         
         if (hasLuxor && remainingDays > 0) {
             distribution.luxor = Math.max(1, Math.ceil(remainingDays * 0.4));
@@ -1484,22 +1651,836 @@ private calculateNightsDistribution(duration: number, destinations: string[]): {
 
         return {
             es: `Este itinerario personalizado de ${duration} días ha sido diseñado especialmente para ti, combinando lo mejor de ${cityList}. Cada detalle ha sido cuidadosamente seleccionado para crear una experiencia inolvidable.`,
-            en: `This custom ${duration}-day itinerary has been specially designed for you, combining the best of ${cityList}. Every detail has been carefully selected to create an unforgettable experience.`,
-            ar: `هذا المسار المخصص لمدة ${duration} أيام مصمم خصيصًا لك، يجمع بين أفضل ما في ${cityList}. تم اختيار كل تفصيل بعناية لخلق تجربة لا تُنسى.`
+            en: `This custo    // 🔄 تحويل توزيع الليالي
+    private convertNightsDistribution(nightsDistribution: any): { [key: string]: number } {
+        const result: { [key: string]: number } = {};
+        for (const [city, nights] of Object.entries(nightsDistribution)) {
+            if (typeof nights === 'number' && nights > 0) {
+                result[city] = nights;
+            }
+        }
+        return result;
+    }
+
+    // 🗺️ إنشاء البرنامج اليومي المرن
+    private createFlexibleItinerary(analyzedRequest: any, language: Language): ItineraryItem[] {
+        const itinerary: ItineraryItem[] = [];
+        let currentDay = 1;
+
+        // يوم الوصول
+        itinerary.push(this.createArrivalDay(language));
+
+        // إضافة أيام المدن حسب اختيار العميل
+        for (const city of analyzedRequest.cities) {
+            const citySites = analyzedRequest.sites[city] || [];
+            const cityDays = this.createCityDaysWithSpecificSites(city, citySites, language);
+            
+            for (const day of cityDays) {
+                itinerary.push({
+                    ...day,
+                    day: ++currentDay
+                });
+            }
+        }
+
+        // إضافة أيام الكروز إذا كان مطلوباً
+        if (analyzedRequest.hasCruise) {
+            const cruiseDays = this.createCruiseDaysWithRules(
+                analyzedRequest.cruiseNights,
+                analyzedRequest.cruiseDirection,
+                analyzedRequest.cruiseStartCity,
+                language
+            );
+            
+            for (const day of cruiseDays) {
+                itinerary.push({
+                    ...day,
+                    day: ++currentDay
+                });
+            }
+        }
+
+        // يوم المغادرة
+        itinerary.push(this.createDepartureDay(currentDay + 1, language));
+
+        return itinerary;
+    }
+
+    // 🏛️ إنشاء أيام المدينة مع مواقع محددة
+    private createCityDaysWithSpecificSites(city: string, sites: string[], language: Language): ItineraryItem[] {
+        const days: ItineraryItem[] = [];
+        
+        switch (city.toLowerCase()) {
+            case 'cairo':
+                days.push(...this.createCairoDaysWithSites(sites, language));
+                break;
+            case 'luxor':
+                days.push(...this.createLuxorDaysWithSites(sites, language));
+                break;
+            case 'aswan':
+                days.push(...this.createAswanDaysWithSites(sites, language));
+                break;
+            case 'alexandria':
+                days.push(...this.createAlexandriaDaysWithSites(sites, language));
+                break;
+        }
+
+        return days;
+    }
+
+    // 🏛️ إنشاء أيام القاهرة مع مواقع محددة
+    private createCairoDaysWithSites(sites: string[], language: Language): ItineraryItem[] {
+        const days: ItineraryItem[] = [];
+        
+        // تجميع المواقع حسب الأيام
+        const sitesPerDay = this.groupSitesByDay(sites, 'cairo');
+        
+        for (let i = 0; i < sitesPerDay.length; i++) {
+            const daySites = sitesPerDay[i];
+            const dayTitle = this.getDayTitleForSites(daySites, 'cairo', language);
+            const activities = this.generateActivitiesForSites(daySites, 'cairo', language);
+            
+            days.push({
+                day: i + 1,
+                title: dayTitle,
+                activities: activities
+            });
+        }
+
+        return days;
+    }
+
+    // 🏛️ إنشاء أيام الأقصر مع مواقع محددة
+    private createLuxorDaysWithSites(sites: string[], language: Language): ItineraryItem[] {
+        const days: ItineraryItem[] = [];
+        
+        const sitesPerDay = this.groupSitesByDay(sites, 'luxor');
+        
+        for (let i = 0; i < sitesPerDay.length; i++) {
+            const daySites = sitesPerDay[i];
+            const dayTitle = this.getDayTitleForSites(daySites, 'luxor', language);
+            const activities = this.generateActivitiesForSites(daySites, 'luxor', language);
+            
+            days.push({
+                day: i + 1,
+                title: dayTitle,
+                activities: activities
+            });
+        }
+
+        return days;
+    }
+
+    // 🏛️ إنشاء أيام أسوان مع مواقع محددة
+    private createAswanDaysWithSites(sites: string[], language: Language): ItineraryItem[] {
+        const days: ItineraryItem[] = [];
+        
+        const sitesPerDay = this.groupSitesByDay(sites, 'aswan');
+        
+        for (let i = 0; i < sitesPerDay.length; i++) {
+            const daySites = sitesPerDay[i];
+            const dayTitle = this.getDayTitleForSites(daySites, 'aswan', language);
+            const activities = this.generateActivitiesForSites(daySites, 'aswan', language);
+            
+            days.push({
+                day: i + 1,
+                title: dayTitle,
+                activities: activities
+            });
+        }
+
+        return days;
+    }
+
+    // 🏛️ إنشاء أيام الإسكندرية مع مواقع محددة
+    private createAlexandriaDaysWithSites(sites: string[], language: Language): ItineraryItem[] {
+        const days: ItineraryItem[] = [];
+        
+        const sitesPerDay = this.groupSitesByDay(sites, 'alexandria');
+        
+        for (let i = 0; i < sitesPerDay.length; i++) {
+            const daySites = sitesPerDay[i];
+            const dayTitle = this.getDayTitleForSites(daySites, 'alexandria', language);
+            const activities = this.generateActivitiesForSites(daySites, 'alexandria', language);
+            
+            days.push({
+                day: i + 1,
+                title: dayTitle,
+                activities: activities
+            });
+        }
+
+        return days;
+    }
+
+    // 🚢 إنشاء أيام الكروز مع القواعد
+    private createCruiseDaysWithRules(nights: number, direction: string, startCity: string, language: Language): ItineraryItem[] {
+        const days: ItineraryItem[] = [];
+        
+        if (direction === 'luxor-to-aswan') {
+            // الأقصر إلى أسوان
+            days.push(this.createCruiseDay('luxor', 'karnakTemple', 'luxorTemple', language));
+            days.push(this.createCruiseDay('edfu', 'edfuTemple', language));
+            days.push(this.createCruiseDay('komOmbo', 'komOmboTemple', language));
+            days.push(this.createCruiseDay('aswan', 'philaeTemple', 'highDam', language));
+        } else {
+            // أسوان إلى الأقصر
+            days.push(this.createCruiseDay('aswan', 'philaeTemple', 'highDam', language));
+            days.push(this.createCruiseDay('komOmbo', 'komOmboTemple', language));
+            days.push(this.createCruiseDay('edfu', 'edfuTemple', language));
+            days.push(this.createCruiseDay('luxor', 'valleyOfTheKings', 'hatshepsutTemple', language));
+        }
+
+        return days.slice(0, nights);
+    }
+
+    // 🚢 إنشاء يوم كروز واحد
+    private createCruiseDay(city: string, ...sites: string[]): ItineraryItem {
+        return {
+            day: 1,
+            title: {
+                es: `Crucero - ${this.getCityName(city, 'es')}`,
+                en: `Cruise - ${this.getCityName(city, 'en')}`,
+                ar: `كروز - ${this.getCityName(city, 'ar')}`
+            },
+            activities: {
+                es: this.generateCruiseActivities(city, sites, 'es'),
+                en: this.generateCruiseActivities(city, sites, 'en'),
+                ar: this.generateCruiseActivities(city, sites, 'ar')
+            }
         };
     }
 
-    // 🏨 إنشاء الخدمات المضمنة
-    private createServicesIncluded(
-        nightsDistribution: any,
-        category: 'gold' | 'diamond',
-        language: Language
-    ): { es: string[]; en: string[]; ar: string[] } {
-        const baseServices = knowledgeBase.defaults.servicesIncluded[language] || [];
-        const services = [...baseServices];
+    // 📅 تجميع المواقع حسب الأيام
+    private groupSitesByDay(sites: string[], city: string): string[][] {
+        const maxSitesPerDay = this.getMaxSitesPerDay(city);
+        const groups: string[][] = [];
+        
+        for (let i = 0; i < sites.length; i += maxSitesPerDay) {
+            groups.push(sites.slice(i, i + maxSitesPerDay));
+        }
+        
+        return groups;
+    }
 
-        // إضافة خدمات الإقامة
-        for (const [city, nights] of Object.entries(nightsDistribution)) {
+    // 📊 الحصول على الحد الأقصى للمواقع في اليوم الواحد
+    private getMaxSitesPerDay(city: string): number {
+        const limits = {
+            'cairo': 3,
+            'luxor': 4,
+            'aswan': 3,
+            'alexandria': 4
+        };
+        
+        return limits[city as keyof typeof limits] || 3;
+    }
+
+    // 🏷️ الحصول على عنوان اليوم للمواقع
+    private getDayTitleForSites(sites: string[], city: string, language: Language): LocalizedString {
+        const siteNames = sites.map(site => this.getSiteName(site, language)).join(' & ');
+        const cityName = this.getCityName(city, language);
+        
+        return {
+            es: `${cityName} - ${siteNames}`,
+            en: `${cityName} - ${siteNames}`,
+            ar: `${cityName} - ${siteNames}`
+        };
+    }
+
+    // 🎯 إنشاء الأنشطة للمواقع المحددة
+    private generateActivitiesForSites(sites: string[], city: string, language: Language): { es: string[]; en: string[]; ar: string[] } {
+        const activities = {
+            es: [] as string[],
+            en: [] as string[],
+            ar: [] as string[]
+        };
+
+        // إضافة أنشطة أساسية
+        activities[language].push(this.getBasicActivity('breakfast', language));
+        
+        // إضافة أنشطة لكل موقع
+        for (const site of sites) {
+            const siteActivities = this.getSiteActivities(site, language);
+            activities[language].push(...siteActivities);
+        }
+        
+        // إضافة أنشطة ختامية
+        activities[language].push(this.getBasicActivity('lunch', language));
+        activities[language].push(this.getBasicActivity('free_time', language));
+        activities[language].push(this.getBasicActivity('dinner', language));
+
+        // نسخ الأنشطة للغات الأخرى
+        activities.es = [...activities[language]];
+        activities.en = [...activities[language]];
+        activities.ar = [...activities[language]];
+
+        return activities;
+    }
+
+    // 🚢 إنشاء أنشطة الكروز
+    private generateCruiseActivities(city: string, sites: string[], language: Language): string[] {
+        const activities = [];
+        
+        activities.push(this.getBasicActivity('cruise_breakfast', language));
+        
+        for (const site of sites) {
+            const siteActivities = this.getSiteActivities(site, language);
+            activities.push(...siteActivities);
+        }
+        
+        activities.push(this.getBasicActivity('cruise_lunch', language));
+        activities.push(this.getBasicActivity('cruise_sailing', language));
+        activities.push(this.getBasicActivity('cruise_dinner', language));
+        
+        return activities;
+    }
+
+    // 🏷️ الحصول على اسم الموقع
+    private getSiteName(site: string, language: Language): string {
+        const siteNames = {
+            'gizaPyramidsAndSphinx': {
+                es: 'Pirámides de Giza y Esfinge',
+                en: 'Giza Pyramids and Sphinx',
+                ar: 'أهرامات الجيزة وأبو الهول'
+            },
+            'egyptianMuseum': {
+                es: 'Museo Egipcio',
+                en: 'Egyptian Museum',
+                ar: 'المتحف المصري'
+            },
+            'karnakTemple': {
+                es: 'Templo de Karnak',
+                en: 'Karnak Temple',
+                ar: 'معبد الكرنك'
+            },
+            'luxorTemple': {
+                es: 'Templo de Luxor',
+                en: 'Luxor Temple',
+                ar: 'معبد الأقصر'
+            },
+            'valleyOfTheKings': {
+                es: 'Valle de los Reyes',
+                en: 'Valley of the Kings',
+                ar: 'وادي الملوك'
+            },
+            'hatshepsutTemple': {
+                es: 'Templo de Hatshepsut',
+                en: 'Hatshepsut Temple',
+                ar: 'معبد حتشبسوت'
+            },
+            'philaeTemple': {
+                es: 'Templo de Philae',
+                en: 'Philae Temple',
+                ar: 'معبد فيلة'
+            },
+            'edfuTemple': {
+                es: 'Templo de Edfu',
+                en: 'Edfu Temple',
+                ar: 'معبد إدفو'
+            },
+            'komOmboTemple': {
+                es: 'Templo de Kom Ombo',
+                en: 'Kom Ombo Temple',
+                ar: 'معبد كوم أمبو'
+            }
+        };
+
+        return siteNames[site as keyof typeof siteNames]?.[language] || site;
+    }
+
+    // 🏙️ الحصول على اسم المدينة
+    private getCityName(city: string, language: Language): string {
+        const cityNames = {
+            'cairo': {
+                es: 'El Cairo',
+                en: 'Cairo',
+                ar: 'القاهرة'
+            },
+            'luxor': {
+                es: 'Luxor',
+                en: 'Luxor',
+                ar: 'الأقصر'
+            },
+            'aswan': {
+                es: 'Asuán',
+                en: 'Aswan',
+                ar: 'أسوان'
+            },
+            'alexandria': {
+                es: 'Alejandría',
+                en: 'Alexandria',
+                ar: 'الإسكندرية'
+            }
+        };
+
+        return cityNames[city as keyof typeof cityNames]?.[language] || city;
+    }
+
+    // 🎯 الحصول على أنشطة الموقع
+    private getSiteActivities(site: string, language: Language): string[] {
+        const siteActivities = {
+            'gizaPyramidsAndSphinx': {
+                es: [
+                    'Visita a la Meseta de Giza',
+                    'Exploración de las Grandes Pirámides',
+                    'Foto con la Gran Esfinge'
+                ],
+                en: [
+                    'Visit to Giza Plateau',
+                    'Exploration of the Great Pyramids',
+                    'Photo with the Great Sphinx'
+                ],
+                ar: [
+                    'زيارة هضبة الجيزة',
+                    'استكشاف الأهرامات العظيمة',
+                    'التقاط الصور مع أبو الهول'
+                ]
+            },
+            'egyptianMuseum': {
+                es: [
+                    'Visita al Museo Egipcio',
+                    'Exploración de las salas de antigüedades',
+                    'Admiración del tesoro de Tutankamón'
+                ],
+                en: [
+                    'Visit to Egyptian Museum',
+                    'Exploration of antiquities halls',
+                    'Admiration of Tutankhamun\'s treasure'
+                ],
+                ar: [
+                    'زيارة المتحف المصري',
+                    'استكشاف قاعات الآثار',
+                    'الإعجاب بكنوز توت عنخ آمون'
+                ]
+            },
+            'karnakTemple': {
+                es: [
+                    'Visita al Templo de Karnak',
+                    'Exploración del Gran Patio',
+                    'Admiración de la Sala Hipóstila'
+                ],
+                en: [
+                    'Visit to Karnak Temple',
+                    'Exploration of the Great Court',
+                    'Admiration of the Hypostyle Hall'
+                ],
+                ar: [
+                    'زيارة معبد الكرنك',
+                    'استكشاف الفناء الكبير',
+                    'الإعجاب بقاعة الأعمدة'
+                ]
+            }
+        };
+
+        return siteActivities[site as keyof typeof siteActivities]?.[language] || [
+            `Visita a ${this.getSiteName(site, language)}`
+        ];
+    }
+
+    // 🍽️ الحصول على الأنشطة الأساسية
+    private getBasicActivity(type: string, language: Language): string {
+        const activities = {
+            'breakfast': {
+                es: 'Desayuno en el hotel',
+                en: 'Breakfast at hotel',
+                ar: 'الإفطار في الفندق'
+            },
+            'lunch': {
+                es: 'Almuerzo en restaurante local',
+                en: 'Lunch at local restaurant',
+                ar: 'الغداء في مطعم محلي'
+            },
+            'dinner': {
+                es: 'Cena y alojamiento',
+                en: 'Dinner and accommodation',
+                ar: 'العشاء والإقامة'
+            },
+            'free_time': {
+                es: 'Tiempo libre',
+                en: 'Free time',
+                ar: 'وقت حر'
+            },
+            'cruise_breakfast': {
+                es: 'Desayuno a bordo',
+                en: 'Breakfast on board',
+                ar: 'الإفطار على متن السفينة'
+            },
+            'cruise_lunch': {
+                es: 'Almuerzo a bordo',
+                en: 'Lunch on board',
+                ar: 'الغداء على متن السفينة'
+            },
+            'cruise_dinner': {
+                es: 'Cena a bordo',
+                en: 'Dinner on board',
+                ar: 'العشاء على متن السفينة'
+            },
+            'cruise_sailing': {
+                es: 'Navegación por el Nilo',
+                en: 'Nile sailing',
+                ar: 'الإبحار في النيل'
+            }
+        };
+
+        return activities[type as keyof typeof activities]?.[language] || type;
+    }
+
+    // 📊 حساب توزيع الليالي المرن
+    private calculateFlexibleNightsDistribution(analyzedRequest: any): any {
+        const distribution: any = {
+            cairo: 0,
+            luxor: 0,
+            aswan: 0,
+            alexandria: 0,
+            cruise: 0
+        };
+
+        // حساب الليالي لكل مدينة
+        for (const city of analyzedRequest.cities) {
+            const cityDays = this.getCityDaysFromSites(analyzedRequest.sites[city] || []);
+            distribution[city] = cityDays;
+        }
+
+        // إضافة ليالي الكروز
+        if (analyzedRequest.hasCruise) {
+            distribution.cruise = analyzedRequest.cruiseNights;
+        }
+
+        return distribution;
+    }
+
+    // 📊 حساب عدد أيام المدينة من المواقع
+    private getCityDaysFromSites(sites: string[]): number {
+        if (sites.length === 0) return 1;
+        
+        const maxSitesPerDay = 3; // متوسط المواقع في اليوم
+        return Math.ceil(sites.length / maxSitesPerDay);
+    }
+
+    // 🏷️ إنشاء اسم البرنامج المرن
+    private createFlexibleProgramName(analyzedRequest: any, language: Language): LocalizedString {
+        const cityNames = analyzedRequest.cities.map((city: string) => 
+            this.getCityName(city, language)
+        ).join(' & ');
+
+        const duration = analyzedRequest.cities.length + (analyzedRequest.hasCruise ? analyzedRequest.cruiseNights : 0) + 2;
+
+        return {
+            es: `Viaje Personalizado de ${duration} Días - ${cityNames}`,
+            en: `Custom ${duration}-Day Journey - ${cityNames}`,
+            ar: `رحلة مخصصة لمدة ${duration} أيام - ${cityNames}`
+        };
+    }
+
+    // 📝 إنشاء الوصف المختصر المرن
+    private createFlexibleBriefDescription(analyzedRequest: any, language: Language): LocalizedString {
+        const cityNames = analyzedRequest.cities.map((city: string) => 
+            this.getCityName(city, language)
+        ).join(' & ');
+
+        return {
+            es: `Un viaje personalizado explorando ${cityNames} según tus preferencias`,
+            en: `A custom journey exploring ${cityNames} according to your preferences`,
+            ar: `رحلة مخصصة لاستكشاف ${cityNames} حسب تفضيلاتك`
+        };
+    }
+
+    // 📝 إنشاء الوصف العام المرن
+    private createFlexibleGeneralDescription(analyzedRequest: any, language: Language): LocalizedString {
+        const cityNames = analyzedRequest.cities.map((city: string) => 
+            this.getCityName(city, language)
+        ).join(' & ');
+
+        return {
+            es: `Este itinerario ha sido diseñado especialmente para ti, visitando ${cityNames} con los sitios que más te interesan. Cada detalle ha sido personalizado para crear una experiencia única.`,
+            en: `This itinerary has been specially designed for you, visiting ${cityNames} with the sites that interest you most. Every detail has been personalized to create a unique experience.`,
+            ar: `هذا المسار مصمم خصيصًا لك، لزيارة ${cityNames} مع المواقع التي تهمك أكثر. تم تخصيص كل تفصيل لخلق تجربة فريدة.`
+        };
+    }
+
+    // 🗺️ استخراج المواقع من البرنامج المرن
+    private extractSitesFromFlexibleItinerary(itinerary: ItineraryItem[], language: Language): SupportedSite[] {
+        const sites: SupportedSite[] = [];
+        const allActivities = itinerary.flatMap(day => {
+            if (!day.activities) return [];
+            if (Array.isArray(day.activities)) return day.activities;
+            if (typeof day.activities === 'object') {
+                return day.activities[language] || day.activities.en || [];
+            }
+            return [];
+        });
+
+        const activitiesText = allActivities.join(' ').toLowerCase();
+
+        // التعرف على المواقع من النص
+        if (activitiesText.includes('pyramid') || activitiesText.includes('pirámide') || activitiesText.includes('هرم')) {
+            sites.push('gizaPyramidsAndSphinx');
+        }
+        if (activitiesText.includes('museum') || activitiesText.includes('museo') || activitiesText.includes('متحف')) {
+            sites.push('egyptianMuseum');
+        }
+        if (activitiesText.includes('karnak') || activitiesText.includes('الكرنك')) {
+            sites.push('karnakTemple');
+        }
+        if (activitiesText.includes('luxor temple') || activitiesText.includes('templo de luxor') || activitiesText.includes('معبد الأقصر')) {
+            sites.push('luxorTemple');
+        }
+        if (activitiesText.includes('valley of the kings') || activitiesText.includes('valle de los reyes') || activitiesText.includes('وادي الملوك')) {
+            sites.push('valleyOfTheKings');
+        }
+        if (activitiesText.includes('hatshepsut') || activitiesText.includes('حتشبسوت')) {
+            sites.push('hatshepsutTemple');
+        }
+        if (activitiesText.includes('philae') || activitiesText.includes('فيلة')) {
+            sites.push('philaeTemple');
+        }
+        if (activitiesText.includes('edfu') || activitiesText.includes('إدفو')) {
+            sites.push('edfuTemple');
+        }
+        if (activitiesText.includes('kom ombo') || activitiesText.includes('كوم أمبو')) {
+            sites.push('komOmboTemple');
+        }
+
+        return [...new Set(sites)];
+    }
+
+    // 📅 إنشاء يوم الوصول
+    private createArrivalDay(language: Language): ItineraryItem {
+        return {
+            day: 1,
+            title: {
+                es: 'Llegada a El Cairo - Bienvenida a Egipto',
+                en: 'Arrival in Cairo - Welcome to Egypt',
+                ar: 'الوصول إلى القاهرة - مرحباً بكم في مصر'
+            },
+            activities: {
+                es: [
+                    'Llegada al aeropuerto internacional de El Cairo',
+                    'Asistencia en el aeropuerto por nuestro representante',
+                    'Traslado privado al hotel',
+                    'Check-in en el hotel y tiempo libre',
+                    'Cena de bienvenida (opcional)'
+                ],
+                en: [
+                    'Arrival at Cairo International Airport',
+                    'Airport assistance by our representative',
+                    'Private transfer to hotel',
+                    'Hotel check-in and free time',
+                    'Welcome dinner (optional)'
+                ],
+                ar: [
+                    'الوصول إلى مطار القاهرة الدولي',
+                    'المساعدة في المطار من قبل ممثلنا',
+                    'انتقال خاص إلى الفندق',
+                    'تسجيل الوصول في الفندق والوقت الحر',
+                    'عشاء ترحيبي (اختياري)'
+                ]
+            }
+        };
+    }
+
+    // 📅 إنشاء يوم المغادرة
+    private createDepartureDay(day: number, language: Language): ItineraryItem {
+        return {
+            day: day,
+            title: {
+                es: 'Salida de El Cairo - Hasta Pronto',
+                en: 'Departure from Cairo - See You Soon',
+                ar: 'المغادرة من القاهرة - إلى اللقاء'
+            },
+            activities: {
+                es: [
+                    'Desayuno en el hotel',
+                    'Tiempo libre para últimas compras',
+                    'Check-out del hotel',
+                    'Traslado al aeropuerto',
+                    'Despedida y fin de nuestros servicios'
+                ],
+                en: [
+                    'Breakfast at the hotel',
+                    'Free time for last-minute shopping',
+                    'Hotel check-out',
+                    'Transfer to airport',
+                    'Farewell and end of our services'
+                ],
+                ar: [
+                    'الإفطار في الفندق',
+                    'وقت حر للتسوق الأخير',
+                    'تسجيل الخروج من الفندق',
+                    'الانتقال إلى المطار',
+                    'الوداع ونهاية خدماتنا'
+                ]
+            }
+        };
+    }
+}createSe// 🚀 تصدير الدالة الرئيسية
+export function createIntelligentCustomProgram(request: {
+    duration: number;
+    travelers: number;
+    destinations: string[];
+    season: 'summer' | 'winter';
+    category: 'gold' | 'diamond';
+    language: Language;
+}): Program {
+    const extractor = new IntelligentDataExtractor();
+    return extractor.createCustomProgram(request);
+}
+
+// 📚 مثال شامل على الاستخدام
+/*
+// إنشاء رحلة مخصصة مرنة
+const customRequest = createFlexibleRequest(
+    4, // عدد المسافرين
+    7, // مدة الرحلة
+    [
+        // يومين في القاهرة مع مواقع محددة
+        createDayPlan('2', 'cairo', ['gizaPyramidsAndSphinx', 'egyptianMuseum', 'khanElKhalili']),
+        
+        // 3 أيام كروز من الأقصر إلى أسوان
+        createDayPlan('3', undefined, undefined, 'cruise', 3, 'luxor', 'luxor-to-aswan', 'saturday'),
+        
+        // يوم في أسوان مع مواقع محددة
+        createDayPlan('1', 'aswan', ['philaeTemple', 'highDam'])
+    ],
+    'winter', // الموسم
+    'diamond', // الفئة
+    'en' // اللغة
+);
+
+// إنشاء البرنامج
+const program = createFlexibleCustomProgram(customRequest);
+
+// أو استخدام الأمثلة الجاهزة
+const cairoProgram = createFlexibleCustomProgram(FlexibleExamples.cairoOnly(2, 'ar'));
+const cruiseProgram = createFlexibleCustomProgram(FlexibleExamples.cruise4Nights(4, 'es'));
+*/
+
+// 🚀 تصدير الدالة المرنة الجديدة
+export function createFlexibleCustomProgram(request: FlexibleCustomRequest): Program {
+    const extractor = new IntelligentDataExtractor();
+    return extractor.createFlexibleCustomProgram(request);
+}
+
+// 🚀 دالة مساعدة لإنشاء طلب مرن بسهولة
+export function createFlexibleRequest(
+    travelers: number,
+    duration: number,
+    dayByDay: DayPlan[],
+    season: 'summer' | 'winter',
+    category: 'gold' | 'diamond',
+    language: Language
+): FlexibleCustomRequest {
+    return {
+        travelers,
+        duration,
+        dayByDay,
+        season,
+        category,
+        language
+    };
+}
+
+// 🚀 دالة مساعدة لإنشاء خطة يومية بسهولة
+export function createDayPlan(
+    days: string,
+    city?: string,
+    sites?: string[],
+    type?: 'cruise' | 'city',
+    nights?: number,
+    startCity?: 'luxor' | 'aswan',
+    direction?: 'luxor-to-aswan' | 'aswan-to-luxor',
+    departureDay?: 'saturday' | 'monday' | 'wednesday' | 'friday'
+): DayPlan {
+    return {
+        days,
+        city,
+        sites,
+        type,
+        nights,
+        startCity,
+        direction,
+        departureDay
+    };
+}
+
+// 🚀 أمثلة على الاستخدام
+export const FlexibleExamples = {
+    // مثال 1: رحلة القاهرة مع مواقع محددة
+    cairoOnly: (travelers: number, language: Language = 'en'): FlexibleCustomRequest => {
+        return createFlexibleRequest(
+            travelers,
+            4,
+            [
+                createDayPlan('2', 'cairo', ['gizaPyramidsAndSphinx', 'egyptianMuseum']),
+                createDayPlan('1', 'cairo', ['khanElKhalili', 'citadelOfSaladin'])
+            ],
+            'winter',
+            'gold',
+            language
+        );
+    },
+
+    // مثال 2: رحلة الأقصر مع مواقع محددة
+    luxorOnly: (travelers: number, language: Language = 'en'): FlexibleCustomRequest => {
+        return createFlexibleRequest(
+            travelers,
+            3,
+            [
+                createDayPlan('2', 'luxor', ['karnakTemple', 'luxorTemple', 'valleyOfTheKings', 'hatshepsutTemple'])
+            ],
+            'winter',
+            'gold',
+            language
+        );
+    },
+
+    // مثال 3: رحلة كروز 4 ليالي من الأقصر إلى أسوان
+    cruise4Nights: (travelers: number, language: Language = 'en'): FlexibleCustomRequest => {
+        return createFlexibleRequest(
+            travelers,
+            6,
+            [
+                createDayPlan('1', 'cairo', ['gizaPyramidsAndSphinx']),
+                createDayPlan('4', undefined, undefined, 'cruise', 4, 'luxor', 'luxor-to-aswan', 'saturday')
+            ],
+            'winter',
+            'diamond',
+            language
+        );
+    },
+
+    // مثال 4: رحلة كروز 3 ليالي من أسوان إلى الأقصر
+    cruise3Nights: (travelers: number, language: Language = 'en'): FlexibleCustomRequest => {
+        return createFlexibleRequest(
+            travelers,
+            5,
+            [
+                createDayPlan('1', 'cairo', ['egyptianMuseum']),
+                createDayPlan('3', undefined, undefined, 'cruise', 3, 'aswan', 'aswan-to-luxor', 'wednesday')
+            ],
+            'winter',
+            'gold',
+            language
+        );
+    },
+
+    // مثال 5: رحلة مرنة مع عدة مدن
+    multiCity: (travelers: number, language: Language = 'en'): FlexibleCustomRequest => {
+        return createFlexibleRequest(
+            travelers,
+            8,
+            [
+                createDayPlan('2', 'cairo', ['gizaPyramidsAndSphinx', 'egyptianMuseum']),
+                createDayPlan('1', 'alexandria', ['qaitbayCitadel', 'alexandriaNationalMuseum']),
+                createDayPlan('3', undefined, undefined, 'cruise', 3, 'luxor', 'luxor-to-aswan', 'saturday'),
+                createDayPlan('1', 'aswan', ['philaeTemple', 'highDam'])
+            ],
+            'winter',
+            'diamond',
+            language
+        );
+    }
+};s] of Object.entries(nightsDistribution)) {
             if (typeof nights === 'number' && nights > 0) {
                 const cityName = this.getCityLocalizedName(city)?.[language] || this.getCityLocalizedName(city)?.en || city;
                 if (language === 'es') {
