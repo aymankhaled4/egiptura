@@ -2233,9 +2233,7 @@ export function createEnhancedCustomProgram(request: {
     category: 'gold' | 'diamond';
     language: Language;
 }): Program {
-    const extractor = new IntelligentDataExtractor();
-    return extractor.createEnhancedCustomProgram(request);
-} private programs: Program[];
+    const extract} programs: Program[];
 
     constructor() {
         this.programs = knowledgeBase.packages;
