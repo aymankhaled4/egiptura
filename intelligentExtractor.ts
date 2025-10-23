@@ -1,4 +1,5 @@
 import type { Program, ItineraryItem, CustomQuoteParams, SupportedSite, SupportedCity, LocalizedString } from './types';
+import { normalizeSiteKey } from './siteAliases';
 import { knowledgeBase } from './services/knowledgeBase';
 import type { Language } from './contexts/LanguageContext';
 
@@ -966,6 +967,45 @@ export class IntelligentDataExtractor {
         return normalized.slice(0, Math.max(0, count));
     }
 
+    // 🧩 بناء أيام مخصصة تحتوي فقط على المواقع التي اختارها العميل (Site-only days)
+    private buildSiteOnlyDays(
+        city: string,
+        daysToAdd: number,
+        sitesRaw: string[] | undefined,
+        language: Language
+    ): ItineraryItem[] {
+        if (!sitesRaw || sitesRaw.length === 0 || daysToAdd <= 0) return [];
+
+        const cityName = this.getCityLocalizedName(city);
+        const localizedCity = cityName?.[language] || cityName?.en || city;
+
+        // قسم المواقع على عدد الأيام المطلوب بالتساوي
+        const chunkSize = Math.max(1, Math.ceil(sitesRaw.length / daysToAdd));
+        const chunks: string[][] = [];
+        for (let i = 0; i < sitesRaw.length; i += chunkSize) {
+            chunks.push(sitesRaw.slice(i, i + chunkSize));
+        }
+        while (chunks.length < daysToAdd) chunks.push([]);
+
+        const mkTitle = (dayIndex: number): LocalizedString => ({
+            es: `${localizedCity} – Visitas Personalizadas (${dayIndex})`,
+            en: `${localizedCity} – Personalized Visits (${dayIndex})`,
+            ar: `${localizedCity} – زيارات مخصصة (${dayIndex})`,
+        });
+
+        const mkActivities = (sites: string[]): { es: string[]; en: string[]; ar?: string[] } => ({
+            es: sites.map(s => `Visita: ${s}`),
+            en: sites.map(s => `Visit: ${s}`),
+            ar: sites.map(s => `زيارة: ${s}`),
+        });
+
+        return chunks.slice(0, daysToAdd).map((sites, idx) => ({
+            day: 0, // سيتم ضبطه لاحقاً
+            title: mkTitle(idx + 1),
+            activities: mkActivities(sites)
+        }));
+    }
+
     // 📝 إنشاء الـ itinerary المخصص بالتفاصيل الكاملة
     // private createCustomItinerary(
     //     duration: number,
@@ -1070,7 +1110,11 @@ export class IntelligentDataExtractor {
     duration: number,
     destinations: string[],
     nightsDistribution: any,
-    language: Language
+    language: Language,
+    clientPlan?: {
+        perCityDays?: Record<string, number>;
+        perCitySitesRaw?: Record<string, string[]>;
+    }
 ): ItineraryItem[] {
     const customItinerary: ItineraryItem[] = [];
     
@@ -1127,9 +1171,12 @@ export class IntelligentDataExtractor {
         return s;
     };
 
+    // دمج توزيع الأيام الذكي مع التوزيع الذي حدده العميل (إن وجد)
+    const effectiveDays: Record<string, number> = { ...nightsDistribution, ...(clientPlan?.perCityDays || {}) };
+
     for (const rawDestination of destinations) {
         const city = normalizeCity(rawDestination);
-        const availableDaysForCity = Math.max(0, (nightsDistribution[city] ?? 0));
+        const availableDaysForCity = Math.max(0, (effectiveDays[city] ?? 0));
         if (availableDaysForCity <= 0) continue;
 
         const remainingSlots = Math.max(0, (duration - currentDay - 1)); // اترك يوم المغادرة
@@ -1137,17 +1184,25 @@ export class IntelligentDataExtractor {
 
         const daysToAdd = Math.min(availableDaysForCity, remainingSlots);
 
-        // جرّب السرد من الباقات أولاً
-        let cityDays = this.buildCityItineraryFromPackages(city, daysToAdd, language);
+        let cityDays: ItineraryItem[] = [];
 
-        // إن لم تكفِ العناصر، كمل بقوالب fallback
-        if (cityDays.length < daysToAdd) {
-            const fallbackDays = this.getDaysForDestination(city, duration, language);
-            const needed = daysToAdd - cityDays.length;
-            cityDays = [
-                ...cityDays,
-                ...fallbackDays.slice(0, needed)
-            ];
+        // إذا حدّد العميل مواقع بعينها لهذه المدينة، أنشئ أياماً تحتوي فقط على هذه المواقع
+        const clientSitesRaw = clientPlan?.perCitySitesRaw?.[city];
+        if (clientSitesRaw && clientSitesRaw.length > 0) {
+            cityDays = this.buildSiteOnlyDays(city, daysToAdd, clientSitesRaw, language);
+        } else {
+            // جرّب السرد من الباقات أولاً
+            cityDays = this.buildCityItineraryFromPackages(city, daysToAdd, language);
+
+            // إن لم تكفِ العناصر، كمل بقوالب fallback
+            if (cityDays.length < daysToAdd) {
+                const fallbackDays = this.getDaysForDestination(city, duration, language);
+                const needed = daysToAdd - cityDays.length;
+                cityDays = [
+                    ...cityDays,
+                    ...fallbackDays.slice(0, needed)
+                ];
+            }
         }
 
         for (const d of cityDays) {
@@ -1336,8 +1391,12 @@ private calculateNightsDistribution(duration: number, destinations: string[]): {
         season: 'summer' | 'winter';
         category: 'gold' | 'diamond';
         language: Language;
+        clientPlan?: {
+            perCityDays?: Record<string, number>;
+            perCitySitesRaw?: Record<string, string[]>;
+        }
     }): Program {
-        const { duration, travelers, destinations, season, category, language } = request;
+        const { duration, travelers, destinations, season, category, language, clientPlan } = request;
         const totalNights = duration - 1;
 
         // حساب توزيع الليالي
@@ -1348,7 +1407,8 @@ private calculateNightsDistribution(duration: number, destinations: string[]): {
             duration, 
             destinations, 
             nightsDistribution,
-            language
+            language,
+            clientPlan
         );
 
         // إنشاء أماكن الإقامة المفصلة

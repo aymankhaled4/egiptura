@@ -241,14 +241,23 @@ export const sendMessageToAI = async (message: string): Promise<string> => {
                 }
 
                 // 🎯 إنشاء البرنامج المخصص باستخدام IntelligentDataExtractor
+                // 🆕 دعم تفضيلات العميل: daysPerCity + sitesPerCity
+                const daysPerCity: Record<string, number> | undefined = customParams.daysPerCity;
+                const sitesPerCityRaw: Record<string, string[]> | undefined = customParams.sitesPerCity;
+
                 const program = createIntelligentCustomProgram({
                     duration: customParams.duration,
                     travelers: customParams.travelers,
                     destinations: customParams.destinations,
                     season: customParams.season,
                     category: customParams.category,
-                    language: customParams.language || 'en'
-                });
+                    language: customParams.language || 'en',
+                    // تمرير الخطة الاختيارية داخل params عبر حقل غير مستخدم مباشرة (سيتم قراءتها في extractor)
+                    clientPlan: {
+                        perCityDays: daysPerCity,
+                        perCitySitesRaw: sitesPerCityRaw,
+                    }
+                } as any);
 
                 // ✅ التحقق من نجاح الإنشاء
                 if ('error' in program) {
