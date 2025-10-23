@@ -923,6 +923,49 @@ export class IntelligentDataExtractor {
         return days;
     }
 
+    // 🧱 إنشاء سرد يومي لكل مدينة اعتمادًا على باقاتنا (Dynamic narrative from packages)
+    private buildCityItineraryFromPackages(city: string, count: number, language: Language): ItineraryItem[] {
+        if (count <= 0) return [];
+
+        const cityData = this.extractCityData(city, language);
+
+        const arrivalKeywords = ['arrival', 'llegada', 'الوصول'];
+        const departureKeywords = ['departure', 'salida', 'المغادرة'];
+        const freeDayKeywords = ['free', 'libre', 'حر'];
+
+        const isNonTouringDay = (title: string, activities: string[]): boolean => {
+            const t = (title || '').toLowerCase();
+            const a = (activities || []).join(' ').toLowerCase();
+            const has = (kw: string[]) => kw.some(k => t.includes(k) || a.includes(k));
+            return has(arrivalKeywords) || has(departureKeywords) || has(freeDayKeywords);
+        };
+
+        const normalized: ItineraryItem[] = [];
+        for (const item of cityData.itinerary) {
+            const localTitle = item.title?.[language] || item.title?.en || '';
+            let acts: string[] = [];
+            if (Array.isArray((item as any).activities)) {
+                acts = (item as any).activities as string[];
+            } else if (typeof (item as any).activities === 'object' && (item as any).activities) {
+                acts = (item as any).activities[language] || (item as any).activities.en || [];
+            }
+
+            if (isNonTouringDay(localTitle, acts)) continue;
+
+            const activitiesObj = Array.isArray((item as any).activities)
+                ? { es: acts, en: acts, ar: acts }
+                : (item as any).activities;
+
+            normalized.push({
+                day: (item as any).day ?? 0, // سيتم ضبطه عند الإدراج النهائي
+                title: item.title,
+                activities: activitiesObj,
+            } as ItineraryItem);
+        }
+
+        return normalized.slice(0, Math.max(0, count));
+    }
+
     // 📝 إنشاء الـ itinerary المخصص بالتفاصيل الكاملة
     // private createCustomItinerary(
     //     duration: number,
@@ -1072,75 +1115,50 @@ export class IntelligentDataExtractor {
     console.log('[itinerary] Starting itinerary creation');
     console.log('[itinerary] Duration:', duration, 'Current day:', currentDay);
     console.log('[itinerary] Nights distribution:', nightsDistribution);
-    
-    // إضافة أيام القاهرة أولاً
-    if (nightsDistribution.cairo > 0) {
-        const cairoDays = this.getCairoDays(duration, language);
-        const daysToAdd = Math.min(nightsDistribution.cairo, cairoDays.length, duration - currentDay - 1);
-        
-        console.log(`[itinerary] Adding ${daysToAdd} Cairo days`);
-        for (let i = 0; i < daysToAdd; i++) {
+
+    // ابنِ الأيام حسب ترتيب اختيارات العميل، بسرد من الباقات إن وُجد
+    const normalizeCity = (d: string): string => {
+        const s = d.toLowerCase();
+        if (s.includes('cruise') || s.includes('nile')) return 'cruise';
+        if (s.includes('cairo') || s.includes('القاهرة') || s.includes('القاهره')) return 'cairo';
+        if (s.includes('luxor') || s.includes('الأقصر') || s.includes('الاقصر')) return 'luxor';
+        if (s.includes('aswan') || s.includes('أسوان') || s.includes('اسوان')) return 'aswan';
+        if (s.includes('alexandria') || s.includes('الإسكندرية') || s.includes('الاسكندرية')) return 'alexandria';
+        return s;
+    };
+
+    for (const rawDestination of destinations) {
+        const city = normalizeCity(rawDestination);
+        const availableDaysForCity = Math.max(0, (nightsDistribution[city] ?? 0));
+        if (availableDaysForCity <= 0) continue;
+
+        const remainingSlots = Math.max(0, (duration - currentDay - 1)); // اترك يوم المغادرة
+        if (remainingSlots <= 0) break;
+
+        const daysToAdd = Math.min(availableDaysForCity, remainingSlots);
+
+        // جرّب السرد من الباقات أولاً
+        let cityDays = this.buildCityItineraryFromPackages(city, daysToAdd, language);
+
+        // إن لم تكفِ العناصر، كمل بقوالب fallback
+        if (cityDays.length < daysToAdd) {
+            const fallbackDays = this.getDaysForDestination(city, duration, language);
+            const needed = daysToAdd - cityDays.length;
+            cityDays = [
+                ...cityDays,
+                ...fallbackDays.slice(0, needed)
+            ];
+        }
+
+        for (const d of cityDays) {
             customItinerary.push({
-                ...cairoDays[i],
+                ...d,
                 day: currentDay++
             });
+            if (currentDay >= duration) break; // لا تتجاوز اليوم الأخير
         }
-    }
-    
-    // إضافة أيام الكروز
-    if (nightsDistribution.cruise > 0) {
-        const cruiseDays = this.getCruiseDays(duration, language);
-        const daysToAdd = Math.min(nightsDistribution.cruise, cruiseDays.length, duration - currentDay - 1);
-        
-        console.log(`[itinerary] Adding ${daysToAdd} Cruise days from ${cruiseDays.length} available`);
-        for (let i = 0; i < daysToAdd; i++) {
-            customItinerary.push({
-                ...cruiseDays[i],
-                day: currentDay++
-            });
-        }
-    }
-    
-    // إضافة أيام الأقصر
-    if (nightsDistribution.luxor > 0) {
-        const luxorDays = this.getLuxorDays(language);
-        const daysToAdd = Math.min(nightsDistribution.luxor, luxorDays.length, duration - currentDay - 1);
-        
-        console.log(`[itinerary] Adding ${daysToAdd} Luxor days`);
-        for (let i = 0; i < daysToAdd; i++) {
-            customItinerary.push({
-                ...luxorDays[i],
-                day: currentDay++
-            });
-        }
-    }
-    
-    // إضافة أيام أسوان
-    if (nightsDistribution.aswan > 0) {
-        const aswanDays = this.getAswanDays(language);
-        const daysToAdd = Math.min(nightsDistribution.aswan, aswanDays.length, duration - currentDay - 1);
-        
-        console.log(`[itinerary] Adding ${daysToAdd} Aswan days`);
-        for (let i = 0; i < daysToAdd; i++) {
-            customItinerary.push({
-                ...aswanDays[i],
-                day: currentDay++
-            });
-        }
-    }
-    
-    // إضافة أيام الإسكندرية
-    if (nightsDistribution.alexandria > 0) {
-        const alexandriaDays = this.getAlexandriaDays(language);
-        const daysToAdd = Math.min(nightsDistribution.alexandria, alexandriaDays.length, duration - currentDay - 1);
-        
-        console.log(`[itinerary] Adding ${daysToAdd} Alexandria days`);
-        for (let i = 0; i < daysToAdd; i++) {
-            customItinerary.push({
-                ...alexandriaDays[i],
-                day: currentDay++
-            });
-        }
+
+        if (currentDay >= duration) break;
     }
     
     // ملء الأيام الفارغة بأيام حرة
