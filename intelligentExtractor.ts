@@ -122,7 +122,7 @@ export class IntelligentDataExtractor {
         const daysDistribution = this.calculateDaysDistribution(duration, cities);
         
         // إنشاء البرنامج اليومي
-        const itinerary = this.createEnhancedItinerary(daysDistribution, specificSites, language);
+        const itinerary = this.createEnhancedItinerary(daysDistribution, specificSites, language, duration);
         
         // إنشاء أماكن الإقامة
         const accommodations = this.createEnhancedAccommodations(daysDistribution, category, language);
@@ -200,7 +200,8 @@ export class IntelligentDataExtractor {
     private createEnhancedItinerary(
         daysDistribution: { [city: string]: number },
         specificSites: { [city: string]: SupportedSite[] },
-        language: Language
+        language: Language,
+        totalDuration: number
     ): ItineraryItem[] {
         const itinerary: ItineraryItem[] = [];
         let currentDay = 1;
@@ -219,7 +220,7 @@ export class IntelligentDataExtractor {
         }
         
         // يوم المغادرة
-        itinerary.push(this.createDepartureDay(duration, language));
+        itinerary.push(this.createDepartureDay(totalDuration, language));
         
         return itinerary;
     }
@@ -663,9 +664,9 @@ export class IntelligentDataExtractor {
     }
 
     // 🎯 إنشاء يوم المغادرة
-    private createDepartureDay(duration: number, language: Language): ItineraryItem {
+    private createDepartureDay(totalDuration: number, language: Language): ItineraryItem {
         return {
-            day: duration,
+            day: totalDuration,
             title: {
                 es: 'Salida de El Cairo - Hasta Pronto',
                 en: 'Departure from Cairo - See You Soon',
