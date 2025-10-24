@@ -430,10 +430,16 @@ export class IntelligentDataExtractor {
     private calculateDaysDistribution(duration: number, cities: string[]): { [city: string]: number } {
         const distribution: { [city: string]: number } = {};
         
-        // ✅ إجمالي الأيام المتاحة للأنشطة (بدون يوم الوصول والمغادرة)
-        const totalActivityDays = duration - 2;
-        
-        console.log(`[Days Calc] Total duration: ${duration}, Activity days: ${totalActivityDays}`);
+         // حساب أيام الكروز
+        let cruiseDays = 0;
+        if (hasCruise) {
+            // تحديد نوع الكروز حسب المدة الإجمالية
+            if (duration <= 6) {
+                cruiseDays = 4; // 3 ليالي = 4 أيام (كروز قصير من أسوان)
+            } else {
+                cruiseDays = 5; // 4 ليالي = 5 أيام (كروز طويل من الأقصر)
+            }
+        }console.log(`[Days Calc] Total duration: ${duration}, Activity days: ${totalActivityDays}`);
         
         // تحديد نوع الكروز المطلوب
         const hasLuxor = cities.includes('luxor');
@@ -503,15 +509,11 @@ export class IntelligentDataExtractor {
         let currentDay = 1;
         
         // ✅ يوم 1: الوصول
-        itinerary.push(this.createArrivalDay(language));
-        currentDay++;
-        
-        // ترتيب المدن حسب الطلب: القاهرة → الإسكندرية → الكروز
-        const orderedCities = this.getOrderedCities(daysDistribution);
-        
-        console.log('[Itinerary] Ordered cities:', orderedCities);
-        
-        for (const city of orderedCities) {
+        itinerary.push(this.createArrivalDay(language))                if (city === 'cruise') {
+                    // إنشاء أيام الكروز
+                    const cruiseDays = this.createCruiseDays(specificSites, language, currentDay, days);
+                    itinerary.push(...cruiseDays);
+                    currentDay += days;r (const city of orderedCities) {
             const days = daysDistribution[city];
             if (days > 0) {
                 console.log(`[Itinerary] Creating ${days} days for ${city}, starting from day ${currentDay}`);
@@ -737,17 +739,22 @@ export class IntelligentDataExtractor {
     private getOrderedCities(daysDistribution: { [city: string]: number }): string[] {
         const cities = Object.keys(daysDistribution).filter(city => daysDistribution[city] > 0);
         
-        // ترتيب مخصص: القاهرة → الإسكندرية → الكروز
-        const orderedCities: string[] = [];
+        // ترت    // ⛵ إنشاء أيام الكروز مع المسار الصحيح
+    private createCruiseDays(
+        specificSites: { [city: string]: SupportedSite[] },
+        language: Language,
+        startDay: number,
+        totalCruiseDays: number = 5
+    ):    ): ItineraryItem[] {
+        const cruiseDays: ItineraryItem[] = [];
         
-        // إضافة القاهرة أولاً
-        if (cities.includes('cairo')) {
-            orderedCities.push('cairo');
+        if (totalCruiseDays === 4) {
+            // كروز قصير 3 ليالي من أسوان (الجمعة والأربعاء)
+            return this.createShortCruiseDays(specificSites, language, startDay);
         }
         
-        // إضافة الإسكندرية ثانياً
-        if (cities.includes('alexandria')) {
-            orderedCities.push('alexandria');
+        // كروز طويل 4 ليالي من الأقصر (السبت والاثنين)
+        // اليوم 1: الأقصر (معبد الأقصر + الكرنك + وادي الملوك + حتشبسوت)xandria');
         }
         
         // إضافة الكروز أخيراً
@@ -929,8 +936,159 @@ export class IntelligentDataExtractor {
                     "Desayuno final a bordo del crucero",
                     "Desembarque después del desayuno",
                     "Excursión opcional a Abu Simbel (recomendada): templos de Ramsés II y Nefertari",
-                    "Traslado al aeropuerto de Asuán para vuelo de regreso a El Cairo",
-                    "O continuación del programa según itinerario personalizado"
+                    "Traslado al aeropuerto de Asuán para vuelo de regreso a El Cair        return cruiseDays;
+    }
+
+    // ⛵ إنشاء كروز قصير 3 ليالي من أسوان
+    private createShortCruiseDays(
+        specificSites: { [city: string]: SupportedSite[] },
+        language: Language,
+        startDay: number
+    ): ItineraryItem[] {
+        const cruiseDays: ItineraryItem[] = [];
+        
+        // اليوم 1: أسوان (معبد فيلة + السد العالي + المسلة الناقصة)
+        cruiseDays.push({
+            day: startDay,
+            title: this.getCruiseDayTitle('aswan', 1, language),
+            activities: {
+                es: [
+                    "Traslado desde El Cairo o Alejandría a Asuán y embarque en el crucero del Nilo",
+                    "Navegamos en bote motorizado al Templo de Philae en la isla de Agilkia",
+                    "Exploramos el Templo de Philae, dedicado a la diosa Isis, en su entorno mágico",
+                    "Visitamos la Presa Alta de Asuán, obra maestra de la ingeniería moderna",
+                    "Admiramos el Obelisco Inacabado en las canteras de granito",
+                    "Paseo opcional en faluca tradicional alrededor de las islas del Nilo",
+                    "Cena y noche a bordo del crucero"
+                ],
+                en: [
+                    "Transfer from Cairo or Alexandria to Aswan and embark on Nile cruise",
+                    "Sail by motorboat to Philae Temple on Agilkia Island",
+                    "Explore Philae Temple, dedicated to goddess Isis, in its magical setting",
+                    "Visit Aswan High Dam, masterpiece of modern engineering",
+                    "Admire the Unfinished Obelisk in granite quarries",
+                    "Optional ride in traditional felucca around Nile islands",
+                    "Dinner and overnight aboard the cruise"
+                ],
+                ar: [
+                    "الانتقال من القاهرة أو الإسكندرية إلى أسوان والصعود على متن الكروز النيلي",
+                    "نبحر بالقارب الآلي إلى معبد فيلة في جزيرة أجيليكا",
+                    "نستكشف معبد فيلة المخصص للإلهة إيزيس في محيطه السحري",
+                    "نزور السد العالي بأسوان، تحفة الهندسة الحديثة",
+                    "نشاهد المسلة الناقصة في محاجر الجرانيت",
+                    "رحلة اختيارية بالفلوكة التقليدية حول جزر النيل",
+                    "العشاء والمبيت على متن الكروز"
+                ]
+            }
+        });
+        
+        // اليوم 2: كوم أمبو
+        cruiseDays.push({
+            day: startDay + 1,
+            title: this.getCruiseDayTitle('komOmbo', 2, language),
+            activities: {
+                es: [
+                    "Desayuno mientras navegamos hacia Kom Ombo",
+                    "Visitamos el Templo de Kom Ombo, único por estar dedicado a dos dioses: Sobek (cocodrilo) y Horus",
+                    "Exploramos el museo de cocodrilos momificados",
+                    "Admiramos los relieves médicos antiguos, precursores de la medicina moderna",
+                    "Continuamos navegando hacia Edfu con hermosas vistas del Nilo",
+                    "Tarde libre para disfrutar de las instalaciones del crucero",
+                    "Cena con espectáculo de música tradicional egipcia"
+                ],
+                en: [
+                    "Breakfast while sailing to Kom Ombo",
+                    "Visit Kom Ombo Temple, unique for being dedicated to two gods: Sobek (crocodile) and Horus",
+                    "Explore the mummified crocodiles museum",
+                    "Admire ancient medical reliefs, precursors of modern medicine",
+                    "Continue sailing to Edfu with beautiful Nile views",
+                    "Afternoon free to enjoy cruise facilities",
+                    "Dinner with traditional Egyptian music show"
+                ],
+                ar: [
+                    "الإفطار أثناء الإبحار إلى كوم أمبو",
+                    "نزور معبد كوم أمبو، الفريد لأنه مخصص لإلهين: سوبك (التمساح) وحورس",
+                    "نستكشف متحف التماسيح المحنطة",
+                    "نشاهد النقوش الطبية القديمة، رواد الطب الحديث",
+                    "نواصل الإبحار إلى إدفو مع مناظر النيل الخلابة",
+                    "بعد الظهر حر للاستمتاع بمرافق الكروز",
+                    "العشاء مع عرض موسيقى مصرية تقليدية"
+                ]
+            }
+        });
+        
+        // اليوم 3: إدفو
+        cruiseDays.push({
+            day: startDay + 2,
+            title: this.getCruiseDayTitle('edfu', 3, language),
+            activities: {
+                es: [
+                    "Desayuno a bordo mientras navegamos por el Nilo",
+                    "Llegada a Edfu y traslado en calesa al templo",
+                    "Visitamos el Templo de Edfu, el templo ptolemaico mejor conservado de Egipto, dedicado al dios Horus",
+                    "Exploramos los relieves detallados que narran la batalla entre Horus y Set",
+                    "Regreso al crucero y continuación de la navegación hacia Luxor",
+                    "Tarde libre para relajarse en la cubierta del barco",
+                    "Cena de gala con trajes tradicionales (opcional)"
+                ],
+                en: [
+                    "Breakfast aboard while sailing the Nile",
+                    "Arrival in Edfu and transfer by horse carriage to temple",
+                    "Visit Edfu Temple, best-preserved Ptolemaic temple in Egypt, dedicated to god Horus",
+                    "Explore detailed reliefs narrating the battle between Horus and Set",
+                    "Return to cruise and continue sailing to Luxor",
+                    "Afternoon free to relax on ship's deck",
+                    "Gala dinner with traditional costumes (optional)"
+                ],
+                ar: [
+                    "الإفطار على متن الكروز أثناء الإبحار في النيل",
+                    "الوصول إلى إدفو والانتقال بعربة الحنطور إلى المعبد",
+                    "نزور معبد إدفو، المعبد البطلمي الأفضل حفظاً في مصر، المخصص للإله حورس",
+                    "نستكشف النقوش التفصيلية التي تروي معركة حورس وست",
+                    "العودة إلى الكروز ومواصلة الإبحار إلى الأقصر",
+                    "بعد الظهر حر للاسترخاء على سطح السفينة",
+                    "عشاء فاخر مع الأزياء التقليدية (اختياري)"
+                ]
+            }
+        });
+        
+        // اليوم 4: الأقصر ومغادرة الكروز
+        cruiseDays.push({
+            day: startDay + 3,
+            title: this.getCruiseDayTitle('luxor', 4, language),
+            activities: {
+                es: [
+                    "Desayuno final a bordo del crucero con vistas al Nilo en Luxor",
+                    "Desembarque después del desayuno",
+                    "Visitamos el Templo de Luxor, iluminado majestuosamente",
+                    "Exploramos el vasto complejo de Karnak, el sitio religioso más grande del mundo antiguo",
+                    "Descendemos al Valle de los Reyes, explorando las tumbas de los faraones",
+                    "Visitamos el Templo de Hatshepsut, obra maestra dedicada a la reina faraón",
+                    "Traslado al aeropuerto de Luxor para vuelo de regreso a El Cairo"
+                ],
+                en: [
+                    "Final breakfast aboard the cruise with Nile views in Luxor",
+                    "Disembarkation after breakfast",
+                    "Visit Luxor Temple, majestically illuminated",
+                    "Explore the vast Karnak complex, the largest religious site in the ancient world",
+                    "Descend into Valley of the Kings, exploring pharaohs' tombs",
+                    "Visit Hatshepsut Temple, masterpiece dedicated to the female pharaoh",
+                    "Transfer to Luxor airport for return flight to Cairo"
+                ],
+                ar: [
+                    "الإفطار الأخير على متن الكروز مع إطلالات النيل في الأقصر",
+                    "مغادرة الكروز بعد الإفطار",
+                    "نزور معبد الأقصر المضاء بشكل مهيب",
+                    "نستكشف مجمع الكرنك الضخم، أكبر موقع ديني في العالم القديم",
+                    "ننزل إلى وادي الملوك، ونستكشف مقابر الفراعنة",
+                    "نزور معبد حتشبسوت، التحفة المخصصة للفرعونة",
+                    "الانتقال إلى مطار الأقصر لرحلة العودة إلى القاهرة"
+                ]
+            }
+        });
+        
+        return cruiseDays;
+    }inuación del programa según itinerario personalizado"
                 ],
                 en: [
                     "Final breakfast aboard the cruise",
@@ -1013,34 +1171,17 @@ export class IntelligentDataExtractor {
     private createEnhancedAccommodations(
         daysDistribution: { [city: string]: number },
         category: 'gold' | 'diamond',
-        language: Language
-    ): { gold: any[]; diamond: any[] } {
-        const accommodations = { gold: [] as any[], diamond: [] as any[] };
-        
-        for (const [city, days] of Object.entries(daysDistribution)) {
-            if (days > 0) {
-                if (city === 'cruise') {
-                    // إضافة الكروز
-                    const cruiseInfo = this.getCruiseInfo(category, language);
-                    accommodations[category].push(cruiseInfo);
-                } else {
-                    // إضافة الفنادق العادية
-                    const cityName = this.getCityLocalizedName(city);
-                    const hotel = this.getBestHotelForCity(city, category, language);
-                    
-                    accommodations[category].push({
-                        city: cityName,
-                        hotel: hotel,
-                        nights: days
-                    });
-                }
-            }
-        }
-        
-        return accommodations;
-    }
-
-    // ⛵ معلومات الكروز
+         // ⛵ معلومات الكروز
+    private getCruiseInfo(category: 'gold' | 'diamond', language: Language, cruiseDays: number = 5): any {
+        const cruiseNames = {
+            gold: {
+                es: "Crucero Dorado del Nilo (5 estrellas)",
+                en: "Golden Nile Cruise (5 stars)",
+                ar: "كروز نيل ذهبي (5 نجوم)"
+            },
+            diamond: {
+                es: "Crucero Diamante del Nilo (5 estrellas lujo)",
+                en: "Dمعلومات الكروز
     private getCruiseInfo(category: 'gold' | 'diamond', language: Language): any {
         const cruiseNames = {
             gold: {
