@@ -12,7 +12,7 @@ export const packages: Program[] = [
         icon: "🏺",
         duration: { days: 8, nights: 7 },
         priceFrom: 1365,
-        categories: ["Aventura", "Cultural", "Histórico", "Familiar", "Lujo", "Crucero"],
+        categories: ["Adventure", "Cultural"],
         startCity: { es: 'El Cairo', en: 'Cairo', ar: 'القاهرة' },
         cruiseNights: 4,
         runDays: {
@@ -157,7 +157,7 @@ export const packages: Program[] = [
         icon: "🕌",
         duration: { days: 5, nights: 4 },
         priceFrom: 540,
-        categories: ["Cultural", "Histórico"],
+        categories: ["Cultural", "Historical"],
         startCity: { es: 'El Cairo', en: 'Cairo', ar: 'القاهرة' },
         // cruiseNights: 0,
         runDays: {
@@ -464,7 +464,7 @@ export const packages: Program[] = [
         icon: "🚂",
         duration: { days: 8, nights: 7 },
         priceFrom: 915,
-        categories: ["Cultural", "Histórico", "Aventura"],
+        categories: ["Cultural", "Historical"],
         startCity: { es: 'El Cairo', en: 'Cairo', ar: 'القاهرة' },
         cruiseNights: 3,
         runDays: {
@@ -878,7 +878,7 @@ export const packages: Program[] = [
         icon: "🚢",
         duration: { days: 8, nights: 7 },
         priceFrom: 1330,
-        categories: ["Cultural", "Histórico"],
+        categories: ["Cultural", "Historical"],
         startCity: { es: "El Cairo", en: "Cairo", ar: "القاهرة" },
         cruiseNights: 4,
         runDays: {
@@ -1262,7 +1262,7 @@ export const packages: Program[] = [
         icon: "🏺",
         duration: { days: 8, nights: 7 },
         priceFrom: 1365,
-        categories: ["Cultural", "Histórico", "City Tour"],
+        categories: ["Cultural", "City Tour"],
         startCity: { es: "El Cairo", en: "Cairo", ar: "القاهرة" },
         cruiseNights: 3,
         runDays: {
@@ -1665,7 +1665,7 @@ export const packages: Program[] = [
         icon: "🌅",
         duration: { days: 9, nights: 8 },
         priceFrom: 1480,
-        categories: ["Cultural", "Histórico"],
+        categories: ["Cultural", "Historical"],
         startCity: { es: "El Cairo", en: "Cairo", ar: "القاهرة" },
         cruiseNights: 4,
         runDays: {
@@ -2076,7 +2076,7 @@ export const packages: Program[] = [
         icon: "🏺",
         duration: { "days": 10, "nights": 9 },
         priceFrom: 1720,
-        categories: ["Cultural", "Histórico"],
+        categories: ["Cultural", "Historical"],
         startCity: { "es": "El Cairo", "en": "Cairo", "ar": "القاهرة" },
         cruiseNights: 4,
         runDays: {
@@ -2498,7 +2498,7 @@ export const packages: Program[] = [
         icon: "🌅",
         duration: { "days": 10, "nights": 9 },
         priceFrom: 1475,
-        categories: ["Aventura", "Cultural", "Histórico", "Naturaleza", "Playa"],
+        categories: ["Adventure", "Historical"],
         startCity: { "es": "El Cairo", "en": "Cairo", "ar": "القاهرة" },
         cruiseNights: 3,
         runDays: {
@@ -2951,7 +2951,7 @@ export const packages: Program[] = [
         icon: "🌅",
         duration: { "days": 8, "nights": 7 },
         priceFrom: 1145,
-        categories: ["Cultural", "Histórico"],
+        categories: ["Cultural", "Historical"],
         startCity: { "es": "El Cairo", "en": "Cairo", "ar": "القاهرة" },
         runDays: {
             "es": "Lunes, Martes, Miércoles, Jueves, Viernes, Sábado, Domingo",
@@ -3323,7 +3323,7 @@ export const packages: Program[] = [
         icon: "🌊",
         duration: { "days": 6, "nights": 5 },
         priceFrom: 975,
-        categories: ["Adventure", "Cultural", "Historical", "Beach", "Honeymoon"],
+        categories: ["Adventure", "Honeymoon"],
         startCity: { "es": "El Cairo", "en": "Cairo", "ar": "القاهرة" },
         runDays: {
             "es": "Lunes, Martes, Miércoles, Jueves, Viernes, Sábado, Domingo",
