@@ -1,7 +1,7 @@
 import { GoogleGenAI, Chat, GenerateContentResponse } from "@google/genai";
 import { knowledgeBase } from './knowledgeBase';
 import { getOfficialExchangeRate } from "./currencyService";
-import { createIntelligentCustomProgram, createEnhancedCustomProgram } from '../intelligentExtractor';
+import { createEnhancedCustomProgram, createAutoProgram, getAvailableSitesForCities } from '../intelligentExtractor';
 import type { Language } from '../contexts/LanguageContext';
 
 let ai: GoogleGenAI | null = null;
@@ -265,10 +265,11 @@ export const sendMessageToAI = async (message: string): Promise<string> => {
                         return `[lang:${lang}]${questions[lang as Language]}`;
                     }
 
-                    program = createIntelligentCustomProgram({
+                    // تحويل destinations إلى cities للنظام الجديد
+                    program = createAutoProgram({
                         duration: customParams.duration,
                         travelers: customParams.travelers,
-                        destinations: customParams.destinations,
+                        cities: customParams.destinations.filter((dest: string) => dest !== 'cruise'),
                         season: customParams.season,
                         category: customParams.category,
                         language: customParams.language || 'en'

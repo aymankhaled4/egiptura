@@ -2,7 +2,7 @@ import type { Program, ItineraryItem, CustomQuoteParams, SupportedSite, Supporte
 import { knowledgeBase } from './knowledgeBase';
 import type { Language } from '../contexts/LanguageContext';
 import { detectSeasonFromText, getCurrentSeason } from '../SeasonDetector';
-import{IntelligentDataExtractor} from '../intelligentExtractor';
+import { createAutoProgram } from '../intelligentExtractor';
 
 
 // 🔍 دالة للعثور على أفضل برنامج مطابق من البرامج العشرة
@@ -230,12 +230,11 @@ export function generateLocalFallbackProgram(
     
     console.log('[fallback] Destinations:', destinations);
     
-    // استخدام النظام الذكي لإنشاء البرنامج
-    const extractor = new IntelligentDataExtractor();
-    const customProgram = extractor.createIntelligentCustomProgram({
+    // استخدام النظام الذكي الجديد لإنشاء البرنامج
+    const customProgram = createAutoProgram({
         duration,
         travelers,
-        destinations,
+        cities: destinations.filter(dest => dest !== 'cruise'), // تحويل destinations إلى cities
         season,  // ✅ الآن يدعم الكشف من الشهر
         category,
         language
