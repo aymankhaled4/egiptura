@@ -41,6 +41,16 @@ const AVAILABLE_SITES = {
         'egyptianCivilizationMuseum',
         'grandEgyptianMuseum'
     ],
+    alexandria: [
+        'qaitbayCitadel',
+        'komElShoqafaCatacombs',
+        'komElDikkaRomanTheater',
+        'pompeysPillar',
+        'alexandriaNationalMuseum',
+        'royalJewelryMuseum',
+        'graecoRomanMuseum',
+        'rosettaRuins'
+    ],
     luxor: [
         'karnakTemple',
         'mutTemple',
@@ -80,21 +90,10 @@ const AVAILABLE_SITES = {
         'nubianMuseum',
         'highDam'
     ],
-    alexandria: [
-        'qaitbayCitadel',
-        'komElShoqafaCatacombs',
-        'komElDikkaRomanTheater',
-        'pompeysPillar',
-        'alexandriaNationalMuseum',
-        'royalJewelryMuseum',
-        'graecoRomanMuseum',
-        'rosettaRuins'
-    ],
     abuSimbel: [
         'abuSimbelTemples',
         'sunFestivalAbuSimbel'
     ],
-    // Other cities with their respective sites
     hurghada: [],
     sharmElSheikh: [],
     dahab: [],
@@ -104,6 +103,222 @@ const AVAILABLE_SITES = {
     farafra: [],
     dakhla: [],
     kharga: []
+};
+
+// 🎨 أنشطة تفصيلية لكل مدينة (Story-like activities)
+const DETAILED_CITY_ACTIVITIES = {
+    cairo: {
+        day1: {
+            es: [
+                "Comenzamos nuestro viaje explorando las majestuosas Pirámides de Giza, una de las Siete Maravillas del Mundo Antiguo",
+                "Contemplamos la enigmática Gran Esfinge, guardiana milenaria de los secretos faraónicos",
+                "Visitamos el Templo del Valle, donde se realizaban los rituales de momificación de los faraones",
+                "Tiempo libre para explorar el área y capturar fotografías memorables",
+                "Almuerzo en restaurante local con vistas panorámicas a las pirámides"
+            ],
+            en: [
+                "We begin our journey exploring the majestic Pyramids of Giza, one of the Seven Wonders of the Ancient World",
+                "Contemplate the enigmatic Great Sphinx, millennial guardian of pharaonic secrets",
+                "Visit the Valley Temple, where the mummification rituals of the pharaohs took place",
+                "Free time to explore the area and capture memorable photographs",
+                "Lunch at local restaurant with panoramic views of the pyramids"
+            ],
+            ar: [
+                "نبدأ رحلتنا باستكشاف أهرامات الجيزة المهيبة، إحدى عجائب الدنيا السبع في العالم القديم",
+                "نتأمل تمثال أبو الهول الغامض، الحارس الألفي لأسرار الفراعنة",
+                "نزور معبد الوادي، حيث كانت تُجرى طقوس التحنيط للفراعنة",
+                "وقت حر لاستكشاف المنطقة والتقاط الصور التذكارية",
+                "الغداء في مطعم محلي مع إطلالة بانورامية على الأهرامات"
+            ]
+        },
+        day2: {
+            es: [
+                "Visitamos el Museo Egipcio en la Plaza Tahrir, hogar de la mayor colección de antigüedades faraónicas del mundo",
+                "Admiramos los tesoros de Tutankamón, incluyendo su famosa máscara de oro macizo",
+                "Exploramos la Sala de las Momias Reales, donde descansan los grandes faraones de Egipto",
+                "Paseamos por el histórico Bazar Khan El Khalili, el mercado más antiguo de El Cairo",
+                "Tiempo libre para compras y degustar el té tradicional egipcio en un café local",
+                "Cena opcional con espectáculo de danza del vientre y música tradicional"
+            ],
+            en: [
+                "Visit the Egyptian Museum in Tahrir Square, home to the world's largest collection of pharaonic antiquities",
+                "Admire the treasures of Tutankhamun, including his famous solid gold mask",
+                "Explore the Royal Mummies Hall, where the great pharaohs of Egypt rest",
+                "Stroll through the historic Khan El Khalili Bazaar, Cairo's oldest market",
+                "Free time for shopping and tasting traditional Egyptian tea at a local café",
+                "Optional dinner with belly dance show and traditional music"
+            ],
+            ar: [
+                "نزور المتحف المصري في ميدان التحرير، موطن أكبر مجموعة من الآثار الفرعونية في العالم",
+                "نشاهد كنوز توت عنخ آمون، بما في ذلك قناعه الذهبي الشهير",
+                "نستكشف قاعة المومياوات الملكية، حيث يستريح عظماء فراعنة مصر",
+                "نتجول في خان الخليلي التاريخي، أقدم سوق في القاهرة",
+                "وقت حر للتسوق وتذوق الشاي المصري التقليدي في مقهى محلي",
+                "عشاء اختياري مع عرض رقص شرقي وموسيقى تقليدية"
+            ]
+        },
+        day3: {
+            es: [
+                "Exploramos la necrópolis de Saqqara, el cementerio más antiguo de Egipto",
+                "Visitamos la Pirámide Escalonada de Zoser, la primera pirámide construida en piedra",
+                "Descubrimos las mastabas bellamente decoradas de los nobles del Reino Antiguo",
+                "Visitamos Memphis, la antigua capital de Egipto, y su museo al aire libre",
+                "Admiramos la estatua colosal de Ramsés II y la enigmática Esfinge de Alabastro",
+                "Continuamos a Dahshur para ver las pirámides de Snefru: la Pirámide Roja y la Pirámide Acodada"
+            ],
+            en: [
+                "Explore the Saqqara necropolis, Egypt's oldest cemetery",
+                "Visit the Step Pyramid of Djoser, the first pyramid built in stone",
+                "Discover the beautifully decorated mastabas of Old Kingdom nobles",
+                "Visit Memphis, the ancient capital of Egypt, and its open-air museum",
+                "Admire the colossal statue of Ramses II and the enigmatic Alabaster Sphinx",
+                "Continue to Dahshur to see Snefru's pyramids: the Red Pyramid and the Bent Pyramid"
+            ],
+            ar: [
+                "نستكشف مقابر سقارة، أقدم مقبرة في مصر",
+                "نزور هرم زوسر المدرج، أول هرم بُني من الحجر",
+                "نكتشف المصاطب المزينة بشكل جميل للنبلاء من عصر المملكة القديمة",
+                "نزور ممفيس، العاصمة القديمة لمصر، ومتحفها المفتوح",
+                "نشاهد تمثال رمسيس الثاني الضخم وأبو الهول المرمر الغامض",
+                "نواصل إلى دهشور لمشاهدة أهرامات سنفرو: الهرم الأحمر والهرم المنحني"
+            ]
+        },
+        day4: {
+            es: [
+                "Visitamos la Ciudadela de Saladino, fortaleza medieval que domina la ciudad",
+                "Exploramos la magnífica Mezquita de Muhammad Ali, conocida como la Mezquita de Alabastro",
+                "Descubrimos el Cairo Copto, visitando la Iglesia Colgante y la Iglesia de San Sergio",
+                "Visitamos la Sinagoga Ben Ezra, uno de los lugares más sagrados del judaísmo",
+                "Paseamos por la histórica calle Al-Muizz, repleta de monumentos islámicos",
+                "Disfrutamos de un crucero por el Nilo al atardecer con cena buffet opcional"
+            ],
+            en: [
+                "Visit the Citadel of Saladin, medieval fortress overlooking the city",
+                "Explore the magnificent Muhammad Ali Mosque, known as the Alabaster Mosque",
+                "Discover Coptic Cairo, visiting the Hanging Church and the Church of St. Sergius",
+                "Visit Ben Ezra Synagogue, one of Judaism's most sacred places",
+                "Stroll along the historic Al-Muizz Street, filled with Islamic monuments",
+                "Enjoy a Nile cruise at sunset with optional buffet dinner"
+            ],
+            ar: [
+                "نزور قلعة صلاح الدين الأيوبي، الحصن الذي يطل على المدينة",
+                "نستكشف مسجد محمد علي الرائع، المعروف بمسجد المرمر",
+                "نكتشف القاهرة القبطية، بزيارة الكنيسة المعلقة وكنيسة مار جرجس",
+                "نزور معبد بن عزرا، أحد أقدس الأماكن في اليهودية",
+                "نتجول في شارع المعز التاريخي، المليء بالآثار الإسلامية",
+                "نستمتع برحلة نيلية عند الغروب مع عشاء بوفيه اختياري"
+            ]
+        }
+    },
+    alexandria: {
+        day1: {
+            es: [
+                "Comenzamos nuestra exploración de Alejandría visitando la Ciudadela de Qaitbay, construida sobre las ruinas del antiguo Faro de Alejandría",
+                "Disfrutamos de las vistas panorámicas del Mar Mediterráneo desde las murallas de la fortaleza",
+                "Paseamos por la Corniche, el hermoso paseo marítimo de la ciudad",
+                "Visitamos la moderna Biblioteca Alexandrina, heredera de la legendaria biblioteca antigua",
+                "Almuerzo de mariscos frescos en restaurante con vista al mar",
+                "Tiempo libre para explorar el barrio de Anfushi y sus mercados de pescado"
+            ],
+            en: [
+                "Begin our Alexandria exploration visiting Qaitbay Citadel, built on the ruins of the ancient Lighthouse of Alexandria",
+                "Enjoy panoramic views of the Mediterranean Sea from the fortress walls",
+                "Walk along the Corniche, the city's beautiful seafront promenade",
+                "Visit the modern Bibliotheca Alexandrina, heir to the legendary ancient library",
+                "Lunch of fresh seafood at restaurant overlooking the sea",
+                "Free time to explore the Anfushi neighborhood and its fish markets"
+            ],
+            ar: [
+                "نبدأ استكشافنا للإسكندرية بزيارة قلعة قايتباي، المبنية على أنقاض منارة الإسكندرية القديمة",
+                "نستمتع بالمناظر البانورامية للبحر الأبيض المتوسط من أسوار القلعة",
+                "نتجول على الكورنيش، الممشى البحري الجميل للمدينة",
+                "نزور مكتبة الإسكندرية الحديثة، وريثة المكتبة القديمة الأسطورية",
+                "غداء من المأكولات البحرية الطازجة في مطعم مطل على البحر",
+                "وقت حر لاستكشاف حي الأنفوشي وأسواق السمك"
+            ]
+        },
+        day2: {
+            es: [
+                "Visitamos las Catacumbas de Kom El Shoqafa, el sitio funerario más grande de Egipto",
+                "Exploramos este fascinante laberinto subterráneo que combina estilos egipcio, griego y romano",
+                "Visitamos la Columna de Pompeyo, el monumento más alto de la ciudad",
+                "Descubrimos el Anfiteatro Romano de Kom El Dikka, único en Egipto",
+                "Visitamos el Museo Nacional de Alejandría, con artefactos que narran la historia de la ciudad",
+                "Tarde libre para pasear por las playas de la ciudad o visitar sus cafés históricos"
+            ],
+            en: [
+                "Visit the Catacombs of Kom El Shoqafa, Egypt's largest burial site",
+                "Explore this fascinating underground labyrinth combining Egyptian, Greek and Roman styles",
+                "Visit Pompey's Pillar, the city's tallest monument",
+                "Discover the Roman Amphitheater of Kom El Dikka, unique in Egypt",
+                "Visit the Alexandria National Museum, with artifacts narrating the city's history",
+                "Afternoon free to stroll the city's beaches or visit its historic cafés"
+            ],
+            ar: [
+                "نزور سراديب كوم الشقافة، أكبر موقع للدفن في مصر",
+                "نستكشف هذا المتاهة الرائعة تحت الأرض التي تجمع بين الأساليب المصرية واليونانية والرومانية",
+                "نزور عمود السواري، أطول نصب تذكاري في المدينة",
+                "نكتشف المدرج الروماني في كوم الدكة، الوحيد في مصر",
+                "نزور المتحف الوطني بالإسكندرية، مع قطع أثرية تروي تاريخ المدينة",
+                "بعد الظهر حر للتنزه على شواطئ المدينة أو زيارة مقاهيها التاريخية"
+            ]
+        },
+        day3: {
+            es: [
+                "Visitamos el Palacio de Montazah, antigua residencia veraniega de la familia real egipcia",
+                "Paseamos por sus magníficos jardines con vistas al Mediterráneo",
+                "Visitamos el Museo de Joyas Reales en el Palacio de Gleem",
+                "Admiramos la impresionante colección de joyas de la familia real de Muhammad Ali",
+                "Exploramos el barrio de Stanley con su famoso puente",
+                "Tiempo libre para disfrutar de la playa o visitar los mercados locales",
+                "Cena opcional de mariscos en uno de los restaurantes tradicionales del puerto"
+            ],
+            en: [
+                "Visit Montazah Palace, former summer residence of the Egyptian royal family",
+                "Stroll through its magnificent gardens overlooking the Mediterranean",
+                "Visit the Royal Jewelry Museum in Gleem Palace",
+                "Admire the impressive jewelry collection of Muhammad Ali's royal family",
+                "Explore the Stanley neighborhood with its famous bridge",
+                "Free time to enjoy the beach or visit local markets",
+                "Optional seafood dinner at one of the traditional harbor restaurants"
+            ],
+            ar: [
+                "نزور قصر المنتزه، المقر الصيفي السابق للعائلة المالكة المصرية",
+                "نتجول في حدائقه الرائعة المطلة على البحر الأبيض المتوسط",
+                "نزور متحف المجوهرات الملكية في قصر جليم",
+                "نشاهد مجموعة المجوهرات المذهلة للعائلة المالكة لمحمد علي",
+                "نستكشف حي ستانلي مع جسره الشهير",
+                "وقت حر للاستمتاع بالشاطئ أو زيارة الأسواق المحلية",
+                "عشاء اختياري من المأكولات البحرية في أحد مطاعم الميناء التقليدية"
+            ]
+        },
+        day4: {
+            es: [
+                "Excursión opcional a El Alamein para visitar los cementerios de guerra y el museo militar",
+                "Alternativa: día libre en Alejandría para actividades personales",
+                "Visita opcional al Acuario de Alejandría y al Museo Hidrobiológico",
+                "Tiempo para compras en los centros comerciales modernos o mercados tradicionales",
+                "Última tarde para disfrutar de la cocina alejandrina en restaurantes locales",
+                "Preparación para el regreso con recuerdos inolvidables de esta ciudad mediterránea"
+            ],
+            en: [
+                "Optional excursion to El Alamein to visit war cemeteries and military museum",
+                "Alternative: free day in Alexandria for personal activities",
+                "Optional visit to Alexandria Aquarium and Hydrobiological Museum",
+                "Time for shopping in modern malls or traditional markets",
+                "Last afternoon to enjoy Alexandrian cuisine at local restaurants",
+                "Preparation for return with unforgettable memories of this Mediterranean city"
+            ],
+            ar: [
+                "رحلة اختيارية إلى العلمين لزيارة مقابر الحرب والمتحف العسكري",
+                "بديل: يوم حر في الإسكندرية للأنشطة الشخصية",
+                "زيارة اختيارية لأكواريوم الإسكندرية والمتحف الهيدروبيولوجي",
+                "وقت للتسوق في مراكز التسوق الحديثة أو الأسواق التقليدية",
+                "بعد ظهر أخير للاستمتاع بالمطبخ السكندري في المطاعم المحلية",
+                "الاستعداد للعودة مع ذكريات لا تُنسى من هذه المدينة المتوسطية"
+            ]
+        }
+    }
 };
 
 // 🧠 نظام ذكي محسن لاستخراج البيانات من البرامج الـ10 الموجودة
@@ -128,8 +343,10 @@ export class IntelligentDataExtractor {
         
         console.log('[Enhanced] Creating custom program for:', { duration, cities, specificSites });
         
-        // حساب توزيع الأيام
+        // ✅ حساب توزيع الأيام بشكل صحيح
         const daysDistribution = this.calculateDaysDistribution(duration, cities);
+        
+        console.log('[Enhanced] Days distribution:', daysDistribution);
         
         // إنشاء البرنامج اليومي
         const itinerary = this.createEnhancedItinerary(daysDistribution, specificSites, language, duration);
@@ -209,10 +426,14 @@ export class IntelligentDataExtractor {
         });
     }
 
-    // 📊 حساب توزيع الأيام بشكل ذكي مع دعم ترتيب المدن
+    // 📊 حساب توزيع الأيام بشكل ذكي مع دعم ترتيب المدن - ✅ FIXED
     private calculateDaysDistribution(duration: number, cities: string[]): { [city: string]: number } {
-        const availableDays = duration - 2; // استبعاد يوم الوصول والمغادرة
         const distribution: { [city: string]: number } = {};
+        
+        // ✅ إجمالي الأيام المتاحة للأنشطة (بدون يوم الوصول والمغادرة)
+        const totalActivityDays = duration - 2;
+        
+        console.log(`[Days Calc] Total duration: ${duration}, Activity days: ${totalActivityDays}`);
         
         // تحديد نوع الكروز المطلوب
         const hasLuxor = cities.includes('luxor');
@@ -222,27 +443,43 @@ export class IntelligentDataExtractor {
         // حساب أيام الكروز
         let cruiseDays = 0;
         if (hasCruise) {
-            // 4 ليالي من الأقصر (5 أيام)
-            cruiseDays = 5;
+            cruiseDays = 5; // 4 ليالي = 5 أيام
         }
         
-        // حساب الأيام المتاحة للمدن الأخرى
-        const remainingDays = availableDays - cruiseDays;
+        // ✅ حساب الأيام المتاحة للمدن الأخرى
+        const remainingDays = totalActivityDays - cruiseDays;
+        
+        console.log(`[Days Calc] Cruise days: ${cruiseDays}, Remaining days: ${remainingDays}`);
         
         // توزيع الأيام حسب ترتيب المدن في الطلب
         let daysLeft = remainingDays;
+        const nonCruiseCities = cities.filter(city => city !== 'luxor' && city !== 'aswan');
         
-        for (const city of cities) {
-            if (city === 'luxor' || city === 'aswan') continue; // سيتم التعامل معها في الكروز
+        for (let i = 0; i < nonCruiseCities.length; i++) {
+            const city = nonCruiseCities[i];
             
             if (daysLeft > 0) {
-                // القاهرة تحصل على 3-4 أيام، باقي المدن على 2-3 أيام
-                const cityDays = city === 'cairo' 
-                    ? Math.min(4, Math.max(3, Math.ceil(daysLeft * 0.4)))
-                    : Math.min(3, Math.max(2, Math.ceil(daysLeft * 0.3)));
+                // ✅ توزيع الأيام بالتساوي أو حسب الأولوية
+                let cityDays: number;
+                
+                if (nonCruiseCities.length === 1) {
+                    // مدينة واحدة فقط = كل الأيام المتبقية
+                    cityDays = daysLeft;
+                } else if (i === nonCruiseCities.length - 1) {
+                    // آخر مدينة = كل ما تبقى
+                    cityDays = daysLeft;
+                } else {
+                    // توزيع متساوٍ مع إعطاء القاهرة أولوية أكبر
+                    const isFirstCity = i === 0;
+                    const baseDays = Math.floor(remainingDays / nonCruiseCities.length);
+                    cityDays = isFirstCity ? Math.ceil(remainingDays / nonCruiseCities.length) : baseDays;
+                    cityDays = Math.min(cityDays, daysLeft);
+                }
                 
                 distribution[city] = cityDays;
                 daysLeft -= cityDays;
+                
+                console.log(`[Days Calc] ${city}: ${cityDays} days, Remaining: ${daysLeft}`);
             }
         }
         
@@ -251,16 +488,11 @@ export class IntelligentDataExtractor {
             distribution.cruise = cruiseDays;
         }
         
-        // أي أيام متبقية تذهب للقاهرة
-        if (daysLeft > 0) {
-            distribution.cairo = (distribution.cairo || 0) + daysLeft;
-        }
-        
-        console.log('[Enhanced] Days distribution:', distribution);
+        console.log('[Days Calc] Final distribution:', distribution);
         return distribution;
     }
 
-    // 🗺️ إنشاء برنامج يومي محسن مع دعم ترتيب المدن والكروز
+    // 🗺️ إنشاء برنامج يومي محسن مع دعم ترتيب المدن والكروز - ✅ FIXED
     private createEnhancedItinerary(
         daysDistribution: { [city: string]: number },
         specificSites: { [city: string]: SupportedSite[] },
@@ -270,34 +502,235 @@ export class IntelligentDataExtractor {
         const itinerary: ItineraryItem[] = [];
         let currentDay = 1;
         
-        // يوم الوصول
+        // ✅ يوم 1: الوصول
         itinerary.push(this.createArrivalDay(language));
         currentDay++;
         
         // ترتيب المدن حسب الطلب: القاهرة → الإسكندرية → الكروز
         const orderedCities = this.getOrderedCities(daysDistribution);
         
+        console.log('[Itinerary] Ordered cities:', orderedCities);
+        
         for (const city of orderedCities) {
             const days = daysDistribution[city];
             if (days > 0) {
+                console.log(`[Itinerary] Creating ${days} days for ${city}, starting from day ${currentDay}`);
+                
                 if (city === 'cruise') {
                     // إنشاء أيام الكروز
                     const cruiseDays = this.createCruiseDays(specificSites, language, currentDay);
                     itinerary.push(...cruiseDays);
                     currentDay += days;
                 } else {
-                    // إنشاء أيام المدن العادية
-                    const cityDays = this.createCityDays(city, days, specificSites[city] || [], language, currentDay);
+                    // ✅ إنشاء أيام المدن العادية بأنشطة تفصيلية
+                    const cityDays = this.createDetailedCityDays(city, days, specificSites[city] || [], language, currentDay);
                     itinerary.push(...cityDays);
                     currentDay += days;
                 }
             }
         }
         
-        // يوم المغادرة
+        // ✅ آخر يوم: المغادرة
         itinerary.push(this.createDepartureDay(totalDuration, language));
         
+        console.log(`[Itinerary] Total days created: ${itinerary.length} (Expected: ${totalDuration})`);
+        
         return itinerary;
+    }
+
+    // 🏙️ إنشاء أيام مدينة مفصلة بأنشطة قصصية - ✅ NEW
+    private createDetailedCityDays(
+        city: string, 
+        days: number, 
+        specificSites: SupportedSite[], 
+        language: Language, 
+        startDay: number
+    ): ItineraryItem[] {
+        const cityDays: ItineraryItem[] = [];
+        
+        console.log(`[Detailed Days] Creating ${days} days for ${city} starting from day ${startDay}`);
+        
+        // الحصول على الأنشطة التفصيلية من DETAILED_CITY_ACTIVITIES
+        const cityActivities = DETAILED_CITY_ACTIVITIES[city as keyof typeof DETAILED_CITY_ACTIVITIES];
+        
+        for (let i = 0; i < days; i++) {
+            const dayNumber = startDay + i;
+            const dayInCity = i + 1;
+            
+            // ✅ استخدام الأنشطة التفصيلية إذا كانت متاحة
+            let dayActivities: { es: string[]; en: string[]; ar: string[] };
+            
+            if (cityActivities) {
+                const dayKey = `day${dayInCity}` as keyof typeof cityActivities;
+                const detailedActivities = cityActivities[dayKey];
+                
+                if (detailedActivities) {
+                    dayActivities = {
+                        es: detailedActivities.es,
+                        en: detailedActivities.en,
+                        ar: detailedActivities.ar
+                    };
+                } else {
+                    // استخدام أنشطة عامة إذا لم تكن متاحة
+                    dayActivities = this.createGenericDayActivities(city, specificSites, language, dayInCity);
+                }
+            } else {
+                // استخدام أنشطة عامة إذا لم تكن متاحة
+                dayActivities = this.createGenericDayActivities(city, specificSites, language, dayInCity);
+            }
+            
+            const dayTitle = this.createDayTitle(city, dayInCity, days, language);
+            
+            cityDays.push({
+                day: dayNumber,
+                title: dayTitle,
+                activities: dayActivities
+            });
+            
+            console.log(`[Detailed Days] Created day ${dayNumber} (Day ${dayInCity} in ${city})`);
+        }
+        
+        return cityDays;
+    }
+
+    // 🎯 إنشاء أنشطة عامة للأيام التي ليس لها أنشطة تفصيلية
+    private createGenericDayActivities(
+        city: string, 
+        specificSites: SupportedSite[], 
+        language: Language,
+        dayInCity: number
+    ): { es: string[]; en: string[]; ar: string[] } {
+        const activities: { es: string[]; en: string[]; ar: string[] } = {
+            es: [],
+            en: [],
+            ar: []
+        };
+        
+        const cityName = this.getCityLocalizedName(city);
+        
+        // إضافة نشاط الصباح
+        activities.es.push(`Desayuno en el hotel y preparación para el día de exploración en ${cityName.es}`);
+        activities.en.push(`Breakfast at hotel and preparation for exploration day in ${cityName.en}`);
+        activities.ar.push(`الإفطار في الفندق والاستعداد ليوم الاستكشاف في ${cityName.ar}`);
+        
+        // إضافة أنشطة المواقع المحددة
+        if (specificSites && specificSites.length > 0) {
+            const sitesForThisDay = this.selectSitesForDay(specificSites, dayInCity - 1, Math.ceil(specificSites.length / 3));
+            
+            for (const site of sitesForThisDay) {
+                const siteActivity = this.getDetailedSiteActivity(site, language);
+                if (siteActivity) {
+                    activities.es.push(siteActivity.es);
+                    activities.en.push(siteActivity.en);
+                    activities.ar.push(siteActivity.ar);
+                }
+            }
+        } else {
+            // أنشطة عامة إذا لم يتم تحديد مواقع
+            activities.es.push(`Exploramos los principales atractivos turísticos de ${cityName.es}`);
+            activities.en.push(`Explore the main tourist attractions of ${cityName.en}`);
+            activities.ar.push(`استكشاف المعالم السياحية الرئيسية في ${cityName.ar}`);
+        }
+        
+        // إضافة نشاط الغداء
+        activities.es.push("Almuerzo en restaurante local con especialidades de la región");
+        activities.en.push("Lunch at local restaurant featuring regional specialties");
+        activities.ar.push("الغداء في مطعم محلي مع الأطباق الإقليمية");
+        
+        // إضافة نشاط المساء
+        activities.es.push(`Tiempo libre para explorar ${cityName.es} por cuenta propia o relajarse en el hotel`);
+        activities.en.push(`Free time to explore ${cityName.en} on your own or relax at the hotel`);
+        activities.ar.push(`وقت حر لاستكشاف ${cityName.ar} بنفسك أو الاسترخاء في الفندق`);
+        
+        return activities;
+    }
+
+    // 🎯 نشاط موقع مفصل بدلاً من سطر واحد
+    private getDetailedSiteActivity(site: SupportedSite, language: Language): { es: string; en: string; ar: string } | null {
+        const detailedActivities: { [key: string]: { es: string; en: string; ar: string } } = {
+            gizaPyramidsAndSphinx: {
+                es: "Visitamos las majestuosas Pirámides de Giza y la Gran Esfinge, contemplando una de las Siete Maravillas del Mundo Antiguo",
+                en: "Visit the majestic Pyramids of Giza and the Great Sphinx, contemplating one of the Seven Wonders of the Ancient World",
+                ar: "نزور أهرامات الجيزة المهيبة وأبو الهول العظيم، ونتأمل إحدى عجائب الدنيا السبع القديمة"
+            },
+            egyptianMuseum: {
+                es: "Exploramos el Museo Egipcio, hogar de la mayor colección de antigüedades faraónicas, incluyendo los tesoros de Tutankamón",
+                en: "Explore the Egyptian Museum, home to the largest collection of pharaonic antiquities, including Tutankhamun's treasures",
+                ar: "نستكشف المتحف المصري، موطن أكبر مجموعة من الآثار الفرعونية، بما في ذلك كنوز توت عنخ آمون"
+            },
+            khanElKhalili: {
+                es: "Paseamos por el histórico Bazar Khan El Khalili, sumergiéndonos en la atmósfera tradicional y los aromas del Oriente",
+                en: "Stroll through the historic Khan El Khalili Bazaar, immersing ourselves in the traditional atmosphere and scents of the Orient",
+                ar: "نتجول في خان الخليلي التاريخي، ونغوص في الأجواء التقليدية وروائح الشرق"
+            },
+            qaitbayCitadel: {
+                es: "Visitamos la Ciudadela de Qaitbay, construida sobre las ruinas del antiguo Faro de Alejandría, disfrutando de las vistas al Mediterráneo",
+                en: "Visit Qaitbay Citadel, built on the ruins of the ancient Lighthouse of Alexandria, enjoying Mediterranean views",
+                ar: "نزور قلعة قايتباي، المبنية على أنقاض منارة الإسكندرية القديمة، مع الاستمتاع بإطلالات البحر المتوسط"
+            },
+            alexandriaNationalMuseum: {
+                es: "Exploramos el Museo Nacional de Alejandría, descubriendo artefactos que narran la rica historia de esta ciudad cosmopolita",
+                en: "Explore the Alexandria National Museum, discovering artifacts that tell the rich history of this cosmopolitan city",
+                ar: "نستكشف المتحف الوطني بالإسكندرية، ونكتشف القطع الأثرية التي تحكي التاريخ الغني لهذه المدينة العالمية"
+            },
+            luxorTemple: {
+                es: "Visitamos el Templo de Luxor, iluminado majestuosamente por la noche, revelando su impresionante arquitectura faraónica",
+                en: "Visit Luxor Temple, majestically illuminated at night, revealing its impressive pharaonic architecture",
+                ar: "نزور معبد الأقصر، المضاء بشكل مهيب في الليل، ليكشف عن عمارته الفرعونية المذهلة"
+            },
+            karnakTemple: {
+                es: "Exploramos el vasto complejo de Karnak, el sitio religioso más grande del mundo antiguo, con su famoso bosque de columnas",
+                en: "Explore the vast Karnak complex, the largest religious site in the ancient world, with its famous hypostyle hall",
+                ar: "نستكشف مجمع الكرنك الضخم، أكبر موقع ديني في العالم القديم، مع قاعة الأعمدة الشهيرة"
+            },
+            valleyOfTheKings: {
+                es: "Descendemos al Valle de los Reyes, explorando las tumbas bellamente decoradas de los faraones del Imperio Nuevo",
+                en: "Descend into the Valley of the Kings, exploring the beautifully decorated tombs of New Kingdom pharaohs",
+                ar: "ننزل إلى وادي الملوك، ونستكشف مقابر فراعنة الدولة الحديثة المزينة بشكل جميل"
+            },
+            hatshepsutTemple: {
+                es: "Visitamos el Templo de Hatshepsut, obra maestra arquitectónica dedicada a la reina faraón más poderosa de Egipto",
+                en: "Visit Hatshepsut Temple, architectural masterpiece dedicated to Egypt's most powerful female pharaoh",
+                ar: "نزور معبد حتشبسوت، التحفة المعمارية المخصصة لأقوى فرعونة في مصر"
+            },
+            philaeTemple: {
+                es: "Navegamos al Templo de Philae en la isla de Agilkia, dedicado a la diosa Isis, disfrutando de su encanto mágico",
+                en: "Sail to Philae Temple on Agilkia Island, dedicated to goddess Isis, enjoying its magical charm",
+                ar: "نبحر إلى معبد فيلة في جزيرة أجيليكا، المخصص للإلهة إيزيس، ونستمتع بسحره الخلاب"
+            },
+            edfuTemple: {
+                es: "Visitamos el Templo de Edfu, el templo ptolemaico mejor conservado de Egipto, dedicado al dios Horus",
+                en: "Visit Edfu Temple, the best-preserved Ptolemaic temple in Egypt, dedicated to god Horus",
+                ar: "نزور معبد إدفو، المعبد البطلمي الأفضل حفظاً في مصر، المخصص للإله حورس"
+            },
+            komOmboTemple: {
+                es: "Exploramos el Templo de Kom Ombo, único por estar dedicado a dos dioses: Sobek y Horus",
+                en: "Explore Kom Ombo Temple, unique for being dedicated to two gods: Sobek and Horus",
+                ar: "نستكشف معبد كوم أمبو، الفريد من نوعه لأنه مخصص لإلهين: سوبك وحورس"
+            },
+            saqqara: {
+                es: "Exploramos la necrópolis de Saqqara, hogar de la Pirámide Escalonada de Zoser, la primera estructura de piedra monumental",
+                en: "Explore Saqqara necropolis, home to Djoser's Step Pyramid, the first monumental stone structure",
+                ar: "نستكشف مقابر سقارة، موطن هرم زوسر المدرج، أول بناء حجري ضخم"
+            },
+            citadelOfSaladin: {
+                es: "Visitamos la Ciudadela de Saladino, fortaleza medieval que ofrece vistas panorámicas de El Cairo",
+                en: "Visit the Citadel of Saladin, medieval fortress offering panoramic views of Cairo",
+                ar: "نزور قلعة صلاح الدين الأيوبي، الحصن الذي يوفر إطلالات بانورامية على القاهرة"
+            },
+            komElShoqafaCatacombs: {
+                es: "Descendemos a las Catacumbas de Kom El Shoqafa, fascinante laberinto que fusiona estilos egipcio, griego y romano",
+                en: "Descend into Catacombs of Kom El Shoqafa, fascinating labyrinth blending Egyptian, Greek and Roman styles",
+                ar: "ننزل إلى سراديب كوم الشقافة، المتاهة الرائعة التي تمزج بين الأساليب المصرية واليونانية والرومانية"
+            },
+            pompeysPillar: {
+                es: "Admiramos la Columna de Pompeyo, el monumento más alto de Alejandría, testimonio de la grandeza romana",
+                en: "Admire Pompey's Pillar, Alexandria's tallest monument, testament to Roman grandeur",
+                ar: "نشاهد عمود السواري، أطول نصب تذكاري في الإسكندرية، شاهد على العظمة الرومانية"
+            }
+        };
+        
+        return detailedActivities[site] || null;
     }
 
     // 🗺️ ترتيب المدن حسب الطلب المطلوب
@@ -340,32 +773,180 @@ export class IntelligentDataExtractor {
     ): ItineraryItem[] {
         const cruiseDays: ItineraryItem[] = [];
         
-        // اليوم 1: الأقصر (معبد الأقصر + الكرنك + وادي الملوك + حتشبسوت + ممنون)
+        // اليوم 1: الأقصر (معبد الأقصر + الكرنك + وادي الملوك + حتشبسوت)
         cruiseDays.push({
             day: startDay,
             title: this.getCruiseDayTitle('luxor', 1, language),
-            activities: this.getCruiseDayActivities('luxor', specificSites.luxor || [], language)
+            activities: {
+                es: [
+                    "Traslado desde El Cairo o Alejandría a Luxor y embarque en el crucero del Nilo",
+                    "Visitamos el Templo de Luxor, iluminado majestuosamente, revelando su impresionante arquitectura",
+                    "Exploramos el vasto complejo de Karnak, el sitio religioso más grande del mundo antiguo",
+                    "Descendemos al Valle de los Reyes, explorando las tumbas de los faraones",
+                    "Visitamos el Templo de Hatshepsut, obra maestra dedicada a la reina faraón",
+                    "Admiramos los Colosos de Memnón, guardianes milenarios del templo de Amenhotep III",
+                    "Cena y noche a bordo del crucero"
+                ],
+                en: [
+                    "Transfer from Cairo or Alexandria to Luxor and embark on Nile cruise",
+                    "Visit Luxor Temple, majestically illuminated, revealing its impressive architecture",
+                    "Explore the vast Karnak complex, the largest religious site in the ancient world",
+                    "Descend into Valley of the Kings, exploring pharaohs' tombs",
+                    "Visit Hatshepsut Temple, masterpiece dedicated to the female pharaoh",
+                    "Admire the Colossi of Memnon, millennial guardians of Amenhotep III's temple",
+                    "Dinner and overnight aboard the cruise"
+                ],
+                ar: [
+                    "الانتقال من القاهرة أو الإسكندرية إلى الأقصر والصعود على متن الكروز النيلي",
+                    "نزور معبد الأقصر المضاء بشكل مهيب، ليكشف عن عمارته المذهلة",
+                    "نستكشف مجمع الكرنك الضخم، أكبر موقع ديني في العالم القديم",
+                    "ننزل إلى وادي الملوك، ونستكشف مقابر الفراعنة",
+                    "نزور معبد حتشبسوت، التحفة المخصصة للفرعونة",
+                    "نشاهد تمثالي ممنون الضخمين، حراس معبد أمنحتب الثالث الألفيين",
+                    "العشاء والمبيت على متن الكروز"
+                ]
+            }
         });
         
         // اليوم 2: إدفو
         cruiseDays.push({
             day: startDay + 1,
             title: this.getCruiseDayTitle('edfu', 2, language),
-            activities: this.getCruiseDayActivities('edfu', [], language)
+            activities: {
+                es: [
+                    "Desayuno a bordo mientras navegamos por el Nilo",
+                    "Llegada a Edfu y traslado en calesa al templo",
+                    "Visitamos el Templo de Edfu, el templo ptolemaico mejor conservado de Egipto, dedicado al dios Horus",
+                    "Exploramos los relieves detallados que narran la batalla entre Horus y Set",
+                    "Regreso al crucero y continuación de la navegación",
+                    "Tarde libre para relajarse en la cubierta del barco",
+                    "Cena con espectáculo de música tradicional egipcia"
+                ],
+                en: [
+                    "Breakfast aboard while sailing the Nile",
+                    "Arrival in Edfu and transfer by horse carriage to temple",
+                    "Visit Edfu Temple, best-preserved Ptolemaic temple in Egypt, dedicated to god Horus",
+                    "Explore detailed reliefs narrating the battle between Horus and Set",
+                    "Return to cruise and continue sailing",
+                    "Afternoon free to relax on ship's deck",
+                    "Dinner with traditional Egyptian music show"
+                ],
+                ar: [
+                    "الإفطار على متن الكروز أثناء الإبحار في النيل",
+                    "الوصول إلى إدفو والانتقال بعربة الحنطور إلى المعبد",
+                    "نزور معبد إدفو، المعبد البطلمي الأفضل حفظاً في مصر، المخصص للإله حورس",
+                    "نستكشف النقوش التفصيلية التي تروي معركة حورس وست",
+                    "العودة إلى الكروز ومواصلة الإبحار",
+                    "بعد الظهر حر للاسترخاء على سطح السفينة",
+                    "العشاء مع عرض موسيقى مصرية تقليدية"
+                ]
+            }
         });
         
         // اليوم 3: كوم أمبو
         cruiseDays.push({
             day: startDay + 2,
             title: this.getCruiseDayTitle('komOmbo', 3, language),
-            activities: this.getCruiseDayActivities('komOmbo', [], language)
+            activities: {
+                es: [
+                    "Desayuno mientras navegamos hacia Kom Ombo",
+                    "Visitamos el Templo de Kom Ombo, único por estar dedicado a dos dioses: Sobek (cocodrilo) y Horus",
+                    "Exploramos el museo de cocodrilos momificados",
+                    "Admiramos los relieves médicos antiguos, precursores de la medicina moderna",
+                    "Continuamos navegando hacia Asuán con hermosas vistas del Nilo",
+                    "Tarde libre para disfrutar de las instalaciones del crucero",
+                    "Cena de gala con trajes tradicionales (opcional)"
+                ],
+                en: [
+                    "Breakfast while sailing to Kom Ombo",
+                    "Visit Kom Ombo Temple, unique for being dedicated to two gods: Sobek (crocodile) and Horus",
+                    "Explore the mummified crocodiles museum",
+                    "Admire ancient medical reliefs, precursors of modern medicine",
+                    "Continue sailing to Aswan with beautiful Nile views",
+                    "Afternoon free to enjoy cruise facilities",
+                    "Gala dinner with traditional costumes (optional)"
+                ],
+                ar: [
+                    "الإفطار أثناء الإبحار إلى كوم أمبو",
+                    "نزور معبد كوم أمبو، الفريد لأنه مخصص لإلهين: سوبك (التمساح) وحورس",
+                    "نستكشف متحف التماسيح المحنطة",
+                    "نشاهد النقوش الطبية القديمة، رواد الطب الحديث",
+                    "نواصل الإبحار إلى أسوان مع مناظر النيل الخلابة",
+                    "بعد الظهر حر للاستمتاع بمرافق الكروز",
+                    "عشاء فاخر مع الأزياء التقليدية (اختياري)"
+                ]
+            }
         });
         
-        // اليوم 4: أسوان (معبد فيلة)
+        // اليوم 4: أسوان
         cruiseDays.push({
             day: startDay + 3,
             title: this.getCruiseDayTitle('aswan', 4, language),
-            activities: this.getCruiseDayActivities('aswan', specificSites.aswan || [], language)
+            activities: {
+                es: [
+                    "Desayuno a bordo con vistas al Nilo en Asuán",
+                    "Navegamos en bote motorizado al Templo de Philae en la isla de Agilkia",
+                    "Exploramos el Templo de Philae, dedicado a la diosa Isis, en su entorno mágico",
+                    "Visitamos la Presa Alta de Asuán, obra maestra de la ingeniería moderna",
+                    "Admiramos el Obelisco Inacabado en las canteras de granito",
+                    "Paseo opcional en faluca tradicional alrededor de las islas del Nilo",
+                    "Visita opcional al pueblo nubio para conocer su cultura única",
+                    "Última cena a bordo del crucero"
+                ],
+                en: [
+                    "Breakfast aboard with Nile views in Aswan",
+                    "Sail by motorboat to Philae Temple on Agilkia Island",
+                    "Explore Philae Temple, dedicated to goddess Isis, in its magical setting",
+                    "Visit Aswan High Dam, masterpiece of modern engineering",
+                    "Admire the Unfinished Obelisk in granite quarries",
+                    "Optional ride in traditional felucca around Nile islands",
+                    "Optional visit to Nubian village to experience its unique culture",
+                    "Last dinner aboard the cruise"
+                ],
+                ar: [
+                    "الإفطار على متن الكروز مع إطلالات النيل في أسوان",
+                    "نبحر بالقارب الآلي إلى معبد فيلة في جزيرة أجيليكا",
+                    "نستكشف معبد فيلة المخصص للإلهة إيزيس في محيطه السحري",
+                    "نزور السد العالي بأسوان، تحفة الهندسة الحديثة",
+                    "نشاهد المسلة الناقصة في محاجر الجرانيت",
+                    "رحلة اختيارية بالفلوكة التقليدية حول جزر النيل",
+                    "زيارة اختيارية للقرية النوبية للتعرف على ثقافتها الفريدة",
+                    "العشاء الأخير على متن الكروز"
+                ]
+            }
+        });
+        
+        // اليوم 5: مغادرة الكروز
+        cruiseDays.push({
+            day: startDay + 4,
+            title: {
+                es: "Crucero del Nilo - Desembarque",
+                en: "Nile Cruise - Disembarkation",
+                ar: "رحلة نيلية - مغادرة الكروز"
+            },
+            activities: {
+                es: [
+                    "Desayuno final a bordo del crucero",
+                    "Desembarque después del desayuno",
+                    "Excursión opcional a Abu Simbel (recomendada): templos de Ramsés II y Nefertari",
+                    "Traslado al aeropuerto de Asuán para vuelo de regreso a El Cairo",
+                    "O continuación del programa según itinerario personalizado"
+                ],
+                en: [
+                    "Final breakfast aboard the cruise",
+                    "Disembarkation after breakfast",
+                    "Optional excursion to Abu Simbel (recommended): temples of Ramses II and Nefertari",
+                    "Transfer to Aswan airport for return flight to Cairo",
+                    "Or program continuation as per customized itinerary"
+                ],
+                ar: [
+                    "الإفطار الأخير على متن الكروز",
+                    "مغادرة الكروز بعد الإفطار",
+                    "رحلة اختيارية إلى أبو سمبل (موصى بها): معابد رمسيس الثاني ونفرتاري",
+                    "الانتقال إلى مطار أسوان لرحلة العودة إلى القاهرة",
+                    "أو مواصلة البرنامج حسب المسار المخصص"
+                ]
+            }
         });
         
         return cruiseDays;
@@ -389,79 +970,10 @@ export class IntelligentDataExtractor {
         };
     }
 
-    // ⛵ أنشطة يوم الكروز
-    private getCruiseDayActivities(city: string, sites: SupportedSite[], language: Language): { es: string[]; en: string[]; ar: string[] } {
-        const activities: { es: string[]; en: string[]; ar: string[] } = { es: [], en: [], ar: [] };
-        
-        if (city === 'luxor') {
-            activities[language].push(
-                this.getSiteActivity('luxorTemple', language) || 'زيارة معبد الأقصر',
-                this.getSiteActivity('karnakTemple', language) || 'زيارة معبد الكرنك',
-                this.getSiteActivity('valleyOfTheKings', language) || 'زيارة وادي الملوك',
-                this.getSiteActivity('hatshepsutTemple', language) || 'زيارة معبد حتشبسوت',
-            );
-        } else if (city === 'edfu') {
-            activities[language].push('زيارة معبد إدفو المخصص للإله حورس');
-        } else if (city === 'komOmbo') {
-            activities[language].push('زيارة معبد كوم أمبو المخصص للإله سوبك وحورس');
-        } else if (city === 'aswan') {
-            activities[language].push(
-                this.getSiteActivity('philaeTemple', language) || 'زيارة معبد فيلة المخصص للإلهة إيزيس'
-            );
-        }
-        
-        return activities;
-    }
-
-    // 🏙️ إنشاء أيام مدينة محددة
-    private createCityDays(
-        city: string, 
-        days: number, 
-        specificSites: SupportedSite[], 
-        language: Language, 
-        startDay: number
-    ): ItineraryItem[] {
-        const cityDays: ItineraryItem[] = [];
-        
-        // التحقق من صحة المواقع المحددة
-        const validSites = this.validateSitesForCity(city, specificSites);
-        
-        // إذا لم يتم تحديد مواقع، نستخدم المواقع المتاحة
-        const sitesToUse = validSites.length > 0 ? validSites : this.getAvailableSitesForCity(city);
-        
-        // الحصول على البيانات من البرامج الجاهزة
-        const cityData = this.extractCityData(city, language);
-        
-        // إنشاء أيام مخصصة بناءً على المواقع المحددة
-        for (let i = 0; i < days; i++) {
-            const dayNumber = startDay + i;
-            const sitesForDay = this.selectSitesForDay(sitesToUse, i, days);
-            
-            const dayTitle = this.createDayTitle(city, i + 1, days, language);
-            const dayActivities = this.createDayActivities(city, sitesForDay, language);
-            
-            cityDays.push({
-                day: dayNumber,
-                title: dayTitle,
-                activities: dayActivities
-            });
-        }
-        
-        return cityDays;
-    }
-
     // 🎯 اختيار المواقع لكل يوم
-    private selectSitesForDay(specificSites: SupportedSite[], dayIndex: number, totalDays: number): SupportedSite[] {
-        if (specificSites.length === 0) {
-            // إذا لم يتم تحديد مواقع محددة، نستخدم المواقع المتاحة للمدينة
-            return this.getAvailableSitesForCity('cairo'); // يمكن تحسين هذا لاحقاً
-        }
-        
-        // توزيع المواقع على الأيام
-        const sitesPerDay = Math.ceil(specificSites.length / totalDays);
+    private selectSitesForDay(specificSites: SupportedSite[], dayIndex: number, sitesPerDay: number): SupportedSite[] {
         const startIndex = dayIndex * sitesPerDay;
         const endIndex = Math.min(startIndex + sitesPerDay, specificSites.length);
-        
         return specificSites.slice(startIndex, endIndex);
     }
 
@@ -497,30 +1009,6 @@ export class IntelligentDataExtractor {
         }
     }
 
-    // 🎯 إنشاء أنشطة اليوم
-    private createDayActivities(city: string, sites: SupportedSite[], language: Language): { es: string[]; en: string[]; ar: string[] } {
-        const activities: { es: string[]; en: string[]; ar: string[] } = { es: [], en: [], ar: [] };
-        
-        // إضافة الأنشطة الأساسية
-        activities[language].push(this.getCityArrivalActivity(city, language));
-        
-        // إضافة أنشطة المواقع المحددة
-        for (const site of sites) {
-            const siteActivity = this.getSiteActivity(site, language);
-            if (siteActivity) {
-                activities[language].push(siteActivity);
-            }
-        }
-        
-        // إضافة الأنشطة النهائية
-        activities[language].push(this.getCityDepartureActivity(city, language));
-        
-        // ملء باقي اللغات
-        this.fillOtherLanguages(activities, language);
-        
-        return activities;
-    }
-
     // 🏨 إنشاء أماكن الإقامة المحسنة مع دعم الكروز
     private createEnhancedAccommodations(
         daysDistribution: { [city: string]: number },
@@ -543,7 +1031,7 @@ export class IntelligentDataExtractor {
                     accommodations[category].push({
                         city: cityName,
                         hotel: hotel,
-                        nights: days - 1
+                        nights: days
                     });
                 }
             }
@@ -556,14 +1044,14 @@ export class IntelligentDataExtractor {
     private getCruiseInfo(category: 'gold' | 'diamond', language: Language): any {
         const cruiseNames = {
             gold: {
-                es: "Crucero Dorado del Nilo",
-                en: "Golden Nile Cruise",
-                ar: "كروز نيل ذهبي"
+                es: "Crucero Dorado del Nilo (5 estrellas)",
+                en: "Golden Nile Cruise (5 stars)",
+                ar: "كروز نيل ذهبي (5 نجوم)"
             },
             diamond: {
-                es: "Crucero Diamante del Nilo",
-                en: "Diamond Nile Cruise", 
-                ar: "كروز نيل ماسي"
+                es: "Crucero Diamante del Nilo (5 estrellas lujo)",
+                en: "Diamond Nile Cruise (5 stars deluxe)", 
+                ar: "كروز نيل ماسي (5 نجوم فاخر)"
             }
         };
         
@@ -652,175 +1140,52 @@ export class IntelligentDataExtractor {
         };
         
         // الخدمات الأساسية
-        services.es.push(`Alojamiento en hoteles de categoría ${category === 'gold' ? 'dorada' : 'diamante'}`);
-        services.en.push(`Accommodation in ${category} category hotels`);
-        services.ar!.push(`الإقامة في فنادق فئة ${category === 'gold' ? 'ذهبية' : 'ماسية'}`);
+        services.es.push(`Alojamiento en hoteles de categoría ${category === 'gold' ? 'dorada (5 estrellas)' : 'diamante (5 estrellas lujo)'}`);
+        services.en.push(`Accommodation in ${category === 'gold' ? 'gold category (5 stars)' : 'diamond category (5 stars deluxe)'} hotels`);
+        services.ar!.push(`الإقامة في فنادق فئة ${category === 'gold' ? 'ذهبية (5 نجوم)' : 'ماسية (5 نجوم فاخرة)'}`);
         
         // إضافة الكروز إذا كان موجوداً
         if (daysDistribution.cruise) {
-            services.es.push("Crucero por el Nilo de 4 noches (Luxor a Asuán)");
-            services.en.push("4-night Nile cruise (Luxor to Aswan)");
-            services.ar!.push("رحلة نيلية لمدة 4 ليالي (من الأقصر إلى أسوان)");
+            services.es.push("Crucero por el Nilo de 4 noches (Luxor a Asuán) pensión completa");
+            services.en.push("4-night Nile cruise (Luxor to Aswan) full board");
+            services.ar!.push("رحلة نيلية لمدة 4 ليالي (من الأقصر إلى أسوان) بنظام الإقامة الكاملة");
         }
         
         // الخدمات الإضافية
         services.es.push(
-            "Guía egiptólogo profesional",
-            "Todas las entradas a monumentos",
-            "Todas las comidas según se especifique",
-            "Traslados al aeropuerto",
-            "Vehículo privado con aire acondicionado",
-            "Todos los impuestos y cargos por servicio"
+            "Guía egiptólogo profesional de habla española durante todo el recorrido",
+            "Todas las entradas a monumentos, museos y sitios arqueológicos",
+            "Todas las comidas según se especifica en el itinerario (desayuno, almuerzo, cena)",
+            "Traslados desde/hacia aeropuertos y hoteles",
+            "Vehículo privado con aire acondicionado y conductor profesional",
+            "Vuelos domésticos (según itinerario)",
+            "Todos los impuestos y cargos por servicio",
+            "Agua embotellada durante las excursiones"
         );
         
         services.en.push(
-            "Professional Egyptologist guide",
-            "All entrance fees to monuments",
-            "All meals as specified",
-            "Airport transfers",
-            "Private air-conditioned vehicle",
-            "All taxes and service charges"
+            "Professional Spanish-speaking Egyptologist guide throughout the tour",
+            "All entrance fees to monuments, museums and archaeological sites",
+            "All meals as specified in itinerary (breakfast, lunch, dinner)",
+            "Transfers from/to airports and hotels",
+            "Private air-conditioned vehicle with professional driver",
+            "Domestic flights (as per itinerary)",
+            "All taxes and service charges",
+            "Bottled water during excursions"
         );
         
         services.ar!.push(
-            "مرشد مصريات محترف",
-            "جميع رسوم دخول المعالم",
-            "جميع الوجبات حسب المحدد",
-            "الانتقالات من وإلى المطار",
-            "مركبة خاصة مكيفة",
-            "جميع الضرائب ورسوم الخدمة"
+            "مرشد مصريات محترف يتحدث الإسبانية طوال الجولة",
+            "جميع رسوم دخول المعالم والمتاحف والمواقع الأثرية",
+            "جميع الوجبات حسب المحدد في البرنامج (إفطار، غداء، عشاء)",
+            "الانتقالات من وإلى المطارات والفنادق",
+            "مركبة خاصة مكيفة مع سائق محترف",
+            "رحلات طيران داخلية (حسب البرنامج)",
+            "جميع الضرائب ورسوم الخدمة",
+            "مياه معبأة خلال الرحلات"
         );
         
         return services;
-    }
-
-    // 🎯 إنشاء أنشطة الموقع
-    private getSiteActivity(site: SupportedSite, language: Language): string | null {
-        const siteActivities = {
-            gizaPyramidsAndSphinx: {
-                es: "Visitar las Pirámides de Giza y la Gran Esfinge",
-                en: "Visit Giza Pyramids and Great Sphinx",
-                ar: "زيارة أهرامات الجيزة والهرم الأكبر"
-            },
-            egyptianMuseum: {
-                es: "Visitar el Museo Egipcio",
-                en: "Visit Egyptian Museum",
-                ar: "زيارة المتحف المصري"
-            },
-            khanElKhalili: {
-                es: "Explorar el Bazar Khan El Khalili",
-                en: "Explore Khan El Khalili Bazaar",
-                ar: "استكشاف خان الخليلي"
-            },
-            qaitbayCitadel: {
-                es: "Visitar la Ciudadela de Qaitbay",
-                en: "Visit Qaitbay Citadel",
-                ar: "زيارة قلعة قايتباي"
-            },
-            alexandriaNationalMuseum: {
-                es: "Visitar el Museo Nacional de Alejandría",
-                en: "Visit Alexandria National Museum",
-                ar: "زيارة المتحف القومي بالإسكندرية"
-            },
-            luxorTemple: {
-                es: "Visitar el Templo de Luxor",
-                en: "Visit Luxor Temple",
-                ar: "زيارة معبد الأقصر"
-            },
-            karnakTemple: {
-                es: "Visitar el Templo de Karnak",
-                en: "Visit Karnak Temple",
-                ar: "زيارة معبد الكرنك"
-            },
-            valleyOfTheKings: {
-                es: "Explorar el Valle de los Reyes",
-                en: "Explore Valley of the Kings",
-                ar: "استكشاف وادي الملوك"
-            },
-            hatshepsutTemple: {
-                es: "Visitar el Templo de Hatshepsut",
-                en: "Visit Hatshepsut Temple",
-                ar: "زيارة معبد حتشبسوت"
-            },
-            colossiOfMemnon: {
-                es: "Ver los Colosos de Memnón",
-                en: "See Colossi of Memnon",
-                ar: "مشاهدة تمثالي ممنون"
-            },
-            philaeTemple: {
-                es: "Visitar el Templo de Philae",
-                en: "Visit Philae Temple",
-                ar: "زيارة معبد فيلة"
-            },
-            edfuTemple: {
-                es: "Visitar el Templo de Edfu",
-                en: "Visit Edfu Temple",
-                ar: "زيارة معبد إدفو"
-            },
-            komOmboTemple: {
-                es: "Visitar el Templo de Kom Ombo",
-                en: "Visit Kom Ombo Temple",
-                ar: "زيارة معبد كوم أمبو"
-            }
-        };
-        
-        return siteActivities[site]?.[language] || null;
-    }
-
-    // 🏙️ أنشطة الوصول للمدينة
-    private getCityArrivalActivity(city: string, language: Language): string {
-        const activities = {
-            cairo: {
-                es: "Llegada a El Cairo y traslado al hotel",
-                en: "Arrival in Cairo and transfer to hotel",
-                ar: "الوصول إلى القاهرة والانتقال إلى الفندق"
-            },
-            alexandria: {
-                es: "Traslado a Alejandría",
-                en: "Transfer to Alexandria",
-                ar: "الانتقال إلى الإسكندرية"
-            },
-            luxor: {
-                es: "Traslado a Luxor",
-                en: "Transfer to Luxor",
-                ar: "الانتقال إلى الأقصر"
-            },
-            aswan: {
-                es: "Traslado a Asuán",
-                en: "Transfer to Aswan",
-                ar: "الانتقال إلى أسوان"
-            }
-        };
-        
-        return activities[city as keyof typeof activities]?.[language] || "Transfer to city";
-    }
-
-    // 🏙️ أنشطة المغادرة من المدينة
-    private getCityDepartureActivity(city: string, language: Language): string {
-        const activities = {
-            cairo: {
-                es: "Tiempo libre en El Cairo",
-                en: "Free time in Cairo",
-                ar: "وقت حر في القاهرة"
-            },
-            alexandria: {
-                es: "Tiempo libre en Alejandría",
-                en: "Free time in Alexandria",
-                ar: "وقت حر في الإسكندرية"
-            },
-            luxor: {
-                es: "Tiempo libre en Luxor",
-                en: "Free time in Luxor",
-                ar: "وقت حر في الأقصر"
-            },
-            aswan: {
-                es: "Tiempo libre en Asuán",
-                en: "Free time in Aswan",
-                ar: "وقت حر في أسوان"
-            }
-        };
-        
-        return activities[city as keyof typeof activities]?.[language] || "Free time in city";
     }
 
     // 🌍 الحصول على اسم المدينة باللغات المختلفة
@@ -842,73 +1207,32 @@ export class IntelligentDataExtractor {
     private getDefaultHotelForCity(city: string, category: 'gold' | 'diamond', language: Language): LocalizedString {
         const hotels = {
             cairo: {
-                gold: { es: "Hotel Dorado de El Cairo", en: "Cairo Gold Hotel", ar: "فندق القاهرة الذهبي" },
-                diamond: { es: "Hotel Diamante de El Cairo", en: "Cairo Diamond Hotel", ar: "فندق القاهرة الماسي" }
+                gold: { es: "Steigenberger El Tahrir o similar", en: "Steigenberger El Tahrir or similar", ar: "فندق شتيجنبرجر التحرير أو مماثل" },
+                diamond: { es: "Four Seasons Cairo at Nile Plaza o similar", en: "Four Seasons Cairo at Nile Plaza or similar", ar: "فندق فور سيزونز القاهرة نايل بلازا أو مماثل" }
             },
             alexandria: {
-                gold: { es: "Hotel Dorado de Alejandría", en: "Alexandria Gold Hotel", ar: "فندق الإسكندرية الذهبي" },
-                diamond: { es: "Hotel Diamante de Alejandría", en: "Alexandria Diamond Hotel", ar: "فندق الإسكندرية الماسي" }
+                gold: { es: "Hilton Alexandria Corniche o similar", en: "Hilton Alexandria Corniche or similar", ar: "فندق هيلتون الإسكندرية كورنيش أو مماثل" },
+                diamond: { es: "Four Seasons Alexandria o similar", en: "Four Seasons Alexandria or similar", ar: "فندق فور سيزونز الإسكندرية أو مماثل" }
             },
             luxor: {
-                gold: { es: "Hotel Dorado de Luxor", en: "Luxor Gold Hotel", ar: "فندق الأقصر الذهبي" },
-                diamond: { es: "Hotel Diamante de Luxor", en: "Luxor Diamond Hotel", ar: "فندق الأقصر الماسي" }
+                gold: { es: "Sonesta St. George Luxor o similar", en: "Sonesta St. George Luxor or similar", ar: "فندق سونيستا سان جورج الأقصر أو مماثل" },
+                diamond: { es: "Sofitel Winter Palace Luxor o similar", en: "Sofitel Winter Palace Luxor or similar", ar: "فندق سوفيتيل ونتر بالاس الأقصر أو مماثل" }
             },
             aswan: {
-                gold: { es: "Hotel Dorado de Asuán", en: "Aswan Gold Hotel", ar: "فندق أسوان الذهبي" },
-                diamond: { es: "Hotel Diamante de Asuán", en: "Aswan Diamond Hotel", ar: "فندق أسوان الماسي" }
+                gold: { es: "Tolip Aswan Hotel o similar", en: "Tolip Aswan Hotel or similar", ar: "فندق توليب أسوان أو مماثل" },
+                diamond: { es: "Sofitel Legend Old Cataract Aswan o similar", en: "Sofitel Legend Old Cataract Aswan or similar", ar: "فندق سوفيتيل ليجند أولد كتاراكت أسوان أو مماثل" }
             }
         };
         
-        return hotels[city as keyof typeof hotels]?.[category] || { es: "Hotel", en: "Hotel", ar: "فندق" };
+        return hotels[city as keyof typeof hotels]?.[category] || { es: "Hotel de lujo", en: "Luxury Hotel", ar: "فندق فاخر" };
     }
 
     // 🔍 التحقق من تطابق المدينة
     private isCityMatch(accCity: LocalizedString, city: string): boolean {
         const cityNames = this.getCityLocalizedName(city);
-        return accCity.en === cityNames.en || accCity.es === cityNames.es || accCity.ar === cityNames.ar;
-    }
-
-    // 📊 استخراج بيانات المدينة
-    private extractCityData(city: string, language: Language): any {
-        // البحث في البرامج الجاهزة عن بيانات المدينة
-        for (const program of this.programs) {
-            if (program.itinerary) {
-                for (const day of program.itinerary) {
-                    if (this.isCityInItinerary(day, city)) {
-                        return {
-                            name: this.getCityLocalizedName(city),
-                            activities: day.activities
-                        };
-                    }
-                }
-            }
-        }
-        
-        return {
-            name: this.getCityLocalizedName(city),
-            activities: { [language]: [] }
-        };
-    }
-
-    // 🔍 التحقق من وجود المدينة في البرنامج اليومي
-    private isCityInItinerary(day: ItineraryItem, city: string): boolean {
-        const cityNames = this.getCityLocalizedName(city);
-        const title = day.title;
-        
-        return title.en.includes(cityNames.en) || 
-               title.es.includes(cityNames.es) || 
-               title.ar.includes(cityNames.ar);
-    }
-
-    // 🌐 ملء باقي اللغات
-    private fillOtherLanguages(activities: { es: string[]; en: string[]; ar: string[] }, language: Language): void {
-        const languages: Language[] = ['es', 'en', 'ar'];
-        
-        for (const lang of languages) {
-            if (lang !== language && activities[lang].length === 0) {
-                activities[lang] = [...activities[language]];
-            }
-        }
+        return accCity.en.toLowerCase().includes(cityNames.en.toLowerCase()) || 
+               accCity.es.toLowerCase().includes(cityNames.es.toLowerCase()) || 
+               (accCity.ar && accCity.ar.includes(cityNames.ar));
     }
 
     // 📊 تحويل الأيام إلى ليالي
@@ -917,10 +1241,10 @@ export class IntelligentDataExtractor {
         
         for (const [city, days] of Object.entries(daysDistribution)) {
             if (city === 'cruise') {
-                // الكروز لا يحتاج ليالي منفصلة
+                // الكروز = 4 ليالي
                 continue;
             }
-            nights[city as SupportedCity] = Math.max(0, days - 1);
+            nights[city as SupportedCity] = days;
         }
         
         return nights;
@@ -930,22 +1254,12 @@ export class IntelligentDataExtractor {
     private calculateFlightSectors(daysDistribution: { [city: string]: number }): number {
         let sectors = 0;
         
-        // إضافة القطاعات حسب المدن
-        if (daysDistribution.cairo) {
-            sectors++;
-        }
-        if (daysDistribution.alexandria) {
-            sectors++;
-        }
-        if (daysDistribution.luxor) {
-            sectors++;
-        }
-        if (daysDistribution.aswan) {
-            sectors++;
-        }
-        if (daysDistribution.cruise) {
-            sectors++;
-        }
+        // قطاع واحد لكل انتقال بين المدن
+        const cities = Object.keys(daysDistribution).filter(city => daysDistribution[city] > 0);
+        
+        if (cities.includes('cairo')) sectors++;
+        if (cities.includes('alexandria')) sectors++;
+        if (cities.includes('cruise') || cities.includes('luxor') || cities.includes('aswan')) sectors += 2; // ذهاب وعودة
         
         return sectors;
     }
@@ -956,7 +1270,6 @@ export class IntelligentDataExtractor {
         
         for (const day of itinerary) {
             if (day.activities && day.activities[language]) {
-                // تحويل النصوص إلى SupportedSite
                 for (const activity of day.activities[language]) {
                     const site = this.convertActivityToSite(activity);
                     if (site && !sites.includes(site)) {
@@ -971,43 +1284,43 @@ export class IntelligentDataExtractor {
 
     // 🔄 تحويل النشاط إلى SupportedSite
     private convertActivityToSite(activity: string): SupportedSite | null {
-        const activityToSiteMap: { [key: string]: SupportedSite } = {
-            'زيارة أهرامات الجيزة والهرم الأكبر': 'gizaPyramidsAndSphinx',
-            'زيارة المتحف المصري': 'egyptianMuseum',
-            'استكشاف خان الخليلي': 'khanElKhalili',
-            'زيارة قلعة قايتباي': 'qaitbayCitadel',
-            'زيارة المتحف القومي بالإسكندرية': 'alexandriaNationalMuseum',
-            'زيارة معبد الأقصر': 'luxorTemple',
-            'زيارة معبد الكرنك': 'karnakTemple',
-            'استكشاف وادي الملوك': 'valleyOfTheKings',
-            'زيارة معبد حتشبسوت': 'hatshepsutTemple',
-            'زيارة معبد فيلة': 'philaeTemple',
-            'زيارة معبد إدفو المخصص للإله حورس': 'edfuTemple',
-            'زيارة معبد كوم أمبو المخصص للإله سوبك وحورس': 'komOmboTemple',
-            'زيارة معبد فيلة المخصص للإلهة إيزيس': 'philaeTemple',
-            'Visit Giza Pyramids and Great Sphinx': 'gizaPyramidsAndSphinx',
-            'Visit Egyptian Museum': 'egyptianMuseum',
-            'Explore Khan El Khalili Bazaar': 'khanElKhalili',
-            'Visit Qaitbay Citadel': 'qaitbayCitadel',
-            'Visit Alexandria National Museum': 'alexandriaNationalMuseum',
-            'Visit Luxor Temple': 'luxorTemple',
-            'Visit Karnak Temple': 'karnakTemple',
-            'Explore Valley of the Kings': 'valleyOfTheKings',
-            'Visit Hatshepsut Temple': 'hatshepsutTemple',
-            'Visit Philae Temple': 'philaeTemple',
-            'Visitar las Pirámides de Giza y la Gran Esfinge': 'gizaPyramidsAndSphinx',
-            'Visitar el Museo Egipcio': 'egyptianMuseum',
-            'Explorar el Bazar Khan El Khalili': 'khanElKhalili',
-            'Visitar la Ciudadela de Qaitbay': 'qaitbayCitadel',
-            'Visitar el Museo Nacional de Alejandría': 'alexandriaNationalMuseum',
-            'Visitar el Templo de Luxor': 'luxorTemple',
-            'Visitar el Templo de Karnak': 'karnakTemple',
-            'Explorar el Valle de los Reyes': 'valleyOfTheKings',
-            'Visitar el Templo de Hatshepsut': 'hatshepsutTemple',
-            'Visitar el Templo de Philae': 'philaeTemple'
-        };
+        const activityLower = activity.toLowerCase();
         
-        return activityToSiteMap[activity] || null;
+        if (activityLower.includes('giza') || activityLower.includes('pirámides') || activityLower.includes('pyramids') || activityLower.includes('أهرامات')) {
+            return 'gizaPyramidsAndSphinx';
+        }
+        if (activityLower.includes('museo egipcio') || activityLower.includes('egyptian museum') || activityLower.includes('المتحف المصري')) {
+            return 'egyptianMuseum';
+        }
+        if (activityLower.includes('khan') || activityLower.includes('khalili') || activityLower.includes('خان الخليلي')) {
+            return 'khanElKhalili';
+        }
+        if (activityLower.includes('qaitbay') || activityLower.includes('qaitbay') || activityLower.includes('قايتباي')) {
+            return 'qaitbayCitadel';
+        }
+        if (activityLower.includes('luxor temple') || activityLower.includes('templo de luxor') || activityLower.includes('معبد الأقصر')) {
+            return 'luxorTemple';
+        }
+        if (activityLower.includes('karnak') || activityLower.includes('الكرنك')) {
+            return 'karnakTemple';
+        }
+        if (activityLower.includes('valley of the kings') || activityLower.includes('valle de los reyes') || activityLower.includes('وادي الملوك')) {
+            return 'valleyOfTheKings';
+        }
+        if (activityLower.includes('hatshepsut') || activityLower.includes('حتشبسوت')) {
+            return 'hatshepsutTemple';
+        }
+        if (activityLower.includes('philae') || activityLower.includes('فيلة')) {
+            return 'philaeTemple';
+        }
+        if (activityLower.includes('edfu') || activityLower.includes('إدفو')) {
+            return 'edfuTemple';
+        }
+        if (activityLower.includes('kom ombo') || activityLower.includes('كوم أمبو')) {
+            return 'komOmboTemple';
+        }
+        
+        return null;
     }
 
     // 🏠 إنشاء يوم الوصول
@@ -1015,14 +1328,41 @@ export class IntelligentDataExtractor {
         return {
             day: 1,
             title: {
-                es: "Llegada a El Cairo",
-                en: "Arrival in Cairo",
-                ar: "الوصول إلى القاهرة"
+                es: "Llegada a El Cairo - Bienvenida a Egipto",
+                en: "Arrival in Cairo - Welcome to Egypt",
+                ar: "الوصول إلى القاهرة - مرحباً بكم في مصر"
             },
             activities: {
-                es: ["Recogida en aeropuerto y traslado al hotel", "Registro en hotel", "Tiempo libre"],
-                en: ["Airport pickup and transfer to hotel", "Hotel check-in", "Free time"],
-                ar: ["استقبال من المطار والانتقال إلى الفندق", "تسجيل الوصول في الفندق", "وقت حر"]
+                es: [
+                    "Llegada al Aeropuerto Internacional de El Cairo",
+                    "Recepción por nuestro representante con cartel de bienvenida",
+                    "Asistencia con los trámites de inmigración y recogida de equipaje",
+                    "Traslado en vehículo privado con aire acondicionado al hotel",
+                    "Check-in en el hotel y entrega de documentación del viaje",
+                    "Briefing sobre el itinerario y consejos para su estancia en Egipto",
+                    "Resto del día libre para descansar del vuelo o explorar los alrededores del hotel",
+                    "Cena de bienvenida opcional en restaurante con vistas al Nilo"
+                ],
+                en: [
+                    "Arrival at Cairo International Airport",
+                    "Meet and greet by our representative with welcome sign",
+                    "Assistance with immigration procedures and luggage collection",
+                    "Transfer in private air-conditioned vehicle to hotel",
+                    "Hotel check-in and trip documentation delivery",
+                    "Briefing about the itinerary and tips for your stay in Egypt",
+                    "Rest of day free to relax from flight or explore hotel surroundings",
+                    "Optional welcome dinner at restaurant with Nile views"
+                ],
+                ar: [
+                    "الوصول إلى مطار القاهرة الدولي",
+                    "الاستقبال من قبل ممثلنا مع لافتة ترحيب",
+                    "المساعدة في إجراءات الهجرة واستلام الأمتعة",
+                    "الانتقال بمركبة خاصة مكيفة إلى الفندق",
+                    "تسجيل الوصول في الفندق وتسليم وثائق الرحلة",
+                    "إحاطة حول البرنامج ونصائح للإقامة في مصر",
+                    "باقي اليوم حر للراحة من الرحلة أو استكشاف محيط الفندق",
+                    "عشاء ترحيبي اختياري في مطعم مطل على النيل"
+                ]
             }
         };
     }
@@ -1032,322 +1372,40 @@ export class IntelligentDataExtractor {
         return {
             day: totalDuration,
             title: {
-                es: "Salida",
-                en: "Departure",
-                ar: "المغادرة"
+                es: "Despedida de Egipto - Traslado al Aeropuerto",
+                en: "Farewell to Egypt - Airport Transfer",
+                ar: "وداعاً مصر - الانتقال إلى المطار"
             },
             activities: {
-                es: ["Check-out del hotel", "Traslado al aeropuerto", "Vuelo de regreso"],
-                en: ["Hotel check-out", "Transfer to airport", "Return flight"],
-                ar: ["تسجيل الخروج من الفندق", "الانتقال إلى المطار", "رحلة العودة"]
+                es: [
+                    "Desayuno final en el hotel",
+                    "Tiempo libre para últimas compras o paseo según horario de vuelo",
+                    "Check-out del hotel con asistencia de nuestro personal",
+                    "Traslado al Aeropuerto Internacional de El Cairo",
+                    "Asistencia con los trámites de facturación y check-in",
+                    "Despedida de nuestro equipo y fin de nuestros servicios",
+                    "Vuelo de regreso a casa con recuerdos inolvidables de Egipto"
+                ],
+                en: [
+                    "Final breakfast at hotel",
+                    "Free time for last-minute shopping or walk depending on flight schedule",
+                    "Hotel check-out with assistance from our staff",
+                    "Transfer to Cairo International Airport",
+                    "Assistance with baggage check-in procedures",
+                    "Farewell from our team and end of our services",
+                    "Return flight home with unforgettable memories of Egypt"
+                ],
+                ar: [
+                    "الإفطار الأخير في الفندق",
+                    "وقت حر لآخر مشتريات أو نزهة حسب موعد الرحلة",
+                    "تسجيل الخروج من الفندق بمساعدة موظفينا",
+                    "الانتقال إلى مطار القاهرة الدولي",
+                    "المساعدة في إجراءات تسجيل الأمتعة",
+                    "وداعاً من فريقنا ونهاية خدماتنا",
+                    "رحلة العودة إلى الوطن مع ذكريات لا تُنسى من مصر"
+                ]
             }
         };
-    }
-
-    // 🎯 إنشاء برنامج مخصص ذكي (النظام القديم)
-    createIntelligentCustomProgram(request: {
-        duration: number;
-        travelers: number;
-        destinations: string[];
-        season: 'summer' | 'winter';
-        category: 'gold' | 'diamond';
-        language: Language;
-    }): Program {
-        const { duration, travelers, destinations, season, category, language } = request;
-        
-        console.log('[Intelligent] Creating custom program for:', { duration, destinations });
-        
-        // البحث عن برنامج مشابه
-        const similarProgram = this.findSimilarProgram(duration, destinations, season, category);
-        
-        if (similarProgram) {
-            console.log('[Intelligent] Found similar program:', similarProgram.id);
-            return this.adaptProgram(similarProgram, duration, travelers, language);
-        }
-        
-        // إنشاء برنامج جديد
-        console.log('[Intelligent] Creating new program');
-        return this.createNewProgram(duration, travelers, destinations, season, category, language);
-    }
-
-    // 🔍 البحث عن برنامج مشابه
-    private findSimilarProgram(
-        duration: number,
-        destinations: string[],
-        season: 'summer' | 'winter',
-        category: 'gold' | 'diamond'
-    ): Program | null {
-        for (const program of this.programs) {
-            if (program.duration.days === duration && 
-                program.categories.includes(category) &&
-                this.hasMatchingDestinations(program, destinations)) {
-                return program;
-            }
-        }
-        
-        return null;
-    }
-
-    // 🔍 التحقق من تطابق الوجهات
-    private hasMatchingDestinations(program: Program, destinations: string[]): boolean {
-        if (!program.itinerary) return false;
-        
-        const programDestinations = new Set<string>();
-        
-        for (const day of program.itinerary) {
-            const title = day.title;
-            if (title.en.includes('Cairo')) programDestinations.add('cairo');
-            if (title.en.includes('Alexandria')) programDestinations.add('alexandria');
-            if (title.en.includes('Luxor')) programDestinations.add('luxor');
-            if (title.en.includes('Aswan')) programDestinations.add('aswan');
-        }
-        
-        return destinations.every(dest => programDestinations.has(dest));
-    }
-
-    // 🔄 تكييف البرنامج
-    private adaptProgram(program: Program, duration: number, travelers: number, language: Language): Program {
-        return {
-            ...program,
-            id: `custom-${Date.now()}`,
-            isCustom: true,
-            name: this.createCustomProgramName(duration, language),
-            duration: { days: duration, nights: duration - 1 },
-            quoteParams: {
-                travelers,
-                duration,
-                season: program.quoteParams?.season || 'summer',
-                category: program.quoteParams?.category || 'gold',
-                itineraryPlan: {
-                    nights: this.convertDaysToNights({ [program.startCity.en.toLowerCase()]: duration }),
-                    sites: this.extractAllSitesFromItinerary(program.itinerary || [], language),
-                    flightSectors: 1
-                }
-            }
-        };
-    }
-
-    // 🆕 إنشاء برنامج جديد
-    private createNewProgram(
-        duration: number,
-        travelers: number,
-        destinations: string[],
-        season: 'summer' | 'winter',
-        category: 'gold' | 'diamond',
-        language: Language
-    ): Program {
-        const itinerary = this.createBasicItinerary(destinations, language);
-        const accommodations = this.createBasicAccommodations(destinations, category, language);
-        
-        return {
-            id: `custom-${Date.now()}`,
-            isCustom: true,
-            name: this.createCustomProgramName(duration, language),
-            icon: "🗺️",
-            duration: { days: duration, nights: duration - 1 },
-            priceFrom: 0,
-            categories: [category],
-            startCity: { es: "El Cairo", en: "Cairo", ar: "القاهرة" },
-            briefDescription: this.createCustomBriefDescription(duration, destinations, language),
-            generalDescription: this.createCustomGeneralDescription(duration, destinations, language),
-            itinerary: itinerary,
-            itineraryOptions: [{
-                name: { es: "Itinerario Principal", en: "Main Itinerary", ar: "البرنامج الرئيسي" },
-                itinerary: itinerary
-            }],
-            accommodations: accommodations,
-            servicesIncluded: this.createCustomServicesIncluded(category, language),
-            servicesExcluded: knowledgeBase.defaults.servicesExcluded,
-            importantNotes: knowledgeBase.defaults.importantNotes,
-            quoteParams: {
-                travelers,
-                duration,
-                season,
-                category,
-                itineraryPlan: {
-                    nights: this.convertDaysToNights({ [destinations[0]]: duration }),
-                    sites: this.extractAllSitesFromItinerary(itinerary, language),
-                    flightSectors: destinations.length
-                }
-            }
-        };
-    }
-
-    // 📝 إنشاء اسم البرنامج المخصص
-    private createCustomProgramName(duration: number, language: Language): LocalizedString {
-        return {
-            es: `Viaje Personalizado de ${duration} Días`,
-            en: `Custom ${duration}-Day Journey`,
-            ar: `رحلة مخصصة لمدة ${duration} أيام`
-        };
-    }
-
-    // 📝 إنشاء وصف مختصر مخصص
-    private createCustomBriefDescription(duration: number, destinations: string[], language: Language): LocalizedString {
-        const destinationNames = destinations.map(dest => this.getCityLocalizedName(dest));
-        const destinationList = destinationNames.map(city => city[language] || city.en).join(', ');
-        
-        return {
-            es: `Descubre Egipto en ${duration} días: ${destinationList}`,
-            en: `Discover Egypt in ${duration} days: ${destinationList}`,
-            ar: `اكتشف مصر في ${duration} أيام: ${destinationList}`
-        };
-    }
-
-    // 📝 إنشاء وصف عام مخصص
-    private createCustomGeneralDescription(duration: number, destinations: string[], language: Language): LocalizedString {
-        const destinationNames = destinations.map(dest => this.getCityLocalizedName(dest));
-        const destinationList = destinationNames.map(city => city[language] || city.en).join(', ');
-        
-        return {
-            es: `Una experiencia única de ${duration} días visitando ${destinationList}. Incluye alojamiento de lujo, guías expertos y todas las entradas.`,
-            en: `A unique ${duration}-day experience visiting ${destinationList}. Includes luxury accommodation, expert guides, and all entrance fees.`,
-            ar: `تجربة فريدة لمدة ${duration} أيام لزيارة ${destinationList}. تشمل الإقامة الفاخرة والمرشدين الخبراء وجميع رسوم الدخول.`
-        };
-    }
-
-    // 🎯 إنشاء الخدمات المشمولة مخصصة
-    private createCustomServicesIncluded(category: 'gold' | 'diamond', language: Language): { es: string[]; en: string[]; ar?: string[] } {
-        return {
-            es: [
-                `Alojamiento en hoteles de categoría ${category === 'gold' ? 'dorada' : 'diamante'}`,
-                "Guía egiptólogo profesional",
-                "Todas las entradas a monumentos",
-                "Todas las comidas según se especifique",
-                "Traslados al aeropuerto",
-                "Vehículo privado con aire acondicionado",
-                "Todos los impuestos y cargos por servicio"
-            ],
-            en: [
-                `Accommodation in ${category} category hotels`,
-                "Professional Egyptologist guide",
-                "All entrance fees to monuments",
-                "All meals as specified",
-                "Airport transfers",
-                "Private air-conditioned vehicle",
-                "All taxes and service charges"
-            ],
-            ar: [
-                `الإقامة في فنادق فئة ${category === 'gold' ? 'ذهبية' : 'ماسية'}`,
-                "مرشد مصريات محترف",
-                "جميع رسوم دخول المعالم",
-                "جميع الوجبات حسب المحدد",
-                "الانتقالات من وإلى المطار",
-                "مركبة خاصة مكيفة",
-                "جميع الضرائب ورسوم الخدمة"
-            ]
-        };
-    }
-
-    // 🗺️ إنشاء برنامج يومي أساسي
-    private createBasicItinerary(destinations: string[], language: Language): ItineraryItem[] {
-        const itinerary: ItineraryItem[] = [];
-        let currentDay = 1;
-        
-        // يوم الوصول
-        itinerary.push(this.createArrivalDay(language));
-        currentDay++;
-        
-        // أيام الوجهات
-        for (const destination of destinations) {
-            const cityName = this.getCityLocalizedName(destination);
-            itinerary.push({
-                day: currentDay,
-                title: {
-                    es: `Explorando ${cityName.es}`,
-                    en: `Exploring ${cityName.en}`,
-                    ar: `استكشاف ${cityName.ar}`
-                },
-                activities: {
-                    es: [`Visitar los principales atractivos de ${cityName.es}`],
-                    en: [`Visit main attractions of ${cityName.en}`],
-                    ar: [`زيارة المعالم الرئيسية في ${cityName.ar}`]
-                }
-            });
-            currentDay++;
-        }
-        
-        // يوم المغادرة
-        itinerary.push(this.createDepartureDay(currentDay, language));
-        
-        return itinerary;
-    }
-
-    // 🏨 إنشاء أماكن الإقامة أساسية
-    private createBasicAccommodations(destinations: string[], category: 'gold' | 'diamond', language: Language): { gold: any[]; diamond: any[] } {
-        const accommodations = { gold: [] as any[], diamond: [] as any[] };
-        
-        for (const destination of destinations) {
-            const cityName = this.getCityLocalizedName(destination);
-            const hotel = this.getDefaultHotelForCity(destination, category, language);
-            
-            accommodations[category].push({
-                city: cityName,
-                hotel: hotel
-            });
-        }
-        
-        return accommodations;
-    }
-
-    // 🔍 البحث عن برامج مطابقة
-    findMatchingPrograms(criteria: {
-        duration?: number;
-        destinations?: string[];
-        season?: 'summer' | 'winter';
-        category?: 'gold' | 'diamond';
-        maxPrice?: number;
-    }): Program[] {
-        return this.programs.filter(program => {
-            if (criteria.duration && program.duration.days !== criteria.duration) return false;
-            if (criteria.season && !program.quoteParams?.season) return false;
-            if (criteria.category && !program.categories.includes(criteria.category)) return false;
-            if (criteria.maxPrice && program.priceFrom > criteria.maxPrice) return false;
-            if (criteria.destinations && !this.hasMatchingDestinations(program, criteria.destinations)) return false;
-            
-            return true;
-        });
-    }
-
-    // 📊 تحليل البرامج
-    analyzePrograms(): {
-        totalPrograms: number;
-        averageDuration: number;
-        categories: { [key: string]: number };
-        destinations: { [key: string]: number };
-    } {
-        const analysis = {
-            totalPrograms: this.programs.length,
-            averageDuration: 0,
-            categories: {} as { [key: string]: number },
-            destinations: {} as { [key: string]: number }
-        };
-        
-        let totalDays = 0;
-        
-        for (const program of this.programs) {
-            totalDays += program.duration.days;
-            
-            // تحليل الفئات
-            for (const category of program.categories) {
-                analysis.categories[category] = (analysis.categories[category] || 0) + 1;
-            }
-            
-            // تحليل الوجهات
-            if (program.itinerary) {
-                for (const day of program.itinerary) {
-                    const title = day.title.en.toLowerCase();
-                    if (title.includes('cairo')) analysis.destinations.cairo = (analysis.destinations.cairo || 0) + 1;
-                    if (title.includes('alexandria')) analysis.destinations.alexandria = (analysis.destinations.alexandria || 0) + 1;
-                    if (title.includes('luxor')) analysis.destinations.luxor = (analysis.destinations.luxor || 0) + 1;
-                    if (title.includes('aswan')) analysis.destinations.aswan = (analysis.destinations.aswan || 0) + 1;
-                }
-            }
-        }
-        
-        analysis.averageDuration = totalDays / this.programs.length;
-        
-        return analysis;
     }
 
     // 🗺️ الحصول على المواقع المتاحة للمدن
@@ -1360,84 +1418,9 @@ export class IntelligentDataExtractor {
         
         return result;
     }
-
-    // 🎯 الحصول على توصيات
-    getRecommendations(userPreferences: {
-        duration: number;
-        budget: number;
-        interests: string[];
-        season: 'summer' | 'winter';
-    }): Program[] {
-        const recommendations: Program[] = [];
-        
-        for (const program of this.programs) {
-            let score = 0;
-            
-            // تحليل المدة
-            if (Math.abs(program.duration.days - userPreferences.duration) <= 2) {
-                score += 10;
-            }
-            
-            // تحليل الميزانية
-            if (program.priceFrom <= userPreferences.budget) {
-                score += 15;
-            }
-            
-            // تحليل الاهتمامات
-            if (program.itinerary) {
-                for (const day of program.itinerary) {
-                    for (const interest of userPreferences.interests) {
-                        if (day.activities.en.some(activity => 
-                            activity.toLowerCase().includes(interest.toLowerCase())
-                        )) {
-                            score += 5;
-                        }
-                    }
-                }
-            }
-            
-            // تحليل الموسم
-            if (program.quoteParams?.season === userPreferences.season) {
-                score += 8;
-            }
-            
-            if (score >= 20) {
-                recommendations.push(program);
-            }
-        }
-        
-        return recommendations.sort((a, b) => {
-            const scoreA = this.calculateRecommendationScore(a, userPreferences);
-            const scoreB = this.calculateRecommendationScore(b, userPreferences);
-            return scoreB - scoreA;
-        });
-    }
-
-    // 📊 حساب نقاط التوصية
-    private calculateRecommendationScore(program: Program, preferences: any): number {
-        let score = 0;
-        
-        if (Math.abs(program.duration.days - preferences.duration) <= 2) score += 10;
-        if (program.priceFrom <= preferences.budget) score += 15;
-        if (program.quoteParams?.season === preferences.season) score += 8;
-        
-        return score;
-    }
 }
 
 // 🚀 تصدير الدوال الرئيسية
-export function createIntelligentCustomProgram(request: {
-    duration: number;
-    travelers: number;
-    destinations: string[];
-    season: 'summer' | 'winter';
-    category: 'gold' | 'diamond';
-    language: Language;
-}): Program {
-    const extractor = new IntelligentDataExtractor();
-    return extractor.createIntelligentCustomProgram(request);
-}
-
 export function createEnhancedCustomProgram(request: {
     duration: number;
     travelers: number;
