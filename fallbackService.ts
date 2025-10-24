@@ -230,6 +230,39 @@ export function generateLocalFallbackProgram(
     
     console.log('[fallback] Destinations:', destinations);
     
+    // 🆕 استخراج تفاصيل الكروز
+    let cruiseNights: 3 | 4 | undefined = undefined;
+    let cruiseDirection: 'luxor-aswan' | 'aswan-luxor' | undefined = undefined;
+    
+    const hasCruise = destinations.includes('cruise') || 
+                      (destinations.includes('luxor') && destinations.includes('aswan'));
+    
+    if (hasCruise) {
+        // تحديد عدد ليالي الكروز
+        if (/3\s*(?:nights?|noches?|ليال(?:ي)?)\s*cruise/i.test(userInput)) {
+            cruiseNights = 3;
+        } else if (/4\s*(?:nights?|noches?|ليال(?:ي)?)\s*cruise/i.test(userInput)) {
+            cruiseNights = 4;
+        } else {
+            // افتراضي: 4 ليالي
+            cruiseNights = 4;
+        }
+        
+        // تحديد الاتجاه
+        if (/aswan\s*to\s*luxor|اسوان\s*الى\s*الاقصر|asuán\s*a\s*luxor/i.test(userInput)) {
+            cruiseDirection = 'aswan-luxor';
+            if (cruiseNights === 4) cruiseNights = 3; // 3 ليالي من أسوان
+        } else if (/luxor\s*to\s*aswan|الاقصر\s*الى\s*اسوان|luxor\s*a\s*asuán/i.test(userInput)) {
+            cruiseDirection = 'luxor-aswan';
+            if (cruiseNights === 3) cruiseNights = 4; // 4 ليالي من الأقصر
+        } else {
+            // افتراضي: من الأقصر لأسوان (4 ليالي)
+            cruiseDirection = 'luxor-aswan';
+        }
+        
+        console.log('[fallback] Cruise details:', { cruiseNights, cruiseDirection });
+    }
+    
     // استخدام النظام الذكي لإنشاء البرنامج
     const extractor = new IntelligentDataExtractor();
     const customProgram = extractor.createIntelligentCustomProgram({
@@ -238,7 +271,9 @@ export function generateLocalFallbackProgram(
         destinations,
         season,  // ✅ الآن يدعم الكشف من الشهر
         category,
-        language
+        language,
+        cruiseNights,  // ✅ دعم اختيار نوع الكروز
+        cruiseDirection  // ✅ دعم اتجاه الكروز
     });
     
     console.log('[fallback] ✅ Custom program created');
