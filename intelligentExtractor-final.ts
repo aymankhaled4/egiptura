@@ -174,6 +174,41 @@ export class IntelligentDataExtractor {
         return program;
     }
 
+    // 🤖 إنشاء برنامج تلقائي بناءً على المواقع المتاحة
+    createAutoProgram(request: {
+        duration: number;
+        travelers: number;
+        cities: string[];
+        season: 'summer' | 'winter';
+        category: 'gold' | 'diamond';
+        language: Language;
+    }): Program {
+        const { duration, travelers, cities, season, category, language } = request;
+        
+        console.log('[Auto] Creating auto program for:', { duration, cities });
+        
+        // إنشاء مواقع تلقائية لكل مدينة
+        const autoSites: { [city: string]: SupportedSite[] } = {};
+        
+        for (const city of cities) {
+            const availableSites = this.getAvailableSitesForCity(city);
+            // اختيار أفضل 3-5 مواقع لكل مدينة
+            const sitesPerCity = Math.min(5, Math.max(3, Math.ceil(availableSites.length * 0.6)));
+            autoSites[city] = availableSites.slice(0, sitesPerCity);
+        }
+        
+        // استخدام النظام المحسن مع المواقع التلقائية
+        return this.createEnhancedCustomProgram({
+            duration,
+            travelers,
+            cities,
+            specificSites: autoSites,
+            season,
+            category,
+            language
+        });
+    }
+
     // 📊 حساب توزيع الأيام بشكل ذكي مع دعم ترتيب المدن
     private calculateDaysDistribution(duration: number, cities: string[]): { [city: string]: number } {
         const availableDays = duration - 2; // استبعاد يوم الوصول والمغادرة
@@ -389,13 +424,19 @@ export class IntelligentDataExtractor {
     ): ItineraryItem[] {
         const cityDays: ItineraryItem[] = [];
         
+        // التحقق من صحة المواقع المحددة
+        const validSites = this.validateSitesForCity(city, specificSites);
+        
+        // إذا لم يتم تحديد مواقع، نستخدم المواقع المتاحة
+        const sitesToUse = validSites.length > 0 ? validSites : this.getAvailableSitesForCity(city);
+        
         // الحصول على البيانات من البرامج الجاهزة
         const cityData = this.extractCityData(city, language);
         
         // إنشاء أيام مخصصة بناءً على المواقع المحددة
         for (let i = 0; i < days; i++) {
             const dayNumber = startDay + i;
-            const sitesForDay = this.selectSitesForDay(specificSites, i, days);
+            const sitesForDay = this.selectSitesForDay(sitesToUse, i, days);
             
             const dayTitle = this.createDayTitle(city, i + 1, days, language);
             const dayActivities = this.createDayActivities(city, sitesForDay, language);
@@ -412,7 +453,10 @@ export class IntelligentDataExtractor {
 
     // 🎯 اختيار المواقع لكل يوم
     private selectSitesForDay(specificSites: SupportedSite[], dayIndex: number, totalDays: number): SupportedSite[] {
-        if (specificSites.length === 0) return [];
+        if (specificSites.length === 0) {
+            // إذا لم يتم تحديد مواقع محددة، نستخدم المواقع المتاحة للمدينة
+            return this.getAvailableSitesForCity('cairo'); // يمكن تحسين هذا لاحقاً
+        }
         
         // توزيع المواقع على الأيام
         const sitesPerDay = Math.ceil(specificSites.length / totalDays);
@@ -420,6 +464,18 @@ export class IntelligentDataExtractor {
         const endIndex = Math.min(startIndex + sitesPerDay, specificSites.length);
         
         return specificSites.slice(startIndex, endIndex);
+    }
+
+    // 🗺️ الحصول على المواقع المتاحة للمدينة
+    private getAvailableSitesForCity(city: string): SupportedSite[] {
+        const cityKey = city.toLowerCase() as keyof typeof AVAILABLE_SITES;
+        return AVAILABLE_SITES[cityKey] || [];
+    }
+
+    // 🎯 التحقق من صحة المواقع المحددة
+    private validateSitesForCity(city: string, sites: SupportedSite[]): SupportedSite[] {
+        const availableSites = this.getAvailableSitesForCity(city);
+        return sites.filter(site => availableSites.includes(site));
     }
 
     // 📝 إنشاء عنوان اليوم
@@ -1298,6 +1354,17 @@ export class IntelligentDataExtractor {
         return analysis;
     }
 
+    // 🗺️ الحصول على المواقع المتاحة للمدن
+    getAvailableSitesForCities(cities: string[]): { [city: string]: SupportedSite[] } {
+        const result: { [city: string]: SupportedSite[] } = {};
+        
+        for (const city of cities) {
+            result[city] = this.getAvailableSitesForCity(city);
+        }
+        
+        return result;
+    }
+
     // 🎯 الحصول على توصيات
     getRecommendations(userPreferences: {
         duration: number;
@@ -1387,3 +1454,23 @@ export function createEnhancedCustomProgram(request: {
     const extractor = new IntelligentDataExtractor();
     return extractor.createEnhancedCustomProgram(request);
 }
+
+export function createAutoProgram(request: {
+    duration: number;
+    travelers: number;
+    cities: string[];
+    season: 'summer' | 'winter';
+    category: 'gold' | 'diamond';
+    language: Language;
+}): Program {
+    const extractor = new IntelligentDataExtractor();
+    return extractor.createAutoProgram(request);
+}
+
+export function getAvailableSitesForCities(cities: string[]): { [city: string]: SupportedSite[] } {
+    const extractor = new IntelligentDataExtractor();
+    return extractor.getAvailableSitesForCities(cities);
+}
+
+// تصدير المواقع المتاحة للاستخدام الخارجي
+export { AVAILABLE_SITES };
