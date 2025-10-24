@@ -1054,15 +1054,22 @@ const handleSendMessage = useCallback(async (userInput: string) => {
         }
         console.log('📋 Pre-defined program IDs found:', programIds);
 
+        // ✅ If we have a custom program, do NOT show predefined programs
+        if (finalCustomProgram) {
+            console.log('✅ Custom program present — clearing predefined programs');
+            programIds.length = 0;
+        }
+
         // ✅ البحث عن البرامج المطابقة
         let matchingProgramIds: number[] = [];
-        if (!isExplicitCustomRequest) {
+        // ✅ Do NOT search for similar programs if a custom program already exists
+        if (!isExplicitCustomRequest && !finalCustomProgram) {
             matchingProgramIds = findMatchingPrograms(userInput, finalCustomProgram);
             console.log('🔍 Matching programs found:', matchingProgramIds);
         }
 
         // ✅ المنطق النهائي
-        if (matchingProgramIds.length > 0 && !isExplicitCustomRequest) {
+        if (matchingProgramIds.length > 0 && !isExplicitCustomRequest && !finalCustomProgram) {
             console.log('✅ Showing matching programs');
             programIds.length = 0;
             programIds.push(...matchingProgramIds);
