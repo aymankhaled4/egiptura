@@ -20,10 +20,14 @@ const App: React.FC = () => {
     const getInitialMessage = useCallback((): Message => {
         const messages = knowledgeBase.localizedStrings.ui[language]?.welcomeMessages || knowledgeBase.localizedStrings.ui.es.welcomeMessages;
         const randomMessage = messages[Math.floor(Math.random() * messages.length)];
+        
+        // Clean up any [lang:xx] prefix that might have been added
+        const cleanMessage = randomMessage.replace(/^\[lang:(es|en|ar)\]\s*/, '');
+        
         return {
             id: 'init-message',
             role: 'model',
-            content: randomMessage,
+            content: cleanMessage,
         };
     }, [language]);
     
@@ -98,10 +102,13 @@ const App: React.FC = () => {
     }, [language, getInitialMessage]);
 
     const addMessage = useCallback((role: 'user' | 'model', content: string) => {
+        // Clean up any [lang:xx] prefix that might have been added
+        const cleanContent = content.replace(/^\[lang:(es|en|ar)\]\s*/, '');
+        
         const newMessage: Message = {
              id: Date.now().toString() + Math.random(),
              role,
-             content
+             content: cleanContent
         };
         setMessages(prev => [...prev, newMessage]);
     }, []);
