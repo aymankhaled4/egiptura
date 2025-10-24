@@ -857,12 +857,22 @@ const handleSendMessage = useCallback(async (userInput: string) => {
             source: seasonInfo.isExplicitSeason ? 'direct keyword' : seasonInfo.mentionedMonth ? 'from month' : 'not detected'
         });
         
+        // 🆕 تحليل تفاصيل مهيكلة لطلب مخصص حتى بدون كلمة "custom"
+        const hasTravelers = /(\d+)\s*(people|persons?|travelers|viajeros|اشخاص|مسافر(?:ين)?)/i.test(userInput);
+        const hasCities = /(cairo|luxor|aswan|alexandria|cruise|نيل|كروز|القاهرة|الأقصر|أسوان|الإسكندرية)/i.test(userInput);
+        const hasCategory = /(gold|diamond|ذهبي|الماسي)/i.test(userInput);
+        const structuredDetailsCount = [hasTravelers, requestedDays > 0, hasCities, hasSeason, hasCategory].filter(Boolean).length;
+        const isStructuredCustomRequest = structuredDetailsCount >= 4;
+        const isCustomRequest = isExplicitCustomRequest || isStructuredCustomRequest;
+
         // ✅ LOG 2: تسجيل نوع الطلب
         console.log('📊 Request Analysis:', {
-            isCustomRequest: isExplicitCustomRequest,
-            isChipRequest: isChipRequest,
-            requestedDays: requestedDays,
-            hasSeason: hasSeason
+            isCustomRequest,
+            isExplicitCustomRequest,
+            isChipRequest,
+            requestedDays,
+            hasSeason,
+            structuredDetailsCount
         });
 
         let response, responseText, currentLang = language;
@@ -1017,7 +1027,7 @@ const handleSendMessage = useCallback(async (userInput: string) => {
         
         // ✅ Fallback للطلبات المخصصة بدون رد AI
         const hasTravelDetails = /\d+\s*(days?|d[iíì]as|ايام)/i.test(userInput);
-        if (isExplicitCustomRequest && hasTravelDetails && !finalCustomProgram) {
+        if (isCustomRequest && hasTravelDetails && !finalCustomProgram) {
             console.warn('⚠️ Custom request without AI program - generating fallback');
             
             const fallbackProgram = generateLocalFallbackProgram(userInput, currentLang);
@@ -1054,6 +1064,11 @@ const handleSendMessage = useCallback(async (userInput: string) => {
         }
         console.log('📋 Pre-defined program IDs found:', programIds);
 
+        // ✅ إذا كان الطلب مخصصًا (حتى بدون كلمة مخصصة) لا نعرض برامج جاهزة
+        if (isCustomRequest) {
+            programIds.length = 0;
+        }
+
         // ✅ If we have a custom program, do NOT show predefined programs
         if (finalCustomProgram) {
             console.log('✅ Custom program present — clearing predefined programs');
@@ -1063,13 +1078,13 @@ const handleSendMessage = useCallback(async (userInput: string) => {
         // ✅ البحث عن البرامج المطابقة
         let matchingProgramIds: number[] = [];
         // ✅ Do NOT search for similar programs if a custom program already exists
-        if (!isExplicitCustomRequest && !finalCustomProgram) {
+        if (!isCustomRequest && !finalCustomProgram) {
             matchingProgramIds = findMatchingPrograms(userInput, finalCustomProgram);
             console.log('🔍 Matching programs found:', matchingProgramIds);
         }
 
         // ✅ المنطق النهائي
-        if (matchingProgramIds.length > 0 && !isExplicitCustomRequest && !finalCustomProgram) {
+        if (matchingProgramIds.length > 0 && !isCustomRequest && !finalCustomProgram) {
             console.log('✅ Showing matching programs');
             programIds.length = 0;
             programIds.push(...matchingProgramIds);
@@ -1082,7 +1097,7 @@ const handleSendMessage = useCallback(async (userInput: string) => {
                     "I found these programs that match what you're looking for:" :
                     "لقد وجدت هذه البرامج التي تطابق ما تبحث عنه:";
             }
-        } else if (isExplicitCustomRequest) {
+        } else if (isCustomRequest) {
             console.log('✅ Custom program request - clearing predefined programs');
             programIds.length = 0;
             
