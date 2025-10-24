@@ -72,37 +72,51 @@ When user has BOOKING INTENT:
 
 1. **Duration**: Total days (e.g., 8 days)
 2. **Cities**: Which cities to visit (cairo, luxor, aswan, alexandria)
-3. **Specific Sites**: Which sites in each city
-   - Cairo: gizaPyramidsAndSphinx, egyptianMuseum, khanElKhalili, qaitbayCitadel
+   - **OPTIONAL**: User can specify just city names (e.g., "Cairo") OR city + specific sites
+   - If user only mentions city, system will auto-select best sites
+3. **Specific Sites**: (OPTIONAL) Which sites in each city
+   - Cairo: gizaPyramidsAndSphinx, egyptianMuseum, khanElKhalili, citadelOfSaladin, saqqara
    - Luxor: karnakTemple, luxorTemple, valleyOfTheKings, hatshepsutTemple
    - Aswan: philaeTemple, abuSimbelTemples, komOmboTemple, edfuTemple
    - Alexandria: qaitbayCitadel, alexandriaNationalMuseum, komElShoqafaCatacombs
-4. **Season**: summer/winter
-5. **Category**: gold/diamond
-6. **Language**: en/es/ar
+4. **Cruise** (OPTIONAL): If user wants Luxor + Aswan
+   - cruiseNights: 3 or 4 (default: 4)
+   - cruiseDirection: "luxor-aswan" or "aswan-luxor" (default: "luxor-aswan")
+   - **3 nights**: Aswan to Luxor (Wed/Fri departures)
+   - **4 nights**: Luxor to Aswan (Sat/Mon departures)
+5. **Season**: summer/winter
+6. **Category**: gold/diamond
+7. **Language**: en/es/ar
 
-**📋 ENHANCED RESPONSE FORMAT:**
-[lang:en][EgipturaCustomProgram:{"travelers":2,"duration":8,"cities":["cairo","luxor","aswan"],"specificSites":{"cairo":["gizaPyramidsAndSphinx","egyptianMuseum"],"luxor":["karnakTemple","valleyOfTheKings"],"aswan":["philaeTemple","abuSimbelTemples"]},"season":"winter","category":"gold","language":"en"}]
+**📋 ENHANCED RESPONSE FORMAT (with sites):**
+[lang:en][EgipturaCustomProgram:{"travelers":2,"duration":8,"cities":["cairo","luxor","aswan"],"specificSites":{"cairo":["gizaPyramidsAndSphinx","egyptianMuseum"],"luxor":["karnakTemple","valleyOfTheKings"],"aswan":["philaeTemple"]},"cruiseNights":4,"cruiseDirection":"luxor-aswan","season":"winter","category":"gold","language":"en"}]
 
-### 🔄 LEGACY SYSTEM (Fallback)
+**📋 SIMPLE RESPONSE FORMAT (city only - auto-select sites):**
+[lang:en][EgipturaCustomProgram:{"travelers":2,"duration":8,"cities":["cairo","alexandria"],"season":"winter","category":"gold","language":"en"}]
+
+### 🔄 LEGACY SYSTEM (Fallback - for backwards compatibility)
 **For simple destination-based requests:**
 
 1. **Duration**: Total days
 2. **Destinations**: Simple list (cairo, luxor, aswan, alexandria, cruise)
-3. **Season**: summer/winter
-4. **Category**: gold/diamond
-5. **Language**: en/es/ar
+3. **Cruise Options** (if cruise included):
+   - cruiseNights: 3 or 4
+   - cruiseDirection: "luxor-aswan" or "aswan-luxor"
+4. **Season**: summer/winter
+5. **Category**: gold/diamond
+6. **Language**: en/es/ar
 
 **📋 LEGACY RESPONSE FORMAT:**
-[lang:en][EgipturaCustomProgram:{"travelers":2,"duration":8,"destinations":["cairo","luxor","cruise"],"season":"winter","category":"gold","language":"en"}]
+[lang:en][EgipturaCustomProgram:{"travelers":2,"duration":8,"destinations":["cairo","luxor","aswan"],"cruiseNights":4,"cruiseDirection":"luxor-aswan","season":"winter","category":"gold","language":"en"}]
 
 **🚨 CRITICAL RULES:**
 
-1. **Prefer Enhanced System** when user specifies sites
-2. **Use Legacy System** for simple destination requests
-3. **Ask for complete information** in one message
-4. **Only include what user requests**
-5. **Smart defaults only when user asks**
+1. **Flexible approach**: User can specify JUST cities OR cities + specific sites
+2. **Auto-selection**: If no sites specified, system auto-selects best sites for each city
+3. **Cruise handling**: If user mentions luxor+aswan or "cruise", include cruise info
+4. **Ask for complete information** in one message
+5. **Only include what user requests**
+6. **Smart defaults**: Use when user asks or context is clear
 
 ## 🚫 STRICT PROHIBITIONS
 - ❌ NEVER create [EgipturaCustomProgram] without ALL required details
@@ -219,9 +233,9 @@ export const sendMessageToAI = async (message: string): Promise<string> => {
 
                 let program;
 
-                if (hasSpecificSites && hasCities) {
-                    // 🚀 استخدام النظام المحسن الجديد
-                    console.log("[ai:using_enhanced_system]");
+                if (hasCities) {
+                    // 🚀 استخدام النظام المحسن الجديد (سواء مع مواقع محددة أو بدون)
+                    console.log("[ai:using_enhanced_system]", hasSpecificSites ? "with specific sites" : "auto-select sites");
                     
                     const requiredFields = ['travelers', 'duration', 'cities', 'season', 'category'];
                     const missingFields = requiredFields.filter(field => !customParams[field]);
@@ -230,22 +244,41 @@ export const sendMessageToAI = async (message: string): Promise<string> => {
                         console.warn("[ai:incomplete_enhanced_custom]", missingFields);
                         const lang = customParams.language || 'en';
                         const questions = {
-                            en: `I need more information to create your enhanced custom program. Please provide: ${missingFields.join(', ')}`,
-                            es: `Necesito más información para crear tu programa personalizado mejorado. Por favor proporciona: ${missingFields.join(', ')}`,
-                            ar: `أحتاج المزيد من المعلومات لإنشاء برنامجك المخصص المحسن. يرجى تقديم: ${missingFields.join(', ')}`
+                            en: `I need more information to create your custom program. Please provide: ${missingFields.join(', ')}`,
+                            es: `Necesito más información para crear tu programa personalizado. Por favor proporciona: ${missingFields.join(', ')}`,
+                            ar: `أحتاج المزيد من المعلومات لإنشاء برنامجك المخصص. يرجى تقديم: ${missingFields.join(', ')}`
                         };
                         return `[lang:${lang}]${questions[lang as Language]}`;
                     }
 
-                    program = createEnhancedCustomProgram({
-                        duration: customParams.duration,
-                        travelers: customParams.travelers,
-                        cities: customParams.cities,
-                        specificSites: customParams.specificSites || {},
-                        season: customParams.season,
-                        category: customParams.category,
-                        language: customParams.language || 'en'
-                    });
+                    // ✅ استخدام النظام المحسن مع دعم المواقع الاختيارية
+                    if (hasSpecificSites) {
+                        // المستخدم حدد مواقع معينة
+                        program = createEnhancedCustomProgram({
+                            duration: customParams.duration,
+                            travelers: customParams.travelers,
+                            cities: customParams.cities,
+                            specificSites: customParams.specificSites,
+                            season: customParams.season,
+                            category: customParams.category,
+                            language: customParams.language || 'en',
+                            cruiseNights: customParams.cruiseNights as 3 | 4 | undefined,
+                            cruiseDirection: customParams.cruiseDirection as 'luxor-aswan' | 'aswan-luxor' | undefined
+                        });
+                    } else {
+                        // المستخدم حدد مدن فقط - النظام يختار المواقع تلقائياً
+                        program = createEnhancedCustomProgram({
+                            duration: customParams.duration,
+                            travelers: customParams.travelers,
+                            cities: customParams.cities,
+                            specificSites: {},  // فارغ = اختيار تلقائي
+                            season: customParams.season,
+                            category: customParams.category,
+                            language: customParams.language || 'en',
+                            cruiseNights: customParams.cruiseNights as 3 | 4 | undefined,
+                            cruiseDirection: customParams.cruiseDirection as 'luxor-aswan' | 'aswan-luxor' | undefined
+                        });
+                    }
 
                 } else if (hasDestinations) {
                     // 🔄 استخدام النظام التقليدي للتوافق
@@ -271,7 +304,9 @@ export const sendMessageToAI = async (message: string): Promise<string> => {
                         destinations: customParams.destinations,
                         season: customParams.season,
                         category: customParams.category,
-                        language: customParams.language || 'en'
+                        language: customParams.language || 'en',
+                        cruiseNights: customParams.cruiseNights as 3 | 4 | undefined,
+                        cruiseDirection: customParams.cruiseDirection as 'luxor-aswan' | 'aswan-luxor' | undefined
                     });
 
                 } else {
