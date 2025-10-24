@@ -893,6 +893,90 @@ const handleSendMessage = useCallback(async (userInput: string) => {
             return;
         }
 
+        // 🎯 معالجة الطلبات المخصصة تلقائياً
+        if (isExplicitCustomRequest && requestedDays > 0) {
+            console.log('🎯 Custom request detected - creating auto program...');
+            
+            // استخراج المدن من الطلب
+            const cities = [];
+            if (/cairo|القاهرة/i.test(userInput)) cities.push('cairo');
+            if (/alexandria|الإسكندرية/i.test(userInput)) cities.push('alexandria');
+            if (/luxor|الأقصر/i.test(userInput)) cities.push('luxor');
+            if (/aswan|أسوان/i.test(userInput)) cities.push('aswan');
+            
+            // إذا لم يتم تحديد مدن، نستخدم المدن الافتراضية
+            if (cities.length === 0) {
+                if (requestedDays >= 7) {
+                    cities.push('cairo', 'alexandria', 'luxor', 'aswan');
+                } else if (requestedDays >= 5) {
+                    cities.push('cairo', 'alexandria');
+                } else {
+                    cities.push('cairo');
+                }
+            }
+            
+            // استخراج عدد المسافرين
+            const travelersMatch = userInput.match(/(\d+)\s*(people|person|travelers|viajeros|اشخاص|مسافر)/i);
+            const travelers = travelersMatch ? parseInt(travelersMatch[1], 10) : 2;
+            
+            // استخراج الفئة
+            const category = /diamond|الماسي|lujo/i.test(userInput) ? 'diamond' : 'gold';
+            
+            // استخراج الموسم
+            const season = seasonInfo.season || 'summer';
+            
+            console.log('🎯 Auto program details:', {
+                duration: requestedDays,
+                travelers,
+                cities,
+                category,
+                season
+            });
+            
+            // إنشاء البرنامج التلقائي
+            try {
+                const { createAutoProgram } = await import('./intelligentExtractor-final');
+                const autoProgram = createAutoProgram({
+                    duration: requestedDays,
+                    travelers,
+                    cities,
+                    season,
+                    category,
+                    language: currentLang
+                });
+                
+                console.log('✅ Auto program created successfully');
+                
+                // تطبيق التسعير
+                if (autoProgram.quoteParams && validateQuoteParams(autoProgram.quoteParams)) {
+                    const scenarios = calculatePriceScenarios(autoProgram.quoteParams);
+                    finalCustomProgram = withDisplayDefaults({
+                        ...autoProgram,
+                        seasonalPricing: {
+                            summer: { gold: scenarios.summer, diamond: scenarios.summer },
+                            winter: { gold: scenarios.winter, diamond: scenarios.winter },
+                        },
+                    });
+                } else {
+                    finalCustomProgram = withDisplayDefaults(autoProgram);
+                }
+                
+                responseText = currentLang === 'es' ? 
+                    `¡Perfecto! He creado tu viaje personalizado de ${requestedDays} días por Egipto.` :
+                    currentLang === 'en' ? 
+                    `Perfect! I've created your custom ${requestedDays}-day Egypt journey.` :
+                    `ممتاز! لقد أنشأت رحلتك المخصصة لمدة ${requestedDays} أيام في مصر.`;
+                
+                console.log('✅ Custom program created and ready to display');
+                setIsLoading(false);
+                console.groupEnd();
+                return;
+            } catch (error) {
+                console.error('❌ Failed to create auto program:', error);
+                // الاستمرار مع AI كـ fallback
+            }
+        }
+
         // ✅ معالجة الطلبات العادية عبر AI
         console.log('🤖 Sending to AI...');
         const fullPrompt = messages.length > 2 ? 
